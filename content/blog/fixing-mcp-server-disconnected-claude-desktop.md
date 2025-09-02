@@ -1,3 +1,12 @@
+---
+title: "How We Fixed the 'Server Disconnected' Error in Claude Desktop MCP Servers"
+date: 2025-08-05
+author: "DollhouseMCP Team"
+tags: ["mcp", "debugging", "claude-desktop", "npm", "cli"]
+description: "A deep dive into debugging and fixing npx/CLI execution detection for Model Context Protocol servers"
+keywords: "MCP, Model Context Protocol, Claude Desktop, Server disconnected, npx, CLI, ESM modules"
+---
+
 # How We Fixed the "Server Disconnected" Error in Claude Desktop MCP Servers
 
 *A deep dive into debugging and fixing npx/CLI execution detection for Model Context Protocol servers*

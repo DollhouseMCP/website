@@ -1,3 +1,12 @@
+---
+title: "Building DollhouseMCP from Anywhere: Our Mobile Development Workflow with Blink, tmux, and Claude Code"
+date: 2025-08-18
+author: "DollhouseMCP Team"
+tags: ["mobile", "blink", "tmux", "claude", "iphone", "workflow", "remote-development"]
+description: "How we built an enterprise-grade MCP server while commuting, traveling, and working from coffee shops using just an iPhone"
+keywords: "Blink Shell, tmux, Claude Code, iPhone development, mobile coding, SSH, DollhouseMCP"
+---
+
 # Building DollhouseMCP from Anywhere: Our Mobile Development Workflow with Blink, tmux, and Claude Code
 
 *How we built an enterprise-grade MCP server while commuting, traveling, and working from coffee shops using just an iPhone*
