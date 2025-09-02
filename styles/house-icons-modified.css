@@ -1,0 +1,342 @@
+/* Modified House Icons with Curved Edges and Left Chimney */
+
+/* Modified House with Curved Edges */
+.house-icon-curved {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.house-icon-curved .house-roof {
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-bottom: 14px solid var(--roof-color, var(--color-brand-primary));
+  margin-bottom: -1px;
+  position: relative;
+  z-index: 2; /* Roof in front of chimney */
+}
+
+/* Curved body with matching interior room curves */
+.house-icon-curved .house-body {
+  width: 40px;
+  height: 28px;
+  background: white;
+  border: 2px solid var(--border-color, var(--color-brand-primary));
+  border-radius: 4px; /* Curved edges to match interior rooms */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2px;
+  padding: 2px;
+  margin-bottom: -1px;
+}
+
+.house-icon-curved .house-room {
+  border-radius: 2px; /* Curved room corners */
+}
+
+/* Left-side Chimney (behind roof) */
+.house-icon-curved .house-chimney {
+  position: absolute;
+  width: 6px;
+  height: 10px;
+  background: var(--chimney-color, var(--color-brand-secondary));
+  border-radius: 1px 1px 0 0;
+  top: 2px;
+  left: 6px;
+  z-index: 1; /* Chimney behind roof */
+}
+
+/* Curved foundation */
+.house-icon-curved .house-foundation {
+  width: 46px;
+  height: 8px;
+  background: var(--foundation-color, var(--color-brand-secondary));
+  border-radius: 2px;
+  margin-top: 0px;
+}
+
+/* Terminal House - Modified with horizontal line rooms */
+.house-icon-terminal-lines {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.house-icon-terminal-lines .house-roof {
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-bottom: 14px solid #00ff00;
+  margin-bottom: -1px;
+}
+
+.house-icon-terminal-lines .house-body {
+  width: 40px;
+  height: 28px;
+  background: #000000;
+  border: 2px solid #00ff00;
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  padding: 3px 2px;
+  margin-bottom: -1px;
+}
+
+/* Terminal "lines" as rooms */
+.house-icon-terminal-lines .terminal-line {
+  height: 2px;
+  background: #00ff00;
+  width: 100%;
+  border-radius: 0;
+  opacity: 0.8;
+}
+
+.house-icon-terminal-lines .terminal-line:nth-child(1) { opacity: 1; }
+.house-icon-terminal-lines .terminal-line:nth-child(2) { opacity: 0.9; }
+.house-icon-terminal-lines .terminal-line:nth-child(3) { opacity: 0.7; }
+.house-icon-terminal-lines .terminal-line:nth-child(4) { opacity: 0.5; }
+
+.house-icon-terminal-lines .house-foundation {
+  width: 46px;
+  height: 7px;
+  background: #00ff00; /* Brighter green to match the terminal theme */
+  border-radius: 0; /* Square edges for terminal foundation */
+  margin-top: 1px; /* Small gap from body */
+  box-shadow: 0 0 3px #00ff00; /* Glow effect for visibility */
+}
+
+/* Animated terminal cursor effect */
+@keyframes terminal-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.house-icon-terminal-lines .terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 2px;
+  background: #00ff00;
+  animation: terminal-blink 1s infinite;
+  margin-left: 2px;
+}
+
+/* Size variations for curved house */
+.house-icon-curved.house-icon-small {
+  width: 32px;
+  height: 32px;
+}
+
+.house-icon-curved.house-icon-small .house-roof {
+  border-left-width: 13px;
+  border-right-width: 13px;
+  border-bottom-width: 9px;
+}
+
+.house-icon-curved.house-icon-small .house-body {
+  width: 26px;
+  height: 18px;
+  border-width: 1.5px;
+  gap: 1px;
+  padding: 1px;
+  border-radius: 3px;
+}
+
+.house-icon-curved.house-icon-small .house-chimney {
+  width: 4px;
+  height: 7px;
+  top: 1px;
+  left: 4px;
+}
+
+.house-icon-curved.house-icon-small .house-foundation {
+  width: 30px;
+  height: 5px;
+}
+
+.house-icon-curved.house-icon-large {
+  width: 64px;
+  height: 64px;
+}
+
+.house-icon-curved.house-icon-large .house-roof {
+  border-left-width: 27px;
+  border-right-width: 27px;
+  border-bottom-width: 19px;
+}
+
+.house-icon-curved.house-icon-large .house-body {
+  width: 54px;
+  height: 38px;
+  border-width: 2.5px;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 5px;
+}
+
+.house-icon-curved.house-icon-large .house-chimney {
+  width: 8px;
+  height: 13px;
+  top: 3px;
+  left: 8px;
+}
+
+.house-icon-curved.house-icon-large .house-foundation {
+  width: 62px;
+  height: 11px;
+}
+
+/* Organization Icon Style - Matching actual DollhouseMCP icon */
+.house-icon-org {
+  --roof-color: #4a90e2;
+  --border-color: #4a90e2;
+  --chimney-color: #2563eb;
+  --foundation-color: #2563eb;
+  --room1-color: #4a90e2;
+  --room2-color: #6366f1;
+  --room3-color: #8b5cf6;
+  --room4-color: #a855f7;
+}
+
+/* Better match to actual organization icon */
+.house-icon-exact {
+  width: 56px;
+  height: 56px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.house-icon-exact .house-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.house-icon-exact .house-chimney {
+  position: absolute;
+  width: 5px;
+  height: 12px;
+  background: #1e40af;
+  top: 8px;
+  left: 11px;
+  z-index: 1;
+}
+
+.house-icon-exact .house-roof {
+  width: 0;
+  height: 0;
+  border-left: 24px solid transparent;
+  border-right: 24px solid transparent;
+  border-bottom: 18px solid #4a90e2;
+  position: relative;
+  z-index: 2;
+  margin-bottom: -1px;
+}
+
+.house-icon-exact .house-body {
+  width: 44px;
+  height: 32px;
+  background: white; /* White background inside */
+  border: 3px solid #4a90e2;
+  border-radius: 6px; /* Curved edges for body */
+  padding: 3px 4px; /* Less vertical padding for bigger rooms */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2px; /* Smaller gap for bigger rooms */
+}
+
+.house-icon-exact .house-room {
+  /* Squircle shape - rounded square */
+  border-radius: 25%; /* Makes a squircle, not too round, not too square */
+}
+
+/* Simplified gradient matching the actual icon */
+.house-icon-exact .house-room-1 {
+  background: #60a5fa;
+}
+
+.house-icon-exact .house-room-2 {
+  background: #818cf8;
+}
+
+.house-icon-exact .house-room-3 {
+  background: #a78bfa;
+}
+
+.house-icon-exact .house-room-4 {
+  background: #c4b5fd;
+}
+
+.house-icon-exact .house-foundation {
+  width: 52px;
+  height: 5px;
+  background: #1e40af;
+  border-radius: 0; /* Square corners - no curves */
+  margin-top: -1px;
+}
+
+/* Alternative curved designs with different chimney positions */
+.house-icon-curved .house-chimney-center {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.house-icon-curved .house-chimney-double {
+  /* Left chimney */
+  position: absolute;
+  width: 5px;
+  height: 9px;
+  background: var(--chimney-color, var(--color-brand-secondary));
+  border-radius: 1px 1px 0 0;
+  top: 2px;
+  left: 6px;
+}
+
+.house-icon-curved .house-chimney-double::after {
+  /* Right chimney */
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 9px;
+  background: var(--chimney-color, var(--color-brand-secondary));
+  border-radius: 1px 1px 0 0;
+  top: 0;
+  right: -22px;
+}
+
+/* Softer curved variant */
+.house-icon-soft {
+  --roof-radius: 8px;
+}
+
+.house-icon-soft .house-body {
+  border-radius: 8px;
+}
+
+.house-icon-soft .house-room {
+  border-radius: 4px;
+}
+
+.house-icon-soft .house-foundation {
+  border-radius: 4px;
+}

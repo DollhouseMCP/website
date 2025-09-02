@@ -1,0 +1,63 @@
+/* DollhouseMCP Website - Main Stylesheet */
+
+/* Import Design Tokens */
+@import 'tokens.css';
+
+/* Import Base Styles */
+@import 'base.css';
+
+/* Import Components */
+@import 'components.css';
+
+/* Import Mockup-Specific Components */
+@import 'mockup-components.css';
+
+/* Import House Icon System */
+@import 'house-icons.css';
+@import 'house-icons-modified.css';
+
+/* Import Utilities */
+@import 'utilities.css';
+
+/* Custom Page Styles */
+@import 'pages/landing.css';
+
+/* Theme-specific adjustments */
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* Custom scrollbar for the entire site */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-neutral-400) var(--color-neutral-100);
+}
+
+[data-theme="dark"] * {
+  scrollbar-color: var(--color-neutral-600) var(--color-neutral-900);
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Responsive text scaling */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1536px) {
+  html {
+    font-size: 18px;
+  }
+}

@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DollhouseMCP Style Guide</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .style-section {
+            margin-bottom: var(--space-16);
+            padding-bottom: var(--space-16);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--space-4);
+            margin-top: var(--space-6);
+        }
+        
+        .color-swatch {
+            text-align: center;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--color-border);
+        }
+        
+        .color-preview {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .color-info {
+            padding: var(--space-3);
+            background: var(--color-surface);
+        }
+        
+        .color-name {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-primary);
+        }
+        
+        .color-value {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-secondary);
+            font-family: var(--font-family-mono);
+        }
+        
+        .type-sample {
+            margin: var(--space-4) 0;
+            padding: var(--space-4);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+        }
+        
+        .spacing-demo {
+            display: flex;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+            margin-top: var(--space-4);
+        }
+        
+        .spacing-box {
+            background: var(--color-brand-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            border-radius: var(--radius-base);
+        }
+        
+        .component-demo {
+            margin: var(--space-6) 0;
+            padding: var(--space-6);
+            background: var(--color-neutral-50);
+            border-radius: var(--radius-lg);
+        }
+        
+        [data-theme="dark"] .component-demo {
+            background: var(--color-neutral-900);
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: var(--space-4);
+            right: var(--space-4);
+            z-index: var(--z-sticky);
+        }
+    </style>
+</head>
+<body>
+    <button class="btn btn-primary theme-toggle" onclick="toggleTheme()">
+        <span id="theme-icon">🌙</span> Toggle Theme
+    </button>
+    
+    <div class="container" style="padding-top: var(--space-16); padding-bottom: var(--space-16);">
+        <header class="text-center mb-8">
+            <h1 class="hero-title">DollhouseMCP Style Guide</h1>
+            <p class="hero-subtitle">Design system and component library for the DollhouseMCP website</p>
+        </header>
+        
+        <!-- Colors Section -->
+        <section class="style-section">
+            <h2>Colors</h2>
+            <p class="text-secondary mb-6">Our color palette includes brand colors, semantic colors, and a comprehensive neutral scale.</p>
+            
+            <h3>Brand Colors</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: var(--color-brand-primary);">Primary</div>
+                    <div class="color-info">
+                        <div class="color-name">Primary</div>
+                        <div class="color-value">#7c3aed</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: var(--color-brand-secondary);">Secondary</div>
+                    <div class="color-info">
+                        <div class="color-name">Secondary</div>
+                        <div class="color-value">#2563eb</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: var(--color-brand-tertiary);">Tertiary</div>
+                    <div class="color-info">
+                        <div class="color-name">Tertiary</div>
+                        <div class="color-value">#0891b2</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: var(--color-brand-success);">Success</div>
+                    <div class="color-info">
+                        <div class="color-name">Success</div>
+                        <div class="color-value">#16a34a</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: var(--color-brand-warning);">Warning</div>
+                    <div class="color-info">
+                        <div class="color-name">Warning</div>
+                        <div class="color-value">#ea580c</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: var(--color-brand-accent);">Danger</div>
+                    <div class="color-info">
+                        <div class="color-name">Danger</div>
+                        <div class="color-value">#dc2626</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="mt-8">Neutral Colors</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: var(--color-neutral-50); color: var(--color-neutral-900);">50</div>
+                    <div class="color-info">
+                        <div class="color-name">Neutral 50</div>
+                        <div class="color-value">#fafafa</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: var(--color-neutral-200); color: var(--color-neutral-900);">200</div>
+                    <div class="color-info">
+                        <div class="color-name">Neutral 200</div>
+                        <div class="color-value">#e5e5e5</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: var(--color-neutral-400);">400</div>
+                    <div class="color-info">
+                        <div class="color-name">Neutral 400</div>
+                        <div class="color-value">#a3a3a3</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: var(--color-neutral-600);">600</div>
+                    <div class="color-info">
+                        <div class="color-name">Neutral 600</div>
+                        <div class="color-value">#525252</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: var(--color-neutral-800);">800</div>
+                    <div class="color-info">
+                        <div class="color-name">Neutral 800</div>
+                        <div class="color-value">#262626</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: var(--color-neutral-950);">950</div>
+                    <div class="color-info">
+                        <div class="color-name">Neutral 950</div>
+                        <div class="color-value">#0a0a0a</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Typography Section -->
+        <section class="style-section">
+            <h2>Typography</h2>
+            <p class="text-secondary mb-6">Our type system uses system fonts for optimal performance and native feel.</p>
+            
+            <div class="type-sample">
+                <h1>Heading 1 - The quick brown fox</h1>
+                <code>font-size: var(--font-size-5xl); font-weight: var(--font-weight-semibold);</code>
+            </div>
+            
+            <div class="type-sample">
+                <h2>Heading 2 - The quick brown fox</h2>
+                <code>font-size: var(--font-size-4xl); font-weight: var(--font-weight-semibold);</code>
+            </div>
+            
+            <div class="type-sample">
+                <h3>Heading 3 - The quick brown fox</h3>
+                <code>font-size: var(--font-size-3xl); font-weight: var(--font-weight-semibold);</code>
+            </div>
+            
+            <div class="type-sample">
+                <h4>Heading 4 - The quick brown fox</h4>
+                <code>font-size: var(--font-size-2xl); font-weight: var(--font-weight-semibold);</code>
+            </div>
+            
+            <div class="type-sample">
+                <p>Body text - The quick brown fox jumps over the lazy dog. This is how regular paragraph text appears in our design system.</p>
+                <code>font-size: var(--font-size-base); line-height: var(--line-height-normal);</code>
+            </div>
+            
+            <div class="type-sample">
+                <p class="text-sm text-secondary">Small text - Used for captions, labels, and secondary information.</p>
+                <code>font-size: var(--font-size-sm); color: var(--color-text-secondary);</code>
+            </div>
+        </section>
+        
+        <!-- Spacing Section -->
+        <section class="style-section">
+            <h2>Spacing</h2>
+            <p class="text-secondary mb-6">Consistent spacing scale for margins, padding, and gaps.</p>
+            
+            <div class="spacing-demo">
+                <div class="spacing-box" style="width: var(--space-1); height: var(--space-8);">1</div>
+                <div class="spacing-box" style="width: var(--space-2); height: var(--space-8);">2</div>
+                <div class="spacing-box" style="width: var(--space-3); height: var(--space-8);">3</div>
+                <div class="spacing-box" style="width: var(--space-4); height: var(--space-8);">4</div>
+                <div class="spacing-box" style="width: var(--space-5); height: var(--space-8);">5</div>
+                <div class="spacing-box" style="width: var(--space-6); height: var(--space-8);">6</div>
+                <div class="spacing-box" style="width: var(--space-8); height: var(--space-8);">8</div>
+                <div class="spacing-box" style="width: var(--space-10); height: var(--space-8);">10</div>
+                <div class="spacing-box" style="width: var(--space-12); height: var(--space-8);">12</div>
+                <div class="spacing-box" style="width: var(--space-16); height: var(--space-8);">16</div>
+            </div>
+        </section>
+        
+        <!-- Buttons Section -->
+        <section class="style-section">
+            <h2>Buttons</h2>
+            <p class="text-secondary mb-6">Various button styles and sizes for different use cases.</p>
+            
+            <h3>Button Variants</h3>
+            <div class="component-demo">
+                <button class="btn btn-primary">Primary Button</button>
+                <button class="btn btn-secondary">Secondary Button</button>
+                <button class="btn btn-outline">Outline Button</button>
+                <button class="btn btn-ghost">Ghost Button</button>
+                <button class="btn btn-primary" disabled>Disabled Button</button>
+            </div>
+            
+            <h3>Button Sizes</h3>
+            <div class="component-demo">
+                <button class="btn btn-sm btn-primary">Small</button>
+                <button class="btn btn-primary">Default</button>
+                <button class="btn btn-lg btn-primary">Large</button>
+            </div>
+        </section>
+        
+        <!-- Cards Section -->
+        <section class="style-section">
+            <h2>Cards</h2>
+            <p class="text-secondary mb-6">Card components for content grouping and presentation.</p>
+            
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Card Header</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>This is a card body with some example content. Cards are great for grouping related information.</p>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-primary btn-sm">Action</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Simple Card</h3>
+                        <p>A card with just a body section, no header or footer.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎭</div>
+                    <h3 class="feature-title">Feature Card</h3>
+                    <p class="feature-description">Special card style for highlighting features with an icon.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Badges Section -->
+        <section class="style-section">
+            <h2>Badges</h2>
+            <p class="text-secondary mb-6">Small labeling components for status and categorization.</p>
+            
+            <div class="component-demo">
+                <span class="badge badge-primary">Primary</span>
+                <span class="badge badge-secondary">Secondary</span>
+                <span class="badge badge-success">Success</span>
+                <span class="badge badge-warning">Warning</span>
+                <span class="badge badge-danger">Danger</span>
+                <span class="badge badge-neutral">Neutral</span>
+            </div>
+        </section>
+        
+        <!-- Alerts Section -->
+        <section class="style-section">
+            <h2>Alerts</h2>
+            <p class="text-secondary mb-6">Contextual feedback messages for user actions and system states.</p>
+            
+            <div class="alert alert-info">
+                <strong>Info:</strong> This is an informational alert message.
+            </div>
+            
+            <div class="alert alert-success">
+                <strong>Success:</strong> Your action was completed successfully!
+            </div>
+            
+            <div class="alert alert-warning">
+                <strong>Warning:</strong> Please review this important information.
+            </div>
+            
+            <div class="alert alert-error">
+                <strong>Error:</strong> Something went wrong. Please try again.
+            </div>
+        </section>
+        
+        <!-- Forms Section -->
+        <section class="style-section">
+            <h2>Forms</h2>
+            <p class="text-secondary mb-6">Form elements and input components.</p>
+            
+            <div class="component-demo">
+                <div class="form-group">
+                    <label class="form-label">Text Input</label>
+                    <input type="text" class="form-input" placeholder="Enter some text...">
+                    <p class="form-helper">This is helper text for the input field.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Select Dropdown</label>
+                    <select class="form-input">
+                        <option>Option 1</option>
+                        <option>Option 2</option>
+                        <option>Option 3</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Textarea</label>
+                    <textarea class="form-input" rows="4" placeholder="Enter multiple lines of text..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Input with Error</label>
+                    <input type="email" class="form-input" style="border-color: var(--color-brand-accent);" value="invalid@">
+                    <p class="form-error">Please enter a valid email address.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Code Blocks Section -->
+        <section class="style-section">
+            <h2>Code Blocks</h2>
+            <p class="text-secondary mb-6">Styled code blocks for displaying code snippets.</p>
+            
+            <div class="code-block">
+                <div class="code-block-header">
+                    <span class="code-block-title">javascript</span>
+                    <button class="code-block-copy">Copy</button>
+                </div>
+                <div class="code-block-content">// Install DollhouseMCP
+npm install -g @dollhousemcp/mcp-server
+
+// Configure Claude Desktop
+const config = {
+  "mcpServers": {
+    "dollhousemcp": {
+      "command": "npx",
+      "args": ["@dollhousemcp/mcp-server"]
+    }
+  }
+};</div>
+            </div>
+        </section>
+        
+        <!-- Loading States Section -->
+        <section class="style-section">
+            <h2>Loading States</h2>
+            <p class="text-secondary mb-6">Loading indicators and progress components.</p>
+            
+            <div class="component-demo">
+                <div class="mb-4">
+                    <span class="spinner"></span>
+                    <span class="ml-3">Loading...</span>
+                </div>
+                
+                <div>
+                    <p class="text-sm text-secondary mb-2">Progress Bar (60%)</p>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: 60%;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Modal Example -->
+        <section class="style-section">
+            <h2>Modal</h2>
+            <p class="text-secondary mb-6">Modal dialog for focused user interactions.</p>
+            
+            <button class="btn btn-primary" onclick="showModal()">Open Modal</button>
+            
+            <div id="modal" class="modal-overlay" style="display: none;" onclick="hideModal(event)">
+                <div class="modal" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Modal Title</h2>
+                    </div>
+                    <div class="modal-body">
+                        <p>This is a modal dialog. It can contain any content and provides a focused interaction experience.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-ghost" onclick="hideModal()">Cancel</button>
+                        <button class="btn btn-primary" onclick="hideModal()">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- House Icons Section -->
+        <section class="style-section">
+            <h2>House Icons</h2>
+            <p class="text-secondary mb-6">Unique house icons extracted from the sprite sheet, available in multiple color schemes and sizes.</p>
+            
+            <h3>Basic House Icons</h3>
+            <div class="component-demo" style="display: flex; gap: var(--space-6); flex-wrap: wrap; align-items: center;">
+                <!-- Standard Blue House -->
+                <div style="text-align: center;">
+                    <div class="house-icon house-blue house-shadow">
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Blue</p>
+                </div>
+                
+                <!-- Rainbow House -->
+                <div style="text-align: center;">
+                    <div class="house-icon house-rainbow house-shadow">
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Rainbow</p>
+                </div>
+                
+                <!-- Purple House -->
+                <div style="text-align: center;">
+                    <div class="house-icon house-purple house-shadow">
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Purple</p>
+                </div>
+                
+                <!-- Green House -->
+                <div style="text-align: center;">
+                    <div class="house-icon house-green house-shadow">
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Green</p>
+                </div>
+                
+                <!-- Monochrome House -->
+                <div style="text-align: center;">
+                    <div class="house-icon house-monochrome house-shadow">
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Monochrome</p>
+                </div>
+            </div>
+            
+            <h3>Sizes</h3>
+            <div class="component-demo" style="display: flex; gap: var(--space-8); align-items: end;">
+                <!-- Small -->
+                <div style="text-align: center;">
+                    <div class="house-icon house-icon-small house-blue house-shadow">
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Small (32px)</p>
+                </div>
+                
+                <!-- Default -->
+                <div style="text-align: center;">
+                    <div class="house-icon house-blue house-shadow">
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Default (48px)</p>
+                </div>
+                
+                <!-- Large -->
+                <div style="text-align: center;">
+                    <div class="house-icon house-icon-large house-blue house-shadow">
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Large (64px)</p>
+                </div>
+            </div>
+            
+            <h3>Interactive & Animated</h3>
+            <div class="component-demo" style="display: flex; gap: var(--space-8); align-items: center;">
+                <!-- Interactive -->
+                <div style="text-align: center;">
+                    <div class="house-icon house-orange house-shadow house-interactive">
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Hover Me!</p>
+                </div>
+                
+                <!-- Animated -->
+                <div style="text-align: center;">
+                    <div class="house-icon house-pink house-shadow house-animated">
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Animated</p>
+                </div>
+                
+                <!-- Loading -->
+                <div style="text-align: center;">
+                    <div class="house-icon house-cyan house-shadow house-loading">
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Loading Effect</p>
+                </div>
+            </div>
+            
+            <h3>Retro Gaming Themes</h3>
+            <div class="component-demo" style="display: flex; gap: var(--space-6); flex-wrap: wrap;">
+                <!-- Gameboy -->
+                <div style="text-align: center;">
+                    <div class="house-icon house-gameboy house-shadow">
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Gameboy</p>
+                </div>
+                
+                <!-- Commodore -->
+                <div style="text-align: center;">
+                    <div class="house-icon house-commodore house-shadow">
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Commodore 64</p>
+                </div>
+                
+                <!-- NES -->
+                <div style="text-align: center;">
+                    <div class="house-icon house-nes house-shadow">
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">NES</p>
+                </div>
+                
+                <!-- Terminal -->
+                <div style="text-align: center;">
+                    <div class="house-icon house-terminal" style="background: black; padding: 8px; border-radius: 4px;">
+                        <div class="house-roof"></div>
+                        <div class="house-body" style="background: black; border-color: #00ff00;">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Terminal</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Modified House Icons Section -->
+        <section class="style-section">
+            <h2>Modified House Icons (Organization Style)</h2>
+            <p class="text-secondary mb-6">Updated house icons with curved edges matching interior rooms and left-side chimney placement.</p>
+            
+            <h3>Official Organization Icon</h3>
+            <div class="component-demo" style="text-align: center;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: var(--space-8);">
+                    <div>
+                        <img src="icons/Dollhouse-org.png" alt="DollhouseMCP Organization Icon" style="width: 128px; height: 128px;">
+                        <p class="text-sm mt-2">Official PNG Icon</p>
+                    </div>
+                    <div>
+                        <div class="house-icon-exact" style="transform: scale(2.3); margin: 35px;">
+                            <div class="house-wrapper">
+                                <div class="house-chimney"></div>
+                                <div class="house-roof"></div>
+                                <div class="house-body">
+                                    <div class="house-room house-room-1"></div>
+                                    <div class="house-room house-room-2"></div>
+                                    <div class="house-room house-room-3"></div>
+                                    <div class="house-room house-room-4"></div>
+                                </div>
+                                <div class="house-foundation"></div>
+                            </div>
+                        </div>
+                        <p class="text-sm mt-6">CSS Recreation Attempt</p>
+                        <p class="text-xs text-secondary">Best to use the PNG for accuracy</p>
+                    </div>
+                    <div>
+                        <p class="text-secondary">The official organization icon features:</p>
+                        <ul class="text-sm text-secondary" style="text-align: left; margin-top: var(--space-2);">
+                            <li>Blue gradient color scheme</li>
+                            <li>Left-side chimney placement</li>
+                            <li>Rounded corners matching interior rooms</li>
+                            <li>4 rooms with purple gradient</li>
+                            <li>Clean, modern design</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Original vs Modified Comparison</h3>
+            <div class="component-demo" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8);">
+                <!-- Original Column -->
+                <div>
+                    <h4 class="text-center mb-4">Original (Sharp Edges)</h4>
+                    <div style="display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap;">
+                        <div style="text-align: center;">
+                            <div class="house-icon house-blue house-shadow">
+                                <div class="house-roof"></div>
+                                <div class="house-body">
+                                    <div class="house-room house-room-1"></div>
+                                    <div class="house-room house-room-2"></div>
+                                    <div class="house-room house-room-3"></div>
+                                    <div class="house-room house-room-4"></div>
+                                </div>
+                                <div class="house-foundation"></div>
+                            </div>
+                            <p class="text-xs mt-2">Standard</p>
+                        </div>
+                        
+                        <div style="text-align: center;">
+                            <div class="house-icon house-blue house-shadow">
+                                <div class="house-chimney-left"></div>
+                                <div class="house-roof"></div>
+                                <div class="house-body">
+                                    <div class="house-room house-room-1"></div>
+                                    <div class="house-room house-room-2"></div>
+                                    <div class="house-room house-room-3"></div>
+                                    <div class="house-room house-room-4"></div>
+                                </div>
+                                <div class="house-foundation"></div>
+                            </div>
+                            <p class="text-xs mt-2">With Chimney</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modified Column -->
+                <div>
+                    <h4 class="text-center mb-4">Modified (Curved Edges + Left Chimney)</h4>
+                    <div style="display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap;">
+                        <div style="text-align: center;">
+                            <div class="house-icon-curved house-icon-org house-shadow">
+                                <div class="house-chimney"></div>
+                                <div class="house-roof"></div>
+                                <div class="house-body">
+                                    <div class="house-room house-room-1"></div>
+                                    <div class="house-room house-room-2"></div>
+                                    <div class="house-room house-room-3"></div>
+                                    <div class="house-room house-room-4"></div>
+                                </div>
+                                <div class="house-foundation"></div>
+                            </div>
+                            <p class="text-xs mt-2">Organization Icon</p>
+                        </div>
+                        
+                        <div style="text-align: center;">
+                            <div class="house-icon-curved house-rainbow house-shadow">
+                                <div class="house-chimney"></div>
+                                <div class="house-roof"></div>
+                                <div class="house-body">
+                                    <div class="house-room house-room-1"></div>
+                                    <div class="house-room house-room-2"></div>
+                                    <div class="house-room house-room-3"></div>
+                                    <div class="house-room house-room-4"></div>
+                                </div>
+                                <div class="house-foundation"></div>
+                            </div>
+                            <p class="text-xs mt-2">Rainbow Curved</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Terminal Style Comparison</h3>
+            <div class="component-demo" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8);">
+                <!-- Original Terminal -->
+                <div>
+                    <h4 class="text-center mb-4">Original Terminal (Squashed)</h4>
+                    <div style="text-align: center;">
+                        <div class="house-icon house-terminal" style="background: black; padding: 8px; border-radius: 4px; margin: 0 auto;">
+                            <div class="house-roof"></div>
+                            <div class="house-body" style="background: black; border-color: #00ff00;">
+                                <div class="house-room house-room-1"></div>
+                                <div class="house-room house-room-2"></div>
+                                <div class="house-room house-room-3"></div>
+                                <div class="house-room house-room-4"></div>
+                            </div>
+                            <div class="house-foundation"></div>
+                        </div>
+                        <p class="text-xs mt-2">Grid Layout (Squashed)</p>
+                    </div>
+                </div>
+                
+                <!-- Modified Terminal -->
+                <div>
+                    <h4 class="text-center mb-4">Modified Terminal (Lines)</h4>
+                    <div style="text-align: center;">
+                        <div class="house-icon-terminal-lines" style="background: black; padding: 8px 8px 4px 8px; border-radius: 4px; margin: 0 auto;">
+                            <div class="house-roof"></div>
+                            <div class="house-body">
+                                <div class="terminal-line"></div>
+                                <div class="terminal-line"></div>
+                                <div class="terminal-line"></div>
+                                <div class="terminal-line"><span class="terminal-cursor"></span></div>
+                            </div>
+                            <div class="house-foundation"></div>
+                        </div>
+                        <p class="text-xs mt-2">Terminal Lines (with foundation)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Size Variations with Curved Edges</h3>
+            <div class="component-demo" style="display: flex; gap: var(--space-8); align-items: end; justify-content: center;">
+                <!-- Small -->
+                <div style="text-align: center;">
+                    <div class="house-icon-curved house-icon-small house-icon-org house-shadow">
+                        <div class="house-chimney"></div>
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Small (32px)</p>
+                </div>
+                
+                <!-- Default -->
+                <div style="text-align: center;">
+                    <div class="house-icon-curved house-icon-org house-shadow">
+                        <div class="house-chimney"></div>
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Default (48px)</p>
+                </div>
+                
+                <!-- Large -->
+                <div style="text-align: center;">
+                    <div class="house-icon-curved house-icon-large house-icon-org house-shadow">
+                        <div class="house-chimney"></div>
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Large (64px)</p>
+                </div>
+            </div>
+            
+            <h3>Different Curve Intensities</h3>
+            <div class="component-demo" style="display: flex; gap: var(--space-6); flex-wrap: wrap; justify-content: center;">
+                <!-- Standard Curved -->
+                <div style="text-align: center;">
+                    <div class="house-icon-curved house-purple house-shadow">
+                        <div class="house-chimney"></div>
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Standard Curves</p>
+                </div>
+                
+                <!-- Soft Curved -->
+                <div style="text-align: center;">
+                    <div class="house-icon-curved house-icon-soft house-green house-shadow">
+                        <div class="house-chimney"></div>
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Soft Curves</p>
+                </div>
+                
+                <!-- Double Chimney -->
+                <div style="text-align: center;">
+                    <div class="house-icon-curved house-orange house-shadow">
+                        <div class="house-chimney-double"></div>
+                        <div class="house-roof"></div>
+                        <div class="house-body">
+                            <div class="house-room house-room-1"></div>
+                            <div class="house-room house-room-2"></div>
+                            <div class="house-room house-room-3"></div>
+                            <div class="house-room house-room-4"></div>
+                        </div>
+                        <div class="house-foundation"></div>
+                    </div>
+                    <p class="text-xs mt-2">Double Chimney</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Grid System -->
+        <section class="style-section">
+            <h2>Grid System</h2>
+            <p class="text-secondary mb-6">Responsive grid layouts for organizing content.</p>
+            
+            <h3>3-Column Grid</h3>
+            <div class="grid-3 mb-6">
+                <div class="card">
+                    <div class="card-body">Column 1</div>
+                </div>
+                <div class="card">
+                    <div class="card-body">Column 2</div>
+                </div>
+                <div class="card">
+                    <div class="card-body">Column 3</div>
+                </div>
+            </div>
+            
+            <h3>4-Column Grid</h3>
+            <div class="grid-4">
+                <div class="card">
+                    <div class="card-body">Col 1</div>
+                </div>
+                <div class="card">
+                    <div class="card-body">Col 2</div>
+                </div>
+                <div class="card">
+                    <div class="card-body">Col 3</div>
+                </div>
+                <div class="card">
+                    <div class="card-body">Col 4</div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // Theme toggle functionality
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            
+            // Update icon
+            document.getElementById('theme-icon').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            
+            // Save preference
+            localStorage.setItem('theme', newTheme);
+        }
+        
+        // Load saved theme preference
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('theme-icon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        
+        // Modal functions
+        function showModal() {
+            document.getElementById('modal').style.display = 'flex';
+        }
+        
+        function hideModal(event) {
+            if (!event || event.target.classList.contains('modal-overlay')) {
+                document.getElementById('modal').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
