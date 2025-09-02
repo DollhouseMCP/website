@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DollhouseMCP Complete Sprite Sheet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .sprite-sheet {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: repeat(12, 64px);
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .sprite-item {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            background: #fafafa;
+            position: relative;
+        }
+
+        .sprite-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8px;
+            color: #6b7280;
+            white-space: nowrap;
+            text-align: center;
+            width: 80px;
+        }
+
+        /* Base House Structure */
+        .house {
+            width: 48px;
+            height: 48px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .house-roof {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 14px solid var(--roof-color, #3b82f6);
+            margin-bottom: -1px;
+        }
+
+        .house-body {
+            width: 40px;
+            height: 28px;
+            background: white;
+            border: 2px solid var(--border-color, #3b82f6);
+            border-radius: 2px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 2px;
+            padding: 2px;
+            margin-bottom: -1px;
+        }
+
+        .room {
+            border-radius: 1px;
+        }
+
+        .room-1 { background: var(--room1-color, #3b82f6); }
+        .room-2 { background: var(--room2-color, #6366f1); }
+        .room-3 { background: var(--room3-color, #8b5cf6); }
+        .room-4 { background: var(--room4-color, #a855f7); }
+
+        /* Foundation */
+        .foundation {
+            width: 46px;
+            height: 8px;
+            background: var(--foundation-color, #1e40af);
+            border-radius: 1px;
+            margin-top: 0px;
+        }
+
+        /* Chimney Variations */
+        .chimney-left {
+            position: absolute;
+            width: 6px;
+            height: 8px;
+            background: var(--chimney-color, #1e40af);
+            border-radius: 1px;
+            top: 4px;
+            left: 8px;
+        }
+
+        .chimney-right {
+            position: absolute;
+            width: 6px;
+            height: 8px;
+            background: var(--chimney-color, #1e40af);
+            border-radius: 1px;
+            top: 4px;
+            right: 8px;
+        }
+
+        .chimney-both-left {
+            position: absolute;
+            width: 5px;
+            height: 7px;
+            background: var(--chimney-color, #1e40af);
+            border-radius: 1px;
+            top: 4px;
+            left: 7px;
+        }
+
+        .chimney-both-right {
+            position: absolute;
+            width: 5px;
+            height: 7px;
+            background: var(--chimney-color, #1e40af);
+            border-radius: 1px;
+            top: 4px;
+            right: 7px;
+        }
+
+        /* Shadow Effect */
+        .shadow {
+            filter: drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.15));
+        }
+
+        /* Color Schemes */
+        .blue-scheme {
+            --roof-color: #3b82f6;
+            --border-color: #3b82f6;
+            --chimney-color: #1e40af;
+            --foundation-color: #1e40af;
+            --room1-color: #3b82f6;
+            --room2-color: #6366f1;
+            --room3-color: #8b5cf6;
+            --room4-color: #a855f7;
+        }
+
+        .indigo-scheme {
+            --roof-color: #6366f1;
+            --border-color: #6366f1;
+            --chimney-color: #4338ca;
+            --foundation-color: #4338ca;
+            --room1-color: #6366f1;
+            --room2-color: #4f46e5;
+            --room3-color: #4338ca;
+            --room4-color: #3730a3;
+        }
+
+        .monochrome-scheme {
+            --roof-color: #374151;
+            --border-color: #374151;
+            --chimney-color: #1f2937;
+            --foundation-color: #1f2937;
+            --room1-color: #374151;
+            --room2-color: #4b5563;
+            --room3-color: #6b7280;
+            --room4-color: #9ca3af;
+        }
+
+        .purple-scheme {
+            --roof-color: #8b5cf6;
+            --border-color: #8b5cf6;
+            --chimney-color: #6d28d9;
+            --foundation-color: #6d28d9;
+            --room1-color: #8b5cf6;
+            --room2-color: #7c3aed;
+            --room3-color: #6d28d9;
+            --room4-color: #5b21b6;
+        }
+
+        .pink-scheme {
+            --roof-color: #ec4899;
+            --border-color: #ec4899;
+            --chimney-color: #be185d;
+            --foundation-color: #be185d;
+            --room1-color: #ec4899;
+            --room2-color: #db2777;
+            --room3-color: #be185d;
+            --room4-color: #9d174d;
+        }
+
+        .rainbow-scheme {
+            --roof-color: #3b82f6;
+            --border-color: #3b82f6;
+            --chimney-color: #1e40af;
+            --foundation-color: #1e40af;
+            --room1-color: #3b82f6;
+            --room2-color: #10b981;
+            --room3-color: #f59e0b;
+            --room4-color: #ec4899;
+        }
+
+        .green-scheme {
+            --roof-color: #10b981;
+            --border-color: #10b981;
+            --chimney-color: #047857;
+            --foundation-color: #047857;
+            --room1-color: #10b981;
+            --room2-color: #059669;
+            --room3-color: #047857;
+            --room4-color: #065f46;
+        }
+
+        .teal-scheme {
+            --roof-color: #14b8a6;
+            --border-color: #14b8a6;
+            --chimney-color: #0f766e;
+            --foundation-color: #0f766e;
+            --room1-color: #14b8a6;
+            --room2-color: #0d9488;
+            --room3-color: #0f766e;
+            --room4-color: #115e59;
+        }
+
+        .cyan-scheme {
+            --roof-color: #06b6d4;
+            --border-color: #06b6d4;
+            --chimney-color: #0e7490;
+            --foundation-color: #0e7490;
+            --room1-color: #06b6d4;
+            --room2-color: #0891b2;
+            --room3-color: #0e7490;
+            --room4-color: #155e75;
+        }
+
+        .orange-scheme {
+            --roof-color: #f59e0b;
+            --border-color: #f59e0b;
+            --chimney-color: #b45309;
+            --foundation-color: #b45309;
+            --room1-color: #f59e0b;
+            --room2-color: #d97706;
+            --room3-color: #b45309;
+            --room4-color: #92400e;
+        }
+
+        .amber-scheme {
+            --roof-color: #f59e0b;
+            --border-color: #f59e0b;
+            --chimney-color: #92400e;
+            --foundation-color: #92400e;
+            --room1-color: #fbbf24;
+            --room2-color: #f59e0b;
+            --room3-color: #d97706;
+            --room4-color: #b45309;
+        }
+
+        .yellow-scheme {
+            --roof-color: #eab308;
+            --border-color: #eab308;
+            --chimney-color: #a16207;
+            --foundation-color: #a16207;
+            --room1-color: #fde047;
+            --room2-color: #eab308;
+            --room3-color: #ca8a04;
+            --room4-color: #a16207;
+        }
+
+        .rose-scheme {
+            --roof-color: #f43f5e;
+            --border-color: #f43f5e;
+            --chimney-color: #e11d48;
+            --foundation-color: #e11d48;
+            --room1-color: #fb7185;
+            --room2-color: #f43f5e;
+            --room3-color: #e11d48;
+            --room4-color: #be123c;
+        }
+
+        .lavender-scheme {
+            --roof-color: #a78bfa;
+            --border-color: #a78bfa;
+            --chimney-color: #7c3aed;
+            --foundation-color: #7c3aed;
+            --room1-color: #c4b5fd;
+            --room2-color: #a78bfa;
+            --room3-color: #8b5cf6;
+            --room4-color: #7c3aed;
+        }
+
+        .sage-scheme {
+            --roof-color: #84cc16;
+            --border-color: #84cc16;
+            --chimney-color: #4d7c0f;
+            --foundation-color: #4d7c0f;
+            --room1-color: #a3e635;
+            --room2-color: #84cc16;
+            --room3-color: #65a30d;
+            --room4-color: #4d7c0f;
+        }
+
+        .red-scheme {
+            --roof-color: #ef4444;
+            --border-color: #ef4444;
+            --chimney-color: #b91c1c;
+            --foundation-color: #b91c1c;
+            --room1-color: #ef4444;
+            --room2-color: #dc2626;
+            --room3-color: #b91c1c;
+            --room4-color: #991b1b;
+        }
+
+        .crimson-scheme {
+            --roof-color: #dc2626;
+            --border-color: #dc2626;
+            --chimney-color: #7f1d1d;
+            --foundation-color: #7f1d1d;
+            --room1-color: #ef4444;
+            --room2-color: #dc2626;
+            --room3-color: #b91c1c;
+            --room4-color: #991b1b;
+        }
+
+        .burgundy-scheme {
+            --roof-color: #7f1d1d;
+            --border-color: #7f1d1d;
+            --chimney-color: #451a1a;
+            --foundation-color: #451a1a;
+            --room1-color: #991b1b;
+            --room2-color: #7f1d1d;
+            --room3-color: #5f1a1a;
+            --room4-color: #451a1a;
+        }
+
+        .grayscale-scheme {
+            --roof-color: #6b7280;
+            --border-color: #6b7280;
+            --chimney-color: #4b5563;
+            --foundation-color: #4b5563;
+            --room1-color: #6b7280;
+            --room2-color: #9ca3af;
+            --room3-color: #d1d5db;
+            --room4-color: #e5e7eb;
+        }
+
+        .black-scheme {
+            --roof-color: #000000;
+            --border-color: #000000;
+            --chimney-color: #000000;
+            --foundation-color: #000000;
+            --room1-color: #000000;
+            --room2-color: #374151;
+            --room3-color: #6b7280;
+            --room4-color: #d1d5db;
+        }
+
+        .white-scheme {
+            --roof-color: #ffffff;
+            --border-color: #374151;
+            --chimney-color: #374151;
+            --foundation-color: #374151;
+            --room1-color: #ffffff;
+            --room2-color: #f9fafb;
+            --room3-color: #f3f4f6;
+            --room4-color: #e5e7eb;
+        }
+
+        .gameboy-scheme {
+            --roof-color: #0f380f;
+            --border-color: #0f380f;
+            --chimney-color: #0f380f;
+            --foundation-color: #0f380f;
+            --room1-color: #0f380f;
+            --room2-color: #306230;
+            --room3-color: #8bac0f;
+            --room4-color: #9bbc0f;
+        }
+
+        .commodore-scheme {
+            --roof-color: #40318d;
+            --border-color: #40318d;
+            --chimney-color: #40318d;
+            --foundation-color: #40318d;
+            --room1-color: #40318d;
+            --room2-color: #7869c4;
+            --room3-color: #6c5eb5;
+            --room4-color: #a85fb4;
+        }
+
+        .apple2-scheme {
+            --roof-color: #00ff00;
+            --border-color: #00ff00;
+            --chimney-color: #00aa00;
+            --foundation-color: #00aa00;
+            --room1-color: #00ff00;
+            --room2-color: #ffff00;
+            --room3-color: #ff8800;
+            --room4-color: #ff0000;
+        }
+
+        .nes-scheme {
+            --roof-color: #0f0f0f;
+            --border-color: #0f0f0f;
+            --chimney-color: #0f0f0f;
+            --foundation-color: #0f0f0f;
+            --room1-color: #7c7c7c;
+            --room2-color: #0000fc;
+            --room3-color: #fcfcfc;
+            --room4-color: #f83800;
+        }
+
+        .cga-scheme {
+            --roof-color: #aa0000;
+            --border-color: #aa0000;
+            --chimney-color: #aa0000;
+            --foundation-color: #aa0000;
+            --room1-color: #aa0000;
+            --room2-color: #00aa00;
+            --room3-color: #aaaa00;
+            --room4-color: #aaaaaa;
+        }
+
+        .terminal-scheme {
+            --roof-color: #00ff00;
+            --border-color: #00ff00;
+            --chimney-color: #00cc00;
+            --foundation-color: #00cc00;
+            --room1-color: #00ff00;
+            --room2-color: #00cc00;
+            --room3-color: #009900;
+            --room4-color: #006600;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 40px 0 20px 0;
+            text-align: center;
+        }
+
+        .download-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .download-info h3 {
+            color: #1e40af;
+            margin-bottom: 12px;
+        }
+
+        .download-info p {
+            color: #1e40af;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DollhouseMCP Complete Sprite Sheet</h1>
+        <p class="subtitle">All logo variations - structural types and color schemes for graphics program import</p>
+
+        <!-- Foundation Thickness Variations -->
+        <h2 class="section-title">Foundation Thickness Variations (Blue Scheme)</h2>
+        <div class="sprite-sheet" style="grid-template-columns: repeat(6, 64px);">
+            
+            <!-- No Foundation -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                </div>
+                <div class="sprite-label">No Foundation</div>
+            </div>
+
+            <!-- Thin Foundation (2px) -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation" style="height: 2px;"></div>
+                </div>
+                <div class="sprite-label">Thin (2px)</div>
+            </div>
+
+            <!-- Light Foundation (4px) -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation" style="height: 4px;"></div>
+                </div>
+                <div class="sprite-label">Light (4px)</div>
+            </div>
+
+            <!-- Medium Foundation (6px) -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation" style="height: 6px;"></div>
+                </div>
+                <div class="sprite-label">Medium (6px)</div>
+            </div>
+
+            <!-- Current Foundation (8px) -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Current (8px)</div>
+            </div>
+
+            <!-- Thick Foundation (10px) -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation" style="height: 10px;"></div>
+                </div>
+                <div class="sprite-label">Thick (10px)</div>
+            </div>
+
+        </div>
+
+        <!-- Foundation Width Variations -->
+        <h2 class="section-title">Foundation Width Variations (6px thickness)</h2>
+        <div class="sprite-sheet" style="grid-template-columns: repeat(5, 64px);">
+            
+            <!-- Narrow Foundation (42px) -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation" style="height: 6px; width: 42px;"></div>
+                </div>
+                <div class="sprite-label">Narrow (42px)</div>
+            </div>
+
+            <!-- Standard Foundation (44px) -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation" style="height: 6px; width: 44px;"></div>
+                </div>
+                <div class="sprite-label">Standard (44px)</div>
+            </div>
+
+            <!-- Current Foundation (46px) -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation" style="height: 6px; width: 46px;"></div>
+                </div>
+                <div class="sprite-label">Current (46px)</div>
+            </div>
+
+            <!-- Wide Foundation (48px) -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation" style="height: 6px; width: 48px;"></div>
+                </div>
+                <div class="sprite-label">Wide (48px)</div>
+            </div>
+
+            <!-- Extra Wide Foundation (50px) -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation" style="height: 6px; width: 50px;"></div>
+                </div>
+                <div class="sprite-label">Extra Wide (50px)</div>
+            </div>
+
+        </div>
+
+        <!-- Structural Variations -->
+        <h2 class="section-title">Structural Variations (Blue Scheme)</h2>
+        <div class="sprite-sheet" style="grid-template-columns: repeat(8, 64px);">
+            
+            <!-- Original -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                </div>
+                <div class="sprite-label">Original</div>
+            </div>
+
+            <!-- Foundation -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Foundation</div>
+            </div>
+
+            <!-- Left Chimney -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                </div>
+                <div class="sprite-label">Left Chimney</div>
+            </div>
+
+            <!-- Right Chimney -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-right"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                </div>
+                <div class="sprite-label">Right Chimney</div>
+            </div>
+
+            <!-- Both Chimneys -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-both-left"></div>
+                    <div class="chimney-both-right"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                </div>
+                <div class="sprite-label">Both Chimneys</div>
+            </div>
+
+            <!-- Foundation + Left Chimney (Final) -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Final Design</div>
+            </div>
+
+            <!-- Shadow Version -->
+            <div class="sprite-item">
+                <div class="house blue-scheme shadow">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">With Shadow</div>
+            </div>
+
+            <!-- Foundation + Both Chimneys -->
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-both-left"></div>
+                    <div class="chimney-both-right"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Max Features</div>
+            </div>
+
+        </div>
+
+        <!-- Professional Color Schemes -->
+        <h2 class="section-title">Professional Category Colors</h2>
+        <div class="sprite-sheet" style="grid-template-columns: repeat(3, 64px);">
+            
+            <div class="sprite-item">
+                <div class="house blue-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Blue</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house indigo-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Indigo</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house monochrome-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Monochrome</div>
+            </div>
+
+        </div>
+
+        <!-- Creative Color Schemes -->
+        <h2 class="section-title">Creative Category Colors</h2>
+        <div class="sprite-sheet" style="grid-template-columns: repeat(3, 64px);">
+            
+            <div class="sprite-item">
+                <div class="house purple-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Purple</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house pink-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Pink</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house rainbow-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Rainbow</div>
+            </div>
+
+        </div>
+
+        <!-- Educational Color Schemes -->
+        <h2 class="section-title">Educational Category Colors</h2>
+        <div class="sprite-sheet" style="grid-template-columns: repeat(3, 64px);">
+            
+            <div class="sprite-item">
+                <div class="house green-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Green</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house teal-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Teal</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house cyan-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Cyan</div>
+            </div>
+
+        </div>
+
+        <!-- Gaming Color Schemes -->
+        <h2 class="section-title">Gaming Category Colors</h2>
+        <div class="sprite-sheet" style="grid-template-columns: repeat(3, 64px);">
+            
+            <div class="sprite-item">
+                <div class="house orange-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Orange</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house amber-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Amber</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house yellow-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Yellow</div>
+            </div>
+
+        </div>
+
+        <!-- Personal Color Schemes -->
+        <h2 class="section-title">Personal Category Colors</h2>
+        <div class="sprite-sheet" style="grid-template-columns: repeat(3, 64px);">
+            
+            <div class="sprite-item">
+                <div class="house rose-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Rose</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house lavender-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Lavender</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house sage-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Sage</div>
+            </div>
+
+        </div>
+
+        <!-- Adult/NSFW Color Schemes -->
+        <h2 class="section-title">Adult/NSFW Category Colors</h2>
+        <div class="sprite-sheet" style="grid-template-columns: repeat(3, 64px);">
+            
+            <div class="sprite-item">
+                <div class="house red-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Red</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house crimson-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Crimson</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house burgundy-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Burgundy</div>
+            </div>
+
+        </div>
+
+        <!-- Monotone Color Schemes -->
+        <h2 class="section-title">Monotone/Grayscale Colors</h2>
+        <div class="sprite-sheet" style="grid-template-columns: repeat(3, 64px);">
+            
+            <div class="sprite-item">
+                <div class="house grayscale-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Grayscale</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house black-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Black</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house white-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">White</div>
+            </div>
+
+        </div>
+
+        <!-- Retro/8-bit Color Schemes -->
+        <h2 class="section-title">Retro/8-bit Colors</h2>
+        <div class="sprite-sheet" style="grid-template-columns: repeat(6, 64px);">
+            
+            <div class="sprite-item">
+                <div class="house gameboy-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Game Boy</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house commodore-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Commodore</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house apple2-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Apple II</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house nes-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">NES</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house cga-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">CGA</div>
+            </div>
+
+            <div class="sprite-item">
+                <div class="house terminal-scheme">
+                    <div class="chimney-left"></div>
+                    <div class="house-roof"></div>
+                    <div class="house-body">
+                        <div class="room room-1"></div>
+                        <div class="room room-2"></div>
+                        <div class="room room-3"></div>
+                        <div class="room room-4"></div>
+                    </div>
+                    <div class="foundation"></div>
+                </div>
+                <div class="sprite-label">Terminal</div>
+            </div>
+
+        </div>
+
+        <div class="download-info">
+            <h3>📥 How to Use This Sprite Sheet</h3>
+            <p>
+                This page contains all logo variations in 64x64px format, perfect for importing into graphics programs. 
+                Each sprite is precisely positioned in a grid with clear labels. Right-click and "Save As" to download this page, 
+                then use browser dev tools or screenshot tools to extract individual sprites or the entire sheet.
+                All sprites use consistent positioning and can be easily cut into individual assets.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
