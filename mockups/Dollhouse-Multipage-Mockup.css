@@ -1,0 +1,1940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DollhouseMCP - Universal MCP Server for AI Personas & Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        // Documentation navigation
+        function scrollToDoc(sectionId) {
+            // Update active nav item
+            document.querySelectorAll('.doc-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Scroll to section
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #1a1a1a;
+            line-height: 1.6;
+            background: #fefefe;
+        }
+        
+        /* Container and Layout */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+        
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* Typography */
+        h1 { font-size: 52px; font-weight: 800; line-height: 1.1; margin-bottom: 24px; }
+        h2 { font-size: 40px; font-weight: 700; margin-bottom: 16px; }
+        h3 { font-size: 24px; font-weight: 600; margin-bottom: 12px; }
+        h4 { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+        p { margin-bottom: 16px; }
+        
+        /* Code Styles */
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 14px;
+        }
+        
+        pre {
+            background: #111827;
+            color: #e5e7eb;
+            padding: 24px;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        .code-comment { color: #6b7280; }
+        .code-keyword { color: #f97316; }
+        .code-string { color: #86efac; }
+        
+        /* Header Navigation */
+        header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+        }
+        
+        .logo {
+            font-size: 22px;
+            font-weight: 600;
+            color: #111827;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+        
+        .logo-house {
+            width: 36px;
+            height: 36px;
+            background: #eff6ff;
+            border: 2px solid #dbeafe;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        
+        .nav-menu a {
+            text-decoration: none;
+            color: #6b7280;
+            font-weight: 500;
+            transition: color 0.2s;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        
+        .nav-menu a:hover {
+            color: #111827;
+        }
+        
+        .nav-menu a.active {
+            color: #1e40af;
+        }
+        
+        .github-links {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .github-star {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #374151;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .github-star:hover {
+            background: #e5e7eb;
+            border-color: #d1d5db;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+        
+        .btn-large {
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 64, 175, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+            border-color: #d1d5db;
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 60px 0 80px;
+            background: linear-gradient(to bottom, #f0f9ff 0%, #ffffff 100%);
+        }
+        
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+        
+        .hero-version {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 20px;
+            color: #0369a1;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+        
+        .hero-content p {
+            font-size: 20px;
+            color: #6b7280;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            color: #1e40af;
+        }
+        
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .hero-stats {
+            display: flex;
+            gap: 32px;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .stat-icon {
+            color: #10b981;
+        }
+        
+        /* Dollhouse Visual */
+        .dollhouse-visual {
+            position: relative;
+            perspective: 1000px;
+        }
+        
+        .dollhouse {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            transform-style: preserve-3d;
+            transform: rotateX(-10deg) rotateY(15deg);
+            transition: transform 0.5s;
+        }
+        
+        .dollhouse:hover {
+            transform: rotateX(-5deg) rotateY(20deg);
+        }
+        
+        .house-frame {
+            background: white;
+            border: 3px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        
+        .room {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .room:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            transform: translateZ(10px) scale(1.05);
+        }
+        
+        .room-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        
+        .room-name {
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+        }
+        
+        .room-desc {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+        
+        /* Section Headers */
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-header p {
+            font-size: 18px;
+            color: #6b7280;
+        }
+        
+        /* Grid Layouts */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+        
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+        
+        /* Library Specific */
+        .library-categories {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 48px;
+        }
+        
+        .category-tab {
+            padding: 10px 24px;
+            background: none;
+            border: 2px solid #e5e7eb;
+            border-radius: 100px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .category-tab.active {
+            background: #1e40af;
+            color: white;
+            border-color: #1e40af;
+        }
+        
+        .category-tab:hover {
+            border-color: #d1d5db;
+            color: #374151;
+        }
+        
+        .library-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .library-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+            border-color: #d1d5db;
+        }
+        
+        .library-card-header {
+            display: flex;
+            align-items: start;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .library-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #1e40af 0%, #f97316 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .library-meta h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .library-meta p {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        .library-description {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        
+        .library-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .tag {
+            padding: 4px 12px;
+            background: #eff6ff;
+            color: #1e40af;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .tag.ensemble {
+            background: #f0fdf4;
+            color: #059669;
+        }
+        
+        /* Feature Icons */
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: #eff6ff;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 20px;
+        }
+        
+        /* Stats Section */
+        .stats {
+            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        /* Documentation Styles */
+        .doc-container {
+            display: flex;
+            gap: 60px;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        
+        .doc-nav {
+            position: sticky;
+            top: 100px;
+            width: 250px;
+            height: fit-content;
+            flex-shrink: 0;
+        }
+        
+        .doc-nav-item {
+            display: block;
+            padding: 8px 16px;
+            color: #6b7280;
+            text-decoration: none;
+            border-left: 2px solid #e5e7eb;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .doc-nav-item:hover {
+            color: #111827;
+            border-left-color: #d1d5db;
+            background: #f9fafb;
+        }
+        
+        .doc-nav-item.active {
+            color: #1e40af;
+            border-left-color: #1e40af;
+            background: #f0f9ff;
+        }
+        
+        .doc-content {
+            flex: 1;
+            max-width: 800px;
+        }
+        
+        .doc-section {
+            margin-bottom: 60px;
+            scroll-margin-top: 100px;
+        }
+        
+        .doc-section h2 {
+            margin-bottom: 24px;
+        }
+        
+        .doc-section h3 {
+            margin-top: 32px;
+            margin-bottom: 16px;
+        }
+        
+        .doc-section ul {
+            margin-left: 24px;
+            margin-bottom: 16px;
+            color: #6b7280;
+        }
+        
+        .doc-section li {
+            margin-bottom: 8px;
+        }
+        
+        /* Tool Grid */
+        .tool-item {
+            padding: 16px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .tool-item:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+        
+        /* Tabs */
+        .tab-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: -1px;
+        }
+        
+        .tab-button {
+            padding: 8px 16px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+        
+        .tab-button.active {
+            background: #111827;
+            color: white;
+        }
+        
+        .code-block {
+            background: #111827;
+            border-radius: 0 12px 12px 12px;
+            overflow: hidden;
+        }
+        
+        /* Pricing */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+            margin-top: 60px;
+        }
+        
+        .pricing-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pricing-card.featured {
+            border-color: #1e40af;
+            transform: scale(1.05);
+        }
+        
+        .pricing-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e40af;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .pricing-price {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+        
+        .pricing-price span {
+            font-size: 20px;
+            font-weight: 400;
+            color: #6b7280;
+        }
+        
+        .pricing-features {
+            list-style: none;
+            margin: 24px 0;
+        }
+        
+        .pricing-features li {
+            padding: 8px 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .pricing-features li:before {
+            content: "✓ ";
+            color: #10b981;
+            font-weight: 700;
+        }
+        
+        /* Footer */
+        footer {
+            background: #111827;
+            color: #9ca3af;
+            padding: 48px 0 32px;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 32px;
+        }
+        
+        .footer-brand h3 {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+        
+        .footer-brand p {
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #9ca3af;
+            transition: all 0.2s;
+        }
+        
+        .social-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .footer-column h4 {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-column a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .footer-column a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #374151;
+            padding-top: 32px;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header>
+        <div class="container">
+            <nav>
+                <a class="logo" onclick="navigateTo('home')">
+                    <div class="logo-house">🏠</div>
+                    DollhouseMCP
+                </a>
+                <div class="nav-menu">
+                    <a onclick="navigateTo('home')" id="nav-home">Home</a>
+                    <a onclick="navigateTo('library')" id="nav-library">Library</a>
+                    <a onclick="navigateTo('docs')" id="nav-docs">Documentation</a>
+                    <a onclick="navigateTo('support')" id="nav-support">Support</a>
+                    <div class="github-links">
+                        <a href="https://github.com/DollhouseMCP/mcp-server" class="github-star" target="_blank">
+                            ⭐ MCP Server
+                        </a>
+                        <a href="https://github.com/DollhouseMCP/collection" class="github-star" target="_blank">
+                            ⭐ Collection
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Home Page -->
+    <div id="home" class="page active">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-grid">
+                    <div class="hero-content">
+                        <div class="hero-version">
+                            🚀 v1.2.1 - Now with 23 MCP tools!
+                        </div>
+                        
+                        <h1>Connect any AI tool to <span class="highlight">anything</span> with personas</h1>
+                        <p>Universal MCP server that transforms AI interactions through dynamic personas, skills, and ensembles. Works with Claude, ChatGPT, and any MCP-compatible AI.</p>
+                        
+                        <div class="hero-actions">
+                            <a onclick="navigateTo('docs')" class="btn btn-large btn-primary">
+                                🚀 Get Started Free
+                            </a>
+                            <a href="https://github.com/DollhouseMCP/mcp-server" target="_blank" class="btn btn-large btn-secondary">
+                                📖 View on GitHub
+                            </a>
+                        </div>
+                        
+                        <div class="hero-stats">
+                            <div class="stat-item">
+                                <span class="stat-icon">✓</span>
+                                <span>100% Open Source</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-icon">✓</span>
+                                <span>AGPL Licensed</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-icon">✓</span>
+                                <span>5-Minute Setup</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dollhouse-visual">
+                        <div class="dollhouse">
+                            <div class="house-frame">
+                                <div style="text-align: center; margin-bottom: 20px; font-weight: 600; color: #374151;">
+                                    Your AI Command Center
+                                </div>
+                                <div class="room-grid">
+                                    <div class="room" onclick="navigateTo('library')">
+                                        <div class="room-icon">🎭</div>
+                                        <div class="room-name">Personas</div>
+                                        <div class="room-desc">AI Characters</div>
+                                    </div>
+                                    <div class="room" onclick="navigateTo('library')">
+                                        <div class="room-icon">🛠️</div>
+                                        <div class="room-name">Skills</div>
+                                        <div class="room-desc">Capabilities</div>
+                                    </div>
+                                    <div class="room" onclick="navigateTo('library')">
+                                        <div class="room-icon">🤖</div>
+                                        <div class="room-name">Agents</div>
+                                        <div class="room-desc">Autonomous</div>
+                                    </div>
+                                    <div class="room" onclick="navigateTo('library')">
+                                        <div class="room-icon">💬</div>
+                                        <div class="room-name">Prompts</div>
+                                        <div class="room-desc">Templates</div>
+                                    </div>
+                                    <div class="room" onclick="navigateTo('library')">
+                                        <div class="room-icon">📄</div>
+                                        <div class="room-name">Templates</div>
+                                        <div class="room-desc">Workflows</div>
+                                    </div>
+                                    <div class="room" onclick="navigateTo('library')">
+                                        <div class="room-icon">👥</div>
+                                        <div class="room-name">Ensembles</div>
+                                        <div class="room-desc">Collections</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section style="padding: 80px 0; background: #f9fafb;">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Everything you need for AI development</h2>
+                    <p>Powerful features that make AI integration simple</p>
+                </div>
+                
+                <div class="grid-3">
+                    <div class="card" style="text-align: center;">
+                        <div class="feature-icon">🎭</div>
+                        <h3>Dynamic Personas</h3>
+                        <p style="color: #6b7280;">Create and activate AI personas on the fly. Each persona has its own knowledge, style, and capabilities.</p>
+                    </div>
+                    
+                    <div class="card" style="text-align: center;">
+                        <div class="feature-icon">📚</div>
+                        <h3>Community Collection</h3>
+                        <p style="color: #6b7280;">Browse, install, and share content through our GitHub-powered collection. One-click installations.</p>
+                    </div>
+                    
+                    <div class="card" style="text-align: center;">
+                        <div class="feature-icon">🔄</div>
+                        <h3>Auto-Update System</h3>
+                        <p style="color: #6b7280;">Enterprise-grade updates with automatic backups and rollback capabilities. Always stay current.</p>
+                    </div>
+                    
+                    <div class="card" style="text-align: center;">
+                        <div class="feature-icon">👥</div>
+                        <h3>Ensemble Support</h3>
+                        <p style="color: #6b7280;">Combine personas, skills, agents, and tools into powerful ensembles for complex workflows.</p>
+                    </div>
+                    
+                    <div class="card" style="text-align: center;">
+                        <div class="feature-icon">🛡️</div>
+                        <h3>Privacy First</h3>
+                        <p style="color: #6b7280;">Run locally or in the cloud. Your data stays yours. Full control over sharing and privacy.</p>
+                    </div>
+                    
+                    <div class="card" style="text-align: center;">
+                        <div class="feature-icon">🚀</div>
+                        <h3>Universal MCP</h3>
+                        <p style="color: #6b7280;">Works with Claude, ChatGPT, Gemini, and any MCP-compatible AI tool. One server, endless possibilities.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat">
+                        <div class="stat-number">23</div>
+                        <div class="stat-label">MCP Tools</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">372</div>
+                        <div class="stat-label">Tests Coverage</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">20+</div>
+                        <div class="stat-label">AI Platforms</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">∞</div>
+                        <div class="stat-label">Possibilities</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MCP-First Design Section -->
+        <section style="padding: 80px 0; background: white;">
+            <div class="container">
+                <div class="section-header">
+                    <h2>MCP-First Design</h2>
+                    <p>Everything happens in your chat. No dashboards, no complex UIs - just conversation.</p>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-top: 60px;">
+                    <div>
+                        <h3 style="font-size: 32px; margin-bottom: 24px;">Chat is the Interface</h3>
+                        <p style="font-size: 18px; color: #6b7280; margin-bottom: 32px;">
+                            Like mobile-first transformed web design, MCP-first transforms AI tool design. 
+                            Every feature, every action, every configuration - it all happens through natural conversation 
+                            with your AI assistant. No need to leave your flow.
+                        </p>
+                        
+                        <div style="display: grid; gap: 20px;">
+                            <div style="display: flex; gap: 16px; align-items: start;">
+                                <div style="width: 48px; height: 48px; background: #eff6ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <span style="font-size: 24px;">💬</span>
+                                </div>
+                                <div>
+                                    <h4 style="margin-bottom: 4px;">Browse & Search</h4>
+                                    <p style="color: #6b7280; font-size: 14px;">Find personas, explore the collection, search for specific content - all through chat commands.</p>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 16px; align-items: start;">
+                                <div style="width: 48px; height: 48px; background: #f0fdf4; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <span style="font-size: 24px;">✨</span>
+                                </div>
+                                <div>
+                                    <h4 style="margin-bottom: 4px;">Create & Edit</h4>
+                                    <p style="color: #6b7280; font-size: 14px;">Build personas, modify content, validate quality - your AI guides you through every step.</p>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 16px; align-items: start;">
+                                <div style="width: 48px; height: 48px; background: #fef3c7; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <span style="font-size: 24px;">🔄</span>
+                                </div>
+                                <div>
+                                    <h4 style="margin-bottom: 4px;">Update & Manage</h4>
+                                    <p style="color: #6b7280; font-size: 14px;">Check for updates, manage configurations, rollback changes - all without leaving the conversation.</p>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 16px; align-items: start;">
+                                <div style="width: 48px; height: 48px; background: #fce7f3; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <span style="font-size: 24px;">🚀</span>
+                                </div>
+                                <div>
+                                    <h4 style="margin-bottom: 4px;">Share & Collaborate</h4>
+                                    <p style="color: #6b7280; font-size: 14px;">Submit to the collection, install from others, contribute back - community collaboration through conversation.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #111827; border-radius: 16px; padding: 32px; color: #e5e7eb;">
+                        <div style="font-size: 14px; margin-bottom: 24px; opacity: 0.7;">Example conversation:</div>
+                        
+                        <div style="space-y: 16px;">
+                            <div style="margin-bottom: 16px;">
+                                <div style="color: #86efac; margin-bottom: 4px;">You:</div>
+                                <div>Show me available writing personas</div>
+                            </div>
+                            
+                            <div style="margin-bottom: 16px;">
+                                <div style="color: #93c5fd; margin-bottom: 4px;">AI:</div>
+                                <div>I'll search the collection for writing personas...</div>
+                                <div style="margin-top: 8px; padding: 12px; background: #1f2937; border-radius: 8px; font-family: monospace; font-size: 12px;">
+                                    browse_collection "creative"
+                                </div>
+                                <div style="margin-top: 8px;">Found 3 writing personas:
+                                    <br>• Creative Writer - Storytelling specialist
+                                    <br>• Technical Writer - Documentation expert
+                                    <br>• Blog Writer - SEO-optimized content
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 16px;">
+                                <div style="color: #86efac; margin-bottom: 4px;">You:</div>
+                                <div>Install the Creative Writer and activate it</div>
+                            </div>
+                            
+                            <div style="margin-bottom: 16px;">
+                                <div style="color: #93c5fd; margin-bottom: 4px;">AI:</div>
+                                <div>Installing and activating Creative Writer...</div>
+                                <div style="margin-top: 8px; padding: 12px; background: #1f2937; border-radius: 8px; font-family: monospace; font-size: 12px;">
+                                    install_from_collection "creative/creative-writer.md"<br>
+                                    activate_persona "Creative Writer"
+                                </div>
+                                <div style="margin-top: 8px;">✨ Creative Writer persona is now active! I'm ready to help with storytelling and creative content.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 60px;">
+                    <p style="font-size: 18px; color: #6b7280; margin-bottom: 24px;">
+                        No more context switching. No more hunting through menus. Just natural conversation.
+                    </p>
+                    <a onclick="navigateTo('docs')" class="btn btn-large btn-primary">See All 23 MCP Tools →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation Section -->
+        <section style="padding: 80px 0; background: white;">
+            <div class="container">
+                <div style="max-width: 800px; margin: 0 auto;">
+                    <div class="section-header">
+                        <h2>Quick Installation</h2>
+                        <p>Get up and running with DollhouseMCP in 5 minutes</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 32px;">
+                        <h3 style="margin-bottom: 16px;">Prerequisites</h3>
+                        <ul style="margin-left: 24px; color: #6b7280;">
+                            <li>Node.js v20.0.0 or higher</li>
+                            <li>npm v10.0.0 or higher</li>
+                            <li>Claude Desktop or any MCP-compatible AI tool</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="showHomeInstall('npm')">NPM (Recommended)</button>
+                        <button class="tab-button" onclick="showHomeInstall('local')">Local Install</button>
+                        <button class="tab-button" onclick="showHomeInstall('docker')">Docker</button>
+                    </div>
+                    <div class="code-block">
+                        <pre id="npm-install-home"><code><span class="code-comment"># Install globally via NPM</span>
+npm install -g @mickdarling/dollhousemcp
+
+<span class="code-comment"># Add to Claude Desktop config:</span>
+<span class="code-comment"># ~/Library/Application Support/Claude/claude_desktop_config.json</span>
+{
+  "mcpServers": {
+    "dollhousemcp": {
+      "command": "npx",
+      "args": ["@mickdarling/dollhousemcp"]
+    }
+  }
+}
+
+<span class="code-comment"># Restart Claude Desktop and you're ready!</span></code></pre>
+                        <pre id="local-install-home" style="display: none;"><code><span class="code-comment"># Clone the repository</span>
+git clone https://github.com/DollhouseMCP/mcp-server.git
+cd mcp-server
+
+<span class="code-comment"># Run automated setup (Claude Desktop only)</span>
+./setup.sh
+
+<span class="code-comment"># Or manual installation:</span>
+npm install
+npm run build
+
+<span class="code-comment"># Set user identity (optional)</span>
+export DOLLHOUSE_USER="your-username"
+export DOLLHOUSE_EMAIL="your-email@example.com"</code></pre>
+                        <pre id="docker-install-home" style="display: none;"><code><span class="code-comment"># Clone the repository</span>
+git clone https://github.com/DollhouseMCP/mcp-server.git
+cd mcp-server
+
+<span class="code-comment"># Run with Docker Compose</span>
+docker-compose up -d
+
+<span class="code-comment"># Or use Docker directly</span>
+docker run -d \
+  --name dollhousemcp \
+  -v /path/to/personas:/app/personas \
+  -e DOLLHOUSE_USER="your-username" \
+  ghcr.io/dollhousemcp/mcp-server:latest</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section style="background: #f9fafb; padding: 80px 0; text-align: center;">
+            <div class="container">
+                <h2>Ready to transform your AI workflow?</h2>
+                <p style="font-size: 20px; color: #6b7280; margin-bottom: 32px;">Join the stone soup revolution. Every contribution makes the ecosystem better.</p>
+                <div style="display: flex; gap: 16px; justify-content: center;">
+                    <a onclick="navigateTo('docs')" class="btn btn-large btn-primary">Get Started Free</a>
+                    <a href="https://github.com/DollhouseMCP" target="_blank" class="btn btn-large btn-secondary">Star on GitHub</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Library Page -->
+    <div id="library" class="page">
+        <section style="padding: 60px 0;">
+            <div class="container">
+                <div class="section-header">
+                    <h1>Explore the Collection</h1>
+                    <p>Browse personas, skills, agents, and ensembles created by the community</p>
+                </div>
+                
+                <div class="library-categories">
+                    <button class="category-tab active" onclick="filterLibrary('all')">All Content</button>
+                    <button class="category-tab" onclick="filterLibrary('personas')">Personas</button>
+                    <button class="category-tab" onclick="filterLibrary('skills')">Skills</button>
+                    <button class="category-tab" onclick="filterLibrary('agents')">Agents</button>
+                    <button class="category-tab" onclick="filterLibrary('prompts')">Prompts</button>
+                    <button class="category-tab" onclick="filterLibrary('templates')">Templates</button>
+                    <button class="category-tab" onclick="filterLibrary('ensembles')">Ensembles</button>
+                </div>
+                
+                <div class="grid-3" id="library-grid">
+                    <!-- Personas -->
+                    <div class="library-card" data-category="personas">
+                        <div class="library-card-header">
+                            <div class="library-icon">🎭</div>
+                            <div class="library-meta">
+                                <h3>Creative Writer</h3>
+                                <p>Default persona • v1.0</p>
+                            </div>
+                        </div>
+                        <p class="library-description">Imaginative storytelling specialist with expertise in narrative structure, character development, and engaging content creation.</p>
+                        <div class="library-tags">
+                            <span class="tag">creative</span>
+                            <span class="tag">writing</span>
+                            <span class="tag">storytelling</span>
+                        </div>
+                    </div>
+                    
+                    <div class="library-card" data-category="personas">
+                        <div class="library-card-header">
+                            <div class="library-icon">💻</div>
+                            <div class="library-meta">
+                                <h3>Technical Analyst</h3>
+                                <p>Default persona • v1.0</p>
+                            </div>
+                        </div>
+                        <p class="library-description">Deep technical analysis and systematic problem-solving for architecture decisions, debugging, and technical documentation.</p>
+                        <div class="library-tags">
+                            <span class="tag">professional</span>
+                            <span class="tag">analysis</span>
+                            <span class="tag">debugging</span>
+                        </div>
+                    </div>
+                    
+                    <div class="library-card" data-category="personas">
+                        <div class="library-card-header">
+                            <div class="library-icon">🔍</div>
+                            <div class="library-meta">
+                                <h3>Debug Detective</h3>
+                                <p>Default persona • v1.0</p>
+                            </div>
+                        </div>
+                        <p class="library-description">Systematic debugging specialist that hunts bugs, troubleshoots systems, and finds root causes with detective-like precision.</p>
+                        <div class="library-tags">
+                            <span class="tag">professional</span>
+                            <span class="tag">debugging</span>
+                            <span class="tag">troubleshooting</span>
+                        </div>
+                    </div>
+                    
+                    <div class="library-card" data-category="personas">
+                        <div class="library-card-header">
+                            <div class="library-icon">👔</div>
+                            <div class="library-meta">
+                                <h3>Business Consultant</h3>
+                                <p>Default persona • v1.0</p>
+                            </div>
+                        </div>
+                        <p class="library-description">Strategic business analysis expert providing insights on market trends, strategy planning, and decision-making frameworks.</p>
+                        <div class="library-tags">
+                            <span class="tag">professional</span>
+                            <span class="tag">business</span>
+                            <span class="tag">strategy</span>
+                        </div>
+                    </div>
+                    
+                    <div class="library-card" data-category="personas">
+                        <div class="library-card-header">
+                            <div class="library-icon">🎓</div>
+                            <div class="library-meta">
+                                <h3>ELI5 Explainer</h3>
+                                <p>Default persona • v1.0</p>
+                            </div>
+                        </div>
+                        <p class="library-description">Expert at simplifying complex topics into easy-to-understand explanations. Perfect for teaching, onboarding, and documentation.</p>
+                        <div class="library-tags">
+                            <span class="tag">educational</span>
+                            <span class="tag">explainer</span>
+                            <span class="tag">teaching</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Skills -->
+                    <div class="library-card" data-category="skills">
+                        <div class="library-card-header">
+                            <div class="library-icon">🐍</div>
+                            <div class="library-meta">
+                                <h3>Python Data Science</h3>
+                                <p>Skill Module • v2.1</p>
+                            </div>
+                        </div>
+                        <p class="library-description">Complete Python data science toolkit with pandas, numpy, scikit-learn, and visualization capabilities.</p>
+                        <div class="library-tags">
+                            <span class="tag">python</span>
+                            <span class="tag">data-science</span>
+                            <span class="tag">analytics</span>
+                        </div>
+                    </div>
+                    
+                    <div class="library-card" data-category="skills">
+                        <div class="library-card-header">
+                            <div class="library-icon">⚛️</div>
+                            <div class="library-meta">
+                                <h3>React & Next.js</h3>
+                                <p>Skill Module • v3.0</p>
+                            </div>
+                        </div>
+                        <p class="library-description">Modern React development with Next.js, TypeScript, Tailwind CSS, and best practices for production apps.</p>
+                        <div class="library-tags">
+                            <span class="tag">react</span>
+                            <span class="tag">nextjs</span>
+                            <span class="tag">frontend</span>
+                        </div>
+                    </div>
+                    
+                    <div class="library-card" data-category="skills">
+                        <div class="library-card-header">
+                            <div class="library-icon">🗄️</div>
+                            <div class="library-meta">
+                                <h3>SQL & Database</h3>
+                                <p>Skill Module • v1.8</p>
+                            </div>
+                        </div>
+                        <p class="library-description">Advanced SQL querying, database design, optimization techniques, and support for PostgreSQL, MySQL, and SQLite.</p>
+                        <div class="library-tags">
+                            <span class="tag">sql</span>
+                            <span class="tag">database</span>
+                            <span class="tag">backend</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Agents -->
+                    <div class="library-card" data-category="agents">
+                        <div class="library-card-header">
+                            <div class="library-icon">🤖</div>
+                            <div class="library-meta">
+                                <h3>Code Review Agent</h3>
+                                <p>Autonomous Agent • v1.2</p>
+                            </div>
+                        </div>
+                        <p class="library-description">Automated code review agent that checks for bugs, security issues, performance problems, and style violations.</p>
+                        <div class="library-tags">
+                            <span class="tag">automation</span>
+                            <span class="tag">code-review</span>
+                            <span class="tag">quality</span>
+                        </div>
+                    </div>
+                    
+                    <div class="library-card" data-category="agents">
+                        <div class="library-card-header">
+                            <div class="library-icon">📊</div>
+                            <div class="library-meta">
+                                <h3>Data Analysis Agent</h3>
+                                <p>Autonomous Agent • v2.0</p>
+                            </div>
+                        </div>
+                        <p class="library-description">Automated data analysis with statistical insights, visualizations, and report generation from various data sources.</p>
+                        <div class="library-tags">
+                            <span class="tag">analytics</span>
+                            <span class="tag">automation</span>
+                            <span class="tag">reporting</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Prompts -->
+                    <div class="library-card" data-category="prompts">
+                        <div class="library-card-header">
+                            <div class="library-icon">💬</div>
+                            <div class="library-meta">
+                                <h3>System Design Prompts</h3>
+                                <p>Prompt Collection • v1.5</p>
+                            </div>
+                        </div>
+                        <p class="library-description">Comprehensive prompts for system architecture, scalability discussions, and technical design reviews.</p>
+                        <div class="library-tags">
+                            <span class="tag">architecture</span>
+                            <span class="tag">system-design</span>
+                            <span class="tag">technical</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Templates -->
+                    <div class="library-card" data-category="templates">
+                        <div class="library-card-header">
+                            <div class="library-icon">📄</div>
+                            <div class="library-meta">
+                                <h3>Project Documentation</h3>
+                                <p>Template Pack • v2.3</p>
+                            </div>
+                        </div>
+                        <p class="library-description">Complete documentation templates including README, API docs, user guides, and technical specifications.</p>
+                        <div class="library-tags">
+                            <span class="tag">documentation</span>
+                            <span class="tag">templates</span>
+                            <span class="tag">markdown</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Ensembles -->
+                    <div class="library-card" data-category="ensembles">
+                        <div class="library-card-header">
+                            <div class="library-icon">🚀</div>
+                            <div class="library-meta">
+                                <h3>Full-Stack Developer</h3>
+                                <p>Professional Ensemble • v2.0</p>
+                            </div>
+                        </div>
+                        <p class="library-description">Complete development ensemble: coding persona + React/Node.js skills + database tools + DevOps agent + testing frameworks.</p>
+                        <div class="library-tags">
+                            <span class="tag ensemble">ensemble</span>
+                            <span class="tag">fullstack</span>
+                            <span class="tag">5 components</span>
+                        </div>
+                    </div>
+                    
+                    <div class="library-card" data-category="ensembles">
+                        <div class="library-card-header">
+                            <div class="library-icon">✍️</div>
+                            <div class="library-meta">
+                                <h3>Creative Writing Suite</h3>
+                                <p>Creative Ensemble • v1.5</p>
+                            </div>
+                        </div>
+                        <p class="library-description">Professional writing ensemble: storyteller persona + grammar skills + research agent + editing tools + publishing templates.</p>
+                        <div class="library-tags">
+                            <span class="tag ensemble">ensemble</span>
+                            <span class="tag">writing</span>
+                            <span class="tag">6 components</span>
+                        </div>
+                    </div>
+                    
+                    <div class="library-card" data-category="ensembles">
+                        <div class="library-card-header">
+                            <div class="library-icon">📊</div>
+                            <div class="library-meta">
+                                <h3>Business Analyst Pack</h3>
+                                <p>Professional Ensemble • v1.8</p>
+                            </div>
+                        </div>
+                        <p class="library-description">Business analysis ensemble: consultant persona + Excel/SQL skills + data viz tools + report templates + presentation agent.</p>
+                        <div class="library-tags">
+                            <span class="tag ensemble">ensemble</span>
+                            <span class="tag">business</span>
+                            <span class="tag">7 components</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 48px;">
+                    <a href="https://github.com/DollhouseMCP/collection" target="_blank" class="btn btn-large btn-secondary">Browse Full Collection on GitHub →</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Documentation Page -->
+    <div id="docs" class="page">
+        <section style="padding: 60px 0;">
+            <div class="container">
+                <h1 style="margin-bottom: 48px;">Documentation</h1>
+                
+                <!-- Main Documentation Content -->
+                <div style="max-width: 800px; margin: 0 auto;">
+                    <!-- Quick Start Section -->
+                    <div class="doc-section">
+                        <h2>Quick Start</h2>
+                        <p style="font-size: 18px; color: #6b7280; margin-bottom: 32px;">Get up and running with DollhouseMCP in 5 minutes.</p>
+                        
+                        <h3>Prerequisites</h3>
+                        <ul style="margin-left: 24px; margin-bottom: 32px; color: #6b7280;">
+                            <li>Node.js v20.0.0 or higher</li>
+                            <li>npm v10.0.0 or higher</li>
+                            <li>Claude Desktop or any MCP-compatible AI tool</li>
+                        </ul>
+                        
+                        <h3>Installation</h3>
+                        <div class="tab-buttons">
+                            <button class="tab-button active" onclick="showInstallDoc('npm')">NPM (Recommended)</button>
+                            <button class="tab-button" onclick="showInstallDoc('local')">Local Install</button>
+                            <button class="tab-button" onclick="showInstallDoc('docker')">Docker</button>
+                        </div>
+                        <div class="code-block">
+                            <pre id="npm-install-doc"><code><span class="code-comment"># Install globally via NPM</span>
+npm install -g @mickdarling/dollhousemcp
+
+<span class="code-comment"># Add to Claude Desktop config:</span>
+<span class="code-comment"># ~/Library/Application Support/Claude/claude_desktop_config.json</span>
+{
+  "mcpServers": {
+    "dollhousemcp": {
+      "command": "npx",
+      "args": ["@mickdarling/dollhousemcp"]
+    }
+  }
+}
+
+<span class="code-comment"># Restart Claude Desktop and you're ready!</span></code></pre>
+                            <pre id="local-install-doc" style="display: none;"><code><span class="code-comment"># Clone the repository</span>
+git clone https://github.com/DollhouseMCP/mcp-server.git
+cd mcp-server
+
+<span class="code-comment"># Run automated setup (Claude Desktop only)</span>
+./setup.sh
+
+<span class="code-comment"># Or manual installation:</span>
+npm install
+npm run build
+
+<span class="code-comment"># Set user identity (optional)</span>
+export DOLLHOUSE_USER="your-username"
+export DOLLHOUSE_EMAIL="your-email@example.com"</code></pre>
+                            <pre id="docker-install-doc" style="display: none;"><code><span class="code-comment"># Clone the repository</span>
+git clone https://github.com/DollhouseMCP/mcp-server.git
+cd mcp-server
+
+<span class="code-comment"># Run with Docker Compose</span>
+docker-compose up -d
+
+<span class="code-comment"># Or use Docker directly</span>
+docker run -d \
+  --name dollhousemcp \
+  -v /path/to/personas:/app/personas \
+  -e DOLLHOUSE_USER="your-username" \
+  ghcr.io/dollhousemcp/mcp-server:latest</code></pre>
+                        </div>
+                    </div>
+                    
+                    <!-- MCP Tools Section -->
+                    <div class="doc-section">
+                        <h2>MCP Tools Reference</h2>
+                        <p style="font-size: 18px; color: #6b7280; margin-bottom: 32px;">DollhouseMCP provides 23 powerful tools for persona and content management.</p>
+                        
+                        <h3>Persona Management</h3>
+                        <div class="grid-4" style="margin-bottom: 32px;">
+                            <div class="tool-item">list_personas</div>
+                            <div class="tool-item">activate_persona</div>
+                            <div class="tool-item">get_active_persona</div>
+                            <div class="tool-item">deactivate_persona</div>
+                            <div class="tool-item">get_persona_details</div>
+                            <div class="tool-item">reload_personas</div>
+                        </div>
+                        
+                        <h3>Collection Tools</h3>
+                        <div class="grid-4" style="margin-bottom: 32px;">
+                            <div class="tool-item">browse_collection</div>
+                            <div class="tool-item">search_collection</div>
+                            <div class="tool-item">get_collection_item</div>
+                            <div class="tool-item">install_from_collection</div>
+                            <div class="tool-item">submit_to_collection</div>
+                        </div>
+                        
+                        <h3>Creation & Editing</h3>
+                        <div class="grid-4" style="margin-bottom: 32px;">
+                            <div class="tool-item">create_persona</div>
+                            <div class="tool-item">edit_persona</div>
+                            <div class="tool-item">validate_persona</div>
+                        </div>
+                        
+                        <h3>System Tools</h3>
+                        <div class="grid-4" style="margin-bottom: 32px;">
+                            <div class="tool-item">check_for_updates</div>
+                            <div class="tool-item">update_server</div>
+                            <div class="tool-item">rollback_update</div>
+                            <div class="tool-item">get_server_status</div>
+                            <div class="tool-item">configure_indicator</div>
+                            <div class="tool-item">get_indicator_config</div>
+                        </div>
+                        
+                        <h3>User Identity</h3>
+                        <div class="grid-4" style="margin-bottom: 32px;">
+                            <div class="tool-item">set_user_identity</div>
+                            <div class="tool-item">get_user_identity</div>
+                            <div class="tool-item">clear_user_identity</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Creating Personas Section -->
+                    <div class="doc-section">
+                        <h2>Creating Personas</h2>
+                        <p style="font-size: 18px; color: #6b7280; margin-bottom: 32px;">Personas are AI behavioral profiles that transform how your AI assistant interacts.</p>
+                        
+                        <h3>Persona Structure</h3>
+                        <p>Every persona is a markdown file with YAML frontmatter:</p>
+                        <pre><code>---
+name: "Your Persona Name"
+description: "Brief description of what this persona does"
+unique_id: "auto-generated-if-missing"
+author: "your-username"
+triggers: ["keyword1", "keyword2"]
+version: "1.0"
+category: "creative"
+age_rating: "all"
+ai_generated: false
+generation_method: "human"
+price: "free"
+license: "CC-BY-SA-4.0"
+---
+
+# Your Persona Name
+
+Your persona instructions go here. This content defines how the AI should behave when this persona is activated.
+
+## Response Style
+- Communication guidelines
+- Tone and approach
+- Specific behaviors
+
+## Key Techniques
+- Problem-solving methods
+- Interaction patterns</code></pre>
+                        
+                        <h3>Creating via Chat</h3>
+                        <p>Use DollhouseMCP tools directly in your AI chat:</p>
+                        <pre><code><span class="code-comment"># Create a new persona through chat</span>
+create_persona "Study Buddy" "A helpful tutor" "educational" "You are a patient tutor..."
+
+<span class="code-comment"># Edit existing persona</span>
+edit_persona "Study Buddy" "description" "An encouraging academic mentor"
+
+<span class="code-comment"># Validate before sharing</span>
+validate_persona "Study Buddy"
+
+<span class="code-comment"># Submit to the collection</span>
+submit_to_collection "Study Buddy"</code></pre>
+                        
+                        <h3>Categories</h3>
+                        <ul style="margin-left: 24px; color: #6b7280;">
+                            <li><strong>creative</strong> - Writing, art, storytelling</li>
+                            <li><strong>professional</strong> - Business, technical, analytical</li>
+                            <li><strong>educational</strong> - Teaching, tutoring, explaining</li>
+                            <li><strong>gaming</strong> - Game masters, interactive fiction</li>
+                            <li><strong>personal</strong> - Coaching, therapy, companionship</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Collection Section -->
+                    <div class="doc-section">
+                        <h2>DollhouseMCP Collection</h2>
+                        <p style="font-size: 18px; color: #6b7280; margin-bottom: 32px;">The DollhouseMCP Collection on GitHub is where the community shares personas, skills, agents, and more.</p>
+                        
+                        <h3>Browsing Content</h3>
+                        <pre><code><span class="code-comment"># Browse all content in the collection</span>
+browse_collection
+
+<span class="code-comment"># Browse by category</span>
+browse_collection "creative"
+
+<span class="code-comment"># Search for specific content</span>
+search_collection "python developer"</code></pre>
+                        
+                        <h3>Installing from the Collection</h3>
+                        <pre><code><span class="code-comment"># Install a persona from the collection</span>
+install_from_collection "creative/storyteller.md"
+
+<span class="code-comment"># The content is downloaded to your local instance</span>
+<span class="code-comment"># and immediately available for use</span></code></pre>
+                        
+                        <h3>Contributing to the Collection</h3>
+                        <ol style="margin-left: 24px; color: #6b7280;">
+                            <li>Create and test your content locally</li>
+                            <li>Validate it meets quality standards</li>
+                            <li>Submit via the <code>submit_to_collection</code> tool</li>
+                            <li>Your submission creates a GitHub issue for review</li>
+                            <li>Once approved, it's added to the collection</li>
+                        </ol>
+                    </div>
+                    
+                    <!-- Links Section -->
+                    <div class="doc-section">
+                        <h2>Additional Resources</h2>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;">
+                            <a href="https://github.com/DollhouseMCP/mcp-server#readme" target="_blank" class="card" style="text-decoration: none; color: inherit;">
+                                <h4>📚 Full Documentation</h4>
+                                <p style="color: #6b7280; font-size: 14px;">Complete README with all details on GitHub</p>
+                            </a>
+                            <a href="https://github.com/DollhouseMCP/mcp-server/issues" target="_blank" class="card" style="text-decoration: none; color: inherit;">
+                                <h4>🐛 Report Issues</h4>
+                                <p style="color: #6b7280; font-size: 14px;">Found a bug? Let us know on GitHub</p>
+                            </a>
+                            <a href="https://github.com/DollhouseMCP/collection" target="_blank" class="card" style="text-decoration: none; color: inherit;">
+                                <h4>🎭 Browse Collection</h4>
+                                <p style="color: #6b7280; font-size: 14px;">Explore community personas and content</p>
+                            </a>
+                            <a href="https://www.npmjs.com/package/@mickdarling/dollhousemcp" target="_blank" class="card" style="text-decoration: none; color: inherit;">
+                                <h4>📦 NPM Package</h4>
+                                <p style="color: #6b7280; font-size: 14px;">View package details and versions</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Support Page (formerly Pricing) -->
+    <div id="support" class="page">
+        <section style="padding: 60px 0;">
+            <div class="container">
+                <div class="section-header">
+                    <h1>Support the Project</h1>
+                    <p>DollhouseMCP is 100% open source. Optional cloud features help keep the lights on.</p>
+                </div>
+                
+                <!-- Philosophy Section -->
+                <div style="background: #f9fafb; border-radius: 16px; padding: 40px; margin-bottom: 60px; text-align: center;">
+                    <h2 style="font-size: 32px; margin-bottom: 20px;">Built for the Community, by the Community</h2>
+                    <p style="font-size: 18px; color: #6b7280; max-width: 800px; margin: 0 auto 24px;">
+                        DollhouseMCP will always be free and open source. Run it locally, modify it, share personas - no limits, no tracking, no accounts required. 
+                        Cloud features are purely optional conveniences for those who want them.
+                    </p>
+                    <div style="display: flex; gap: 40px; justify-content: center; margin-top: 32px;">
+                        <div>
+                            <div style="font-size: 36px; font-weight: 700; color: #1e40af;">∞</div>
+                            <div style="color: #6b7280;">Local Usage</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 36px; font-weight: 700; color: #1e40af;">$0</div>
+                            <div style="color: #6b7280;">Forever Free</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 36px; font-weight: 700; color: #1e40af;">100%</div>
+                            <div style="color: #6b7280;">Open Source</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pricing-grid" style="grid-template-columns: repeat(3, 1fr); gap: 40px;">
+                    <div class="pricing-card">
+                        <h3>Local Forever</h3>
+                        <div class="pricing-price">$0<span>/forever</span></div>
+                        <p style="color: #6b7280; margin-bottom: 24px;">Everything you need, on your machine</p>
+                        <ul class="pricing-features">
+                            <li>All 23 MCP tools</li>
+                            <li>Unlimited personas & ensembles</li>
+                            <li>Full collection access</li>
+                            <li>Create & share content</li>
+                            <li>Auto-updates</li>
+                            <li>Community support</li>
+                            <li>Commercial use allowed</li>
+                        </ul>
+                        <a onclick="navigateTo('docs')" class="btn btn-secondary" style="width: 100%; margin-top: 24px;">Get Started →</a>
+                    </div>
+                    
+                    <div class="pricing-card" style="border-color: #bfdbfe;">
+                        <h3>Cloud Sync</h3>
+                        <div class="pricing-price">$5<span>/month</span></div>
+                        <p style="color: #6b7280; margin-bottom: 24px;">Optional conveniences for power users</p>
+                        <ul class="pricing-features">
+                            <li>Everything in Local</li>
+                            <li>Cloud persona backup</li>
+                            <li>Sync across devices</li>
+                            <li>Private vault (1GB)</li>
+                            <li>Version history</li>
+                            <li>Priority collection listing</li>
+                        </ul>
+                        <a href="#" class="btn btn-secondary" style="width: 100%; margin-top: 24px;">Coming Soon</a>
+                    </div>
+                    
+                    <div class="pricing-card">
+                        <h3>Organization</h3>
+                        <div class="pricing-price">Let's talk</div>
+                        <p style="color: #6b7280; margin-bottom: 24px;">For teams and enterprises</p>
+                        <ul class="pricing-features">
+                            <li>Private deployment options</li>
+                            <li>Team management</li>
+                            <li>SSO integration</li>
+                            <li>Dedicated support</li>
+                            <li>Custom integrations</li>
+                            <li>SLA guarantees</li>
+                        </ul>
+                        <a href="mailto:info@dollhousemcp.com" class="btn btn-secondary" style="width: 100%; margin-top: 24px;">Contact Us →</a>
+                    </div>
+                </div>
+                
+                <!-- Support Options -->
+                <div style="margin-top: 80px; text-align: center;">
+                    <h2 style="margin-bottom: 40px;">Other Ways to Support</h2>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: 900px; margin: 0 auto;">
+                        <div class="card" style="text-align: center; padding: 32px;">
+                            <div style="font-size: 48px; margin-bottom: 16px;">⭐</div>
+                            <h4>Star on GitHub</h4>
+                            <p style="color: #6b7280; font-size: 14px;">Help others discover the project</p>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 32px;">
+                            <div style="font-size: 48px; margin-bottom: 16px;">🎭</div>
+                            <h4>Share Personas</h4>
+                            <p style="color: #6b7280; font-size: 14px;">Contribute to the community collection</p>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 32px;">
+                            <div style="font-size: 48px; margin-bottom: 16px;">💬</div>
+                            <h4>Spread the Word</h4>
+                            <p style="color: #6b7280; font-size: 14px;">Tell others about DollhouseMCP</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Note about commercial use -->
+                <div style="background: #eff6ff; border-radius: 12px; padding: 24px; margin-top: 60px; text-align: center;">
+                    <p style="color: #1e40af; margin: 0;">
+                        <strong>Note on Commercial Use:</strong> While the AGPL license requires sharing modifications, we only ask (not require) 
+                        that commercial users consider supporting the project if they find value in it. Your success is our success!
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3>DollhouseMCP</h3>
+                    <p>Universal MCP server for AI personas & tools.<br>Open source, privacy-first, community-driven.</p>
+                    <div class="social-links">
+                        <a href="https://github.com/DollhouseMCP" class="social-link" target="_blank">🐙</a>
+                        <a href="https://twitter.com/dollhousemcp" class="social-link" target="_blank">𝕏</a>
+                        <a href="#" class="social-link">💬</a>
+                        <a href="mailto:info@dollhousemcp.com" class="social-link">📧</a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a onclick="navigateTo('home')">Features</a></li>
+                        <li><a onclick="navigateTo('library')">Library</a></li>
+                        <li><a onclick="navigateTo('support')">Support Project</a></li>
+                        <li><a href="https://github.com/DollhouseMCP/mcp-server/blob/main/CHANGELOG.md" target="_blank">Changelog</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a onclick="navigateTo('docs')">Documentation</a></li>
+                        <li><a href="https://github.com/DollhouseMCP/mcp-server#quick-start" target="_blank">Quick Start</a></li>
+                        <li><a href="https://github.com/DollhouseMCP/mcp-server#mcp-tools" target="_blank">API Reference</a></li>
+                        <li><a href="https://github.com/DollhouseMCP/mcp-server/tree/main/personas" target="_blank">Examples</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://github.com/DollhouseMCP/mcp-server/issues" target="_blank">Issues</a></li>
+                        <li><a href="https://github.com/DollhouseMCP/mcp-server/discussions" target="_blank">Discussions</a></li>
+                        <li><a href="https://github.com/DollhouseMCP/collection" target="_blank">Collection</a></li>
+                        <li><a href="https://www.npmjs.com/package/@mickdarling/dollhousemcp" target="_blank">NPM Package</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>GitHub</h4>
+                    <ul>
+                        <li><a href="https://github.com/DollhouseMCP/mcp-server" target="_blank">MCP Server</a></li>
+                        <li><a href="https://github.com/DollhouseMCP/collection" target="_blank">Collection</a></li>
+                        <li><a href="https://github.com/DollhouseMCP/personas" target="_blank">Personas</a></li>
+                        <li><a href="https://github.com/DollhouseMCP/mcp-server/blob/main/LICENSE" target="_blank">License</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 DollhouseMCP. Made with ❤️ by the community. AGPL-3.0 Licensed.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navigation
+        function navigateTo(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update nav highlighting
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.getElementById('nav-' + pageId).classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        // Library filtering
+        function filterLibrary(category) {
+            // Update buttons
+            document.querySelectorAll('.category-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter cards
+            document.querySelectorAll('.library-card').forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // Installation tabs
+        function showHomeInstall(type) {
+            // Hide all
+            document.getElementById('npm-install-home').style.display = 'none';
+            document.getElementById('local-install-home').style.display = 'none';
+            document.getElementById('docker-install-home').style.display = 'none';
+            
+            // Show selected
+            document.getElementById(type + '-install-home').style.display = 'block';
+            
+            // Update buttons
+            event.target.parentElement.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+        
+        function showInstallDoc(type) {
+            // Hide all
+            document.getElementById('npm-install-doc').style.display = 'none';
+            document.getElementById('local-install-doc').style.display = 'none';
+            document.getElementById('docker-install-doc').style.display = 'none';
+            
+            // Show selected
+            document.getElementById(type + '-install-doc').style.display = 'block';
+            
+            // Update buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

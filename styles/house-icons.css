@@ -1,0 +1,410 @@
+/* DollhouseMCP House Icon System - Extracted from Sprite Sheet */
+
+/* Base House Structure */
+.house-icon {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.house-icon-small {
+  width: 32px;
+  height: 32px;
+}
+
+.house-icon-large {
+  width: 64px;
+  height: 64px;
+}
+
+.house-roof {
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-bottom: 14px solid var(--roof-color, var(--color-brand-primary));
+  margin-bottom: -1px;
+}
+
+.house-icon-small .house-roof {
+  border-left-width: 13px;
+  border-right-width: 13px;
+  border-bottom-width: 9px;
+}
+
+.house-icon-large .house-roof {
+  border-left-width: 27px;
+  border-right-width: 27px;
+  border-bottom-width: 19px;
+}
+
+.house-body {
+  width: 40px;
+  height: 28px;
+  background: white;
+  border: 2px solid var(--border-color, var(--color-brand-primary));
+  border-radius: 2px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2px;
+  padding: 2px;
+  margin-bottom: -1px;
+}
+
+.house-icon-small .house-body {
+  width: 26px;
+  height: 18px;
+  border-width: 1.5px;
+  gap: 1px;
+  padding: 1px;
+}
+
+.house-icon-large .house-body {
+  width: 54px;
+  height: 38px;
+  border-width: 2.5px;
+  gap: 3px;
+  padding: 3px;
+}
+
+.house-room {
+  border-radius: 1px;
+}
+
+.house-room-1 { background: var(--room1-color, var(--color-brand-primary)); }
+.house-room-2 { background: var(--room2-color, #6366f1); }
+.house-room-3 { background: var(--room3-color, #8b5cf6); }
+.house-room-4 { background: var(--room4-color, #a855f7); }
+
+.house-foundation {
+  width: 46px;
+  height: 8px;
+  background: var(--foundation-color, var(--color-brand-secondary));
+  border-radius: 1px;
+  margin-top: 0px;
+}
+
+.house-icon-small .house-foundation {
+  width: 30px;
+  height: 5px;
+}
+
+.house-icon-large .house-foundation {
+  width: 62px;
+  height: 11px;
+}
+
+/* Chimney Variations */
+.house-chimney-left {
+  position: absolute;
+  width: 6px;
+  height: 8px;
+  background: var(--chimney-color, var(--color-brand-secondary));
+  border-radius: 1px;
+  top: 4px;
+  left: 8px;
+}
+
+.house-chimney-right {
+  position: absolute;
+  width: 6px;
+  height: 8px;
+  background: var(--chimney-color, var(--color-brand-secondary));
+  border-radius: 1px;
+  top: 4px;
+  right: 8px;
+}
+
+/* Shadow Effect */
+.house-shadow {
+  filter: drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.15));
+}
+
+/* Color Schemes */
+.house-blue {
+  --roof-color: #3b82f6;
+  --border-color: #3b82f6;
+  --chimney-color: #1e40af;
+  --foundation-color: #1e40af;
+  --room1-color: #3b82f6;
+  --room2-color: #6366f1;
+  --room3-color: #8b5cf6;
+  --room4-color: #a855f7;
+}
+
+.house-indigo {
+  --roof-color: #6366f1;
+  --border-color: #6366f1;
+  --chimney-color: #4338ca;
+  --foundation-color: #4338ca;
+  --room1-color: #6366f1;
+  --room2-color: #4f46e5;
+  --room3-color: #4338ca;
+  --room4-color: #3730a3;
+}
+
+.house-monochrome {
+  --roof-color: #374151;
+  --border-color: #374151;
+  --chimney-color: #1f2937;
+  --foundation-color: #1f2937;
+  --room1-color: #374151;
+  --room2-color: #4b5563;
+  --room3-color: #6b7280;
+  --room4-color: #9ca3af;
+}
+
+.house-purple {
+  --roof-color: #8b5cf6;
+  --border-color: #8b5cf6;
+  --chimney-color: #6d28d9;
+  --foundation-color: #6d28d9;
+  --room1-color: #8b5cf6;
+  --room2-color: #7c3aed;
+  --room3-color: #6d28d9;
+  --room4-color: #5b21b6;
+}
+
+.house-pink {
+  --roof-color: #ec4899;
+  --border-color: #ec4899;
+  --chimney-color: #be185d;
+  --foundation-color: #be185d;
+  --room1-color: #ec4899;
+  --room2-color: #db2777;
+  --room3-color: #be185d;
+  --room4-color: #9d174d;
+}
+
+.house-rainbow {
+  --roof-color: #3b82f6;
+  --border-color: #3b82f6;
+  --chimney-color: #1e40af;
+  --foundation-color: #1e40af;
+  --room1-color: #3b82f6;
+  --room2-color: #10b981;
+  --room3-color: #f59e0b;
+  --room4-color: #ec4899;
+}
+
+.house-green {
+  --roof-color: #10b981;
+  --border-color: #10b981;
+  --chimney-color: #047857;
+  --foundation-color: #047857;
+  --room1-color: #10b981;
+  --room2-color: #059669;
+  --room3-color: #047857;
+  --room4-color: #065f46;
+}
+
+.house-teal {
+  --roof-color: #14b8a6;
+  --border-color: #14b8a6;
+  --chimney-color: #0f766e;
+  --foundation-color: #0f766e;
+  --room1-color: #14b8a6;
+  --room2-color: #0d9488;
+  --room3-color: #0f766e;
+  --room4-color: #115e59;
+}
+
+.house-cyan {
+  --roof-color: #06b6d4;
+  --border-color: #06b6d4;
+  --chimney-color: #0e7490;
+  --foundation-color: #0e7490;
+  --room1-color: #06b6d4;
+  --room2-color: #0891b2;
+  --room3-color: #0e7490;
+  --room4-color: #155e75;
+}
+
+.house-orange {
+  --roof-color: #f59e0b;
+  --border-color: #f59e0b;
+  --chimney-color: #b45309;
+  --foundation-color: #b45309;
+  --room1-color: #f59e0b;
+  --room2-color: #d97706;
+  --room3-color: #b45309;
+  --room4-color: #92400e;
+}
+
+.house-amber {
+  --roof-color: #f59e0b;
+  --border-color: #f59e0b;
+  --chimney-color: #92400e;
+  --foundation-color: #92400e;
+  --room1-color: #fbbf24;
+  --room2-color: #f59e0b;
+  --room3-color: #d97706;
+  --room4-color: #b45309;
+}
+
+.house-yellow {
+  --roof-color: #eab308;
+  --border-color: #eab308;
+  --chimney-color: #a16207;
+  --foundation-color: #a16207;
+  --room1-color: #fde047;
+  --room2-color: #eab308;
+  --room3-color: #ca8a04;
+  --room4-color: #a16207;
+}
+
+.house-rose {
+  --roof-color: #f43f5e;
+  --border-color: #f43f5e;
+  --chimney-color: #e11d48;
+  --foundation-color: #e11d48;
+  --room1-color: #fb7185;
+  --room2-color: #f43f5e;
+  --room3-color: #e11d48;
+  --room4-color: #be123c;
+}
+
+.house-red {
+  --roof-color: #ef4444;
+  --border-color: #ef4444;
+  --chimney-color: #b91c1c;
+  --foundation-color: #b91c1c;
+  --room1-color: #ef4444;
+  --room2-color: #dc2626;
+  --room3-color: #b91c1c;
+  --room4-color: #991b1b;
+}
+
+.house-grayscale {
+  --roof-color: #6b7280;
+  --border-color: #6b7280;
+  --chimney-color: #4b5563;
+  --foundation-color: #4b5563;
+  --room1-color: #6b7280;
+  --room2-color: #9ca3af;
+  --room3-color: #d1d5db;
+  --room4-color: #e5e7eb;
+}
+
+/* Retro Gaming Themes */
+.house-gameboy {
+  --roof-color: #0f380f;
+  --border-color: #0f380f;
+  --chimney-color: #0f380f;
+  --foundation-color: #0f380f;
+  --room1-color: #0f380f;
+  --room2-color: #306230;
+  --room3-color: #8bac0f;
+  --room4-color: #9bbc0f;
+}
+
+.house-commodore {
+  --roof-color: #40318d;
+  --border-color: #40318d;
+  --chimney-color: #40318d;
+  --foundation-color: #40318d;
+  --room1-color: #40318d;
+  --room2-color: #7869c4;
+  --room3-color: #6c5eb5;
+  --room4-color: #a85fb4;
+}
+
+.house-nes {
+  --roof-color: #0f0f0f;
+  --border-color: #0f0f0f;
+  --chimney-color: #0f0f0f;
+  --foundation-color: #0f0f0f;
+  --room1-color: #7c7c7c;
+  --room2-color: #0000fc;
+  --room3-color: #fcfcfc;
+  --room4-color: #f83800;
+}
+
+.house-terminal {
+  --roof-color: #00ff00;
+  --border-color: #00ff00;
+  --chimney-color: #00cc00;
+  --foundation-color: #00cc00;
+  --room1-color: #00ff00;
+  --room2-color: #00cc00;
+  --room3-color: #009900;
+  --room4-color: #006600;
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .house-body {
+  background: var(--color-neutral-900);
+}
+
+/* Animated house icon */
+@keyframes house-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes room-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.house-animated {
+  animation: house-float 3s ease-in-out infinite;
+}
+
+.house-animated .house-room {
+  animation: room-pulse 2s ease-in-out infinite;
+}
+
+.house-animated .house-room-1 { animation-delay: 0s; }
+.house-animated .house-room-2 { animation-delay: 0.5s; }
+.house-animated .house-room-3 { animation-delay: 1s; }
+.house-animated .house-room-4 { animation-delay: 1.5s; }
+
+/* Interactive house states */
+.house-interactive {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.house-interactive:hover {
+  transform: scale(1.1);
+}
+
+.house-interactive:active {
+  transform: scale(0.95);
+}
+
+/* House as a loading indicator */
+@keyframes house-build {
+  0% { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  25% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.house-loading .house-roof {
+  animation: house-build 0.5s ease-out;
+}
+
+.house-loading .house-body {
+  animation: house-build 0.5s ease-out 0.2s both;
+}
+
+.house-loading .house-foundation {
+  animation: house-build 0.5s ease-out 0.4s both;
+}
