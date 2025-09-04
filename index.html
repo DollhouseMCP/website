@@ -165,6 +165,20 @@
             color: var(--color-brand-primary);
             font-weight: var(--font-weight-semibold);
         }
+        
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto var(--space-6) auto;
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .logo {
+                width: 80px;
+                height: 80px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -177,6 +191,7 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
+            <img src="logo.svg" alt="DollhouseMCP Logo" class="logo" />
             <h1>DollhouseMCP</h1>
             <p class="hero-subtitle">
                 Stop hoping AI understands what you want.<br>
