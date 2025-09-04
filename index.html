@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DollhouseMCP - Vibe Tooling for AI</title>
+    <meta name="description" content="Build persistent AI tools with natural language. Open source platform for creating, sharing, and evolving AI personas and skills.">
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .hero {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: var(--space-8) var(--space-4);
+        }
+        
+        .hero-content {
+            max-width: 800px;
+        }
+        
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: var(--space-6);
+            background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: var(--font-size-xl);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-8);
+            line-height: 1.6;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: var(--space-4);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .section {
+            padding: var(--space-16) var(--space-4);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-8);
+            margin-top: var(--space-12);
+        }
+        
+        .feature-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-8);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            border-color: var(--color-brand-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-4);
+        }
+        
+        .feature-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-3);
+            color: var(--color-text-primary);
+        }
+        
+        .feature-description {
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+        
+        .story-section {
+            background: var(--color-neutral-50);
+        }
+        
+        [data-theme="dark"] .story-section {
+            background: var(--color-neutral-900);
+        }
+        
+        .story-content {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: var(--font-size-lg);
+            line-height: 1.8;
+            color: var(--color-text-secondary);
+        }
+        
+        .story-content p {
+            margin-bottom: var(--space-6);
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-secondary));
+            color: white;
+            text-align: center;
+        }
+        
+        .cta-section h2 {
+            color: white;
+            margin-bottom: var(--space-6);
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: var(--space-4);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: var(--space-4);
+            right: var(--space-4);
+            z-index: var(--z-sticky);
+        }
+        
+        .code-example {
+            background: var(--color-neutral-900);
+            border-radius: var(--radius-md);
+            padding: var(--space-6);
+            margin: var(--space-8) 0;
+            overflow-x: auto;
+        }
+        
+        .code-example pre {
+            color: var(--color-neutral-100);
+            font-family: var(--font-family-mono);
+            font-size: var(--font-size-sm);
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        .highlight {
+            color: var(--color-brand-primary);
+            font-weight: var(--font-weight-semibold);
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button class="btn btn-secondary theme-toggle" onclick="toggleTheme()">
+        <span class="icon-moon">🌙</span>
+        <span class="icon-sun">☀️</span>
+    </button>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>DollhouseMCP</h1>
+            <p class="hero-subtitle">
+                Stop hoping AI understands what you want.<br>
+                Build tools that remember, evolve, and actually work.
+            </p>
+            <div class="hero-buttons">
+                <a href="https://github.com/DollhouseMCP/mcp-server" class="btn btn-primary btn-lg">
+                    Get Started on GitHub
+                </a>
+                <a href="#story" class="btn btn-secondary btn-lg">
+                    Read the Story
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="text-center">Vibe Tooling vs Vibe Coding</h2>
+            <p class="text-center text-lg text-secondary" style="max-width: 700px; margin: 0 auto;">
+                Vibe coding promises zero to 100% done in one prompt. It never works reliably.<br>
+                With DollhouseMCP, you build individual tools that persist, evolve, and improve over time.
+            </p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3 class="feature-title">Natural Language Tools</h3>
+                    <p class="feature-description">
+                        Tell it once "be a harsh security-focused code reviewer" and it remembers forever. 
+                        Need adjustments? Just ask. Version control included.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎭</div>
+                    <h3 class="feature-title">Persistent Personas</h3>
+                    <p class="feature-description">
+                        Create personas with actual personality and skills. They maintain context across 
+                        sessions and platforms, evolving as you refine them.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔗</div>
+                    <h3 class="feature-title">Skills That Stack</h3>
+                    <p class="feature-description">
+                        Combine LinkedIn analysis, copy editing, audio generation, and more. When skills 
+                        interact, the whole becomes greater than the sum of its parts.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3 class="feature-title">Open Source</h3>
+                    <p class="feature-description">
+                        Free and open source. The core will always be free. Build on it, extend it, 
+                        share your creations with the community.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Ready Today</h3>
+                    <p class="feature-description">
+                        Not a concept or beta. It works today with Claude and any MCP-compatible system. 
+                        Start building in minutes.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Actually Useful</h3>
+                    <p class="feature-description">
+                        Built to solve real problems. Already being used for copy editing, content 
+                        analysis, automation, and creative applications we never imagined.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Example Section -->
+    <section class="section story-section">
+        <div class="container">
+            <h2 class="text-center">See It In Action</h2>
+            <div class="code-example">
+                <pre><span class="highlight">// Create a code reviewer persona</span>
+"Be a harsh but constructive security-focused code reviewer"
+<span class="text-secondary">→ Persona created: security-reviewer v1.0</span>
+
+<span class="highlight">// Use it anywhere, anytime</span>
+"Review this authentication module"
+<span class="text-secondary">→ 7 security issues found, 3 critical...</span>
+
+<span class="highlight">// Evolve as needed</span>
+"Dial back the harshness but add web security focus"
+<span class="text-secondary">→ Updated to security-reviewer v1.1</span>
+
+<span class="highlight">// It remembers everything</span>
+Next session, next week, different platform...
+<span class="text-secondary">→ Your tools are always there, always ready</span></pre>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Story Section -->
+    <section id="story" class="section">
+        <div class="container">
+            <h2 class="text-center">The Story Behind DollhouseMCP</h2>
+            <div class="story-content">
+                <p>
+                    <strong>It started with a simple problem:</strong> After two years of building with AI tools, 
+                    I found cool and useful prompts scattered across Reddit, Discord, and LinkedIn. But it became 
+                    messy and hard to find what I wanted when I needed it. I had an incredibly bad system for 
+                    organizing them.
+                </p>
+                <p>
+                    So I started building a simple catalog system using Claude Code and MCP. Day one: proof of 
+                    concept worked. Week two: hey, this is pretty cool. Month two: I realized I could create a 
+                    collection for everyone to use and share. 
+                </p>
+                <p>
+                    <strong>The breakthrough:</strong> Instead of hoping AI understands what you want every time 
+                    (vibe coding), you build individual tools using natural language that persist and evolve 
+                    (vibe tooling). These tools remember your preferences, maintain context, and improve over time.
+                </p>
+                <p>
+                    For those who remember Tomorrowish, this builds on more than a decade of ML/AI work. The 
+                    patents in natural language processing we received provided me a unique lens for blending 
+                    programmatic tools with LLMs.
+                </p>
+                <p>
+                    <strong>Today:</strong> DollhouseMCP is incredibly useful every day. I'm using it right now 
+                    for copy editing through verbal instructions. It's helped me solve dozens of problems. And 
+                    it's remarkably fun to use. The audio skill took five minutes to build, which felt incredibly sci-fi.
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="section cta-section">
+        <div class="container">
+            <h2>Ready to Build Better AI Tools?</h2>
+            <p class="text-lg" style="margin-bottom: var(--space-8);">
+                Stop repeating yourself. Start building tools that remember.
+            </p>
+            <div class="cta-buttons">
+                <a href="https://github.com/DollhouseMCP/mcp-server" class="btn btn-white btn-lg">
+                    View on GitHub
+                </a>
+                <a href="https://github.com/DollhouseMCP/mcp-server#quick-start" class="btn btn-outline-white btn-lg">
+                    Quick Start Guide
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="section" style="text-align: center; padding: var(--space-8);">
+        <p class="text-secondary">
+            Built with DollhouseMCP • Open Source • 
+            <a href="https://github.com/DollhouseMCP">GitHub</a> • 
+            <a href="https://www.linkedin.com/in/mickdarling/">LinkedIn</a>
+        </p>
+    </footer>
+    
+    <script>
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
