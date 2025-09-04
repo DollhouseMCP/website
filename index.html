@@ -128,12 +128,6 @@
             flex-wrap: wrap;
         }
         
-        .theme-toggle {
-            position: fixed;
-            top: var(--space-4);
-            right: var(--space-4);
-            z-index: var(--z-sticky);
-        }
         
         .code-example {
             background: var(--color-neutral-100);
@@ -166,32 +160,84 @@
             font-weight: var(--font-weight-semibold);
         }
         
+        .nav-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--color-background);
+            border-bottom: 1px solid var(--color-border);
+            z-index: var(--z-sticky);
+            padding: var(--space-3) var(--space-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-6);
+        }
+        
         .logo {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto var(--space-6) auto;
+            width: 40px;
+            height: 40px;
             display: block;
         }
         
+        .nav-links {
+            display: flex;
+            gap: var(--space-6);
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--color-brand-primary);
+        }
+        
+        body {
+            padding-top: 60px;
+        }
+        
         @media (max-width: 768px) {
-            .logo {
-                width: 80px;
-                height: 80px;
+            .nav-header {
+                padding: var(--space-2) var(--space-4);
+            }
+            .nav-links {
+                gap: var(--space-4);
             }
         }
     </style>
 </head>
 <body>
-    <!-- Theme Toggle -->
-    <button class="btn btn-secondary theme-toggle" onclick="toggleTheme()">
-        <span class="icon-moon">🌙</span>
-        <span class="icon-sun">☀️</span>
-    </button>
+    <!-- Navigation Header -->
+    <header class="nav-header">
+        <div class="nav-left">
+            <img src="icons/Dollhouse-org.png" alt="DollhouseMCP Logo" class="logo" />
+            <nav class="nav-links">
+                <a href="#">Home</a>
+                <a href="#story">About</a>
+                <a href="/blog">Blog</a>
+                <a href="https://github.com/DollhouseMCP/mcp-server" target="_blank">GitHub</a>
+            </nav>
+        </div>
+        <button class="btn btn-secondary" onclick="toggleTheme()">
+            <span class="icon-moon">🌙</span>
+            <span class="icon-sun">☀️</span>
+        </button>
+    </header>
     
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <img src="icons/Dollhouse-org.png" alt="DollhouseMCP Logo" class="logo" />
             <h1>DollhouseMCP</h1>
             <p class="hero-subtitle">
                 Stop hoping AI understands what you want.<br>
