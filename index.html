@@ -188,7 +188,7 @@
         <div class="container">
             <h2 class="text-center">Vibe Tooling vs Vibe Coding</h2>
             <p class="text-center text-lg text-secondary" style="max-width: 700px; margin: 0 auto;">
-                Vibe coding promises zero to 100% done in one prompt. It never works reliably.<br>
+                Vibe coding's ideal is zero to 100% done in one prompt. It never works reliably.<br>
                 With DollhouseMCP, you build individual tools that persist, evolve, and improve over time.
             </p>
             
@@ -253,23 +253,27 @@
     <!-- Example Section -->
     <section class="section story-section">
         <div class="container">
-            <h2 class="text-center">See It In Action</h2>
+            <h2 class="text-center">Getting Started</h2>
             <div class="code-example">
-                <pre><span class="highlight">// Create a code reviewer persona</span>
-"Be a harsh but constructive security-focused code reviewer"
-<span class="text-secondary">→ Persona created: security-reviewer v1.0</span>
+                <pre><span class="highlight"># Install via npm</span>
+npm install -g @dollhousemcp/mcp-server
 
-<span class="highlight">// Use it anywhere, anytime</span>
-"Review this authentication module"
-<span class="text-secondary">→ 7 security issues found, 3 critical...</span>
+<span class="highlight"># Configure Claude Desktop</span>
+<span class="text-secondary">Add to your config file:</span>
+<span class="text-secondary">• macOS: ~/Library/Application Support/Claude/claude_desktop_config.json</span>
+<span class="text-secondary">• Windows: %APPDATA%\Claude\claude_desktop_config.json</span>
+<span class="text-secondary">• Linux: ~/.config/Claude/claude_desktop_config.json</span>
 
-<span class="highlight">// Evolve as needed</span>
-"Dial back the harshness but add web security focus"
-<span class="text-secondary">→ Updated to security-reviewer v1.1</span>
+{
+  "mcpServers": {
+    "dollhousemcp": {
+      "command": "dollhousemcp"
+    }
+  }
+}
 
-<span class="highlight">// It remembers everything</span>
-Next session, next week, different platform...
-<span class="text-secondary">→ Your tools are always there, always ready</span></pre>
+<span class="highlight"># Restart Claude Desktop and you're ready!</span>
+<span class="text-secondary">Your AI now has access to persistent tools that remember and evolve.</span></pre>
             </div>
         </div>
     </section>
@@ -280,30 +284,52 @@ Next session, next week, different platform...
             <h2 class="text-center">The Story Behind DollhouseMCP</h2>
             <div class="story-content">
                 <p>
-                    <strong>It started with a simple problem:</strong> After two years of building with AI tools, 
-                    I found cool and useful prompts scattered across Reddit, Discord, and LinkedIn. But it became 
-                    messy and hard to find what I wanted when I needed it. I had an incredibly bad system for 
-                    organizing them.
+                    <strong>Hey everyone,</strong>
                 </p>
                 <p>
-                    So I started building a simple catalog system using Claude Code and MCP. Day one: proof of 
-                    concept worked. Week two: hey, this is pretty cool. Month two: I realized I could create a 
-                    collection for everyone to use and share. 
+                    It's been a while since I've posted about my work.
                 </p>
                 <p>
-                    <strong>The breakthrough:</strong> Instead of hoping AI understands what you want every time 
-                    (vibe coding), you build individual tools using natural language that persist and evolve 
-                    (vibe tooling). These tools remember your preferences, maintain context, and improve over time.
+                    Over two years, I've been building with AI tools, searching for something with real spark. I've worked on Chrome extensions, robotics demos, writing tools, collaborative platforms. Some were interesting, some optimized my workflow, but nothing felt like it could both help people and be a product people would actually love... until recently.
                 </p>
                 <p>
-                    For those who remember Tomorrowish, this builds on more than a decade of ML/AI work. The 
-                    patents in natural language processing we received provided me a unique lens for blending 
-                    programmatic tools with LLMs.
+                    I've been working with ChatGPT, Claude, Claude Code, Gemini, Groq, and others. I found cool and useful prompts scattered across Reddit, Discord, and LinkedIn, but it became messy and hard to find what I wanted when I needed it. I had an incredibly bad system for organizing them.
                 </p>
                 <p>
-                    <strong>Today:</strong> DollhouseMCP is incredibly useful every day. I'm using it right now 
-                    for copy editing through verbal instructions. It's helped me solve dozens of problems. And 
-                    it's remarkably fun to use. The audio skill took five minutes to build, which felt incredibly sci-fi.
+                    So I started building a catalog system for prompts using Claude Code and MCP. Day one: proof of concept worked. Week two: hey, this is pretty cool. Month two: I can create a collection for everyone to use and share. I just finished my second month and it all works remarkably well.
+                </p>
+                <p>
+                    <strong>I call it DollhouseMCP.</strong> The simplest way to describe it is "vibe tooling" instead of vibe coding.
+                </p>
+                <p>
+                    Vibe coding's ideal is zero to 100% done in one prompt. When that fails (always), you tweak and try again. Maybe you get something good. Even when it works, you can't repeat that success reliably. You haven't built tools to make the next project easier.
+                </p>
+                <p>
+                    With DollhouseMCP and vibe tooling, you build individual tools using natural language. These tools persist. They can be modified, even evolve on their own as needed. The system saves everything. When multiple personas and skills interact, the whole becomes greater than the sum of its parts.
+                </p>
+                <p>
+                    Tell it once "be a harsh security-focused code reviewer," and it remembers forever. Need it less harsh? Say "dial back the harshness and add Web security focus." Version 1.2, done.
+                </p>
+                <p>
+                    The personas have personality and skills: analyzing LinkedIn profiles, copy editing, generating audio summaries that speak in clear, contextual language. The audio skill took five minutes to build, which felt incredibly sci-fi. They can maintain context across sessions and platforms.
+                </p>
+                <p>
+                    For those who remember Tomorrowish, this builds on more than a decade of ML/AI work. I think the patents in natural language processing we received provided me a unique lens for blending programmatic tools with LLMs.
+                </p>
+                <p>
+                    <strong>It's open source. It's on GitHub. It works today.</strong>
+                </p>
+                <p>
+                    This platform is incredibly useful every day. I'm using it right now for copy editing through verbal instructions. It's helped me solve dozens of problems. And it's remarkably fun to use.
+                </p>
+                <p>
+                    I'll continue developing this as open source. The core will always be free, with compelling business applications worth exploring. People are already sharing creative uses I never dreamed of.
+                </p>
+                <p>
+                    For my friends in media tech: there are exciting possibilities here beyond typical AI applications.
+                </p>
+                <p>
+                    There's a lot more to explore here.
                 </p>
             </div>
         </div>
