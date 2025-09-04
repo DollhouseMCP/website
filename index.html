@@ -265,8 +265,14 @@
         <div class="container">
             <h2 class="text-center">Getting Started</h2>
             <div class="code-example">
-                <pre><span class="highlight"># Install via npm</span>
-npm install -g @dollhousemcp/mcp-server
+                <pre><span class="highlight"># Option 1: Local installation (recommended)</span>
+mkdir ~/mcp-servers && cd ~/mcp-servers
+npm init -y
+npm install @dollhousemcp/mcp-server
+
+<span class="highlight"># Option 2: Use npx (no installation needed)</span>
+<span class="text-secondary">Run directly without installing:</span>
+npx @dollhousemcp/mcp-server
 
 <span class="highlight"># Configure Claude Desktop</span>
 <span class="text-secondary">Add to your config file:</span>
@@ -274,10 +280,22 @@ npm install -g @dollhousemcp/mcp-server
 <span class="text-secondary">• Windows: %APPDATA%\Claude\claude_desktop_config.json</span>
 <span class="text-secondary">• Linux: ~/.config/Claude/claude_desktop_config.json</span>
 
+<span class="text-secondary">For local installation:</span>
 {
   "mcpServers": {
     "dollhousemcp": {
-      "command": "dollhousemcp"
+      "command": "node",
+      "args": ["/Users/YOU/mcp-servers/node_modules/@dollhousemcp/mcp-server/dist/index.js"]
+    }
+  }
+}
+
+<span class="text-secondary">For npx:</span>
+{
+  "mcpServers": {
+    "dollhousemcp": {
+      "command": "npx",
+      "args": ["@dollhousemcp/mcp-server"]
     }
   }
 }
