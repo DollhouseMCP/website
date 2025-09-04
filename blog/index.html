@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - DollhouseMCP</title>
+    <meta name="description" content="Latest updates, tutorials, and insights from the DollhouseMCP team.">
+    <link rel="stylesheet" href="../styles/main.css">
+    <style>
+        .nav-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--color-background);
+            border-bottom: 1px solid var(--color-border);
+            z-index: var(--z-sticky);
+            padding: var(--space-3) var(--space-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-6);
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            display: block;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: var(--space-6);
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--color-brand-primary);
+        }
+        
+        body {
+            padding-top: 60px;
+        }
+        
+        .blog-header {
+            background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-secondary));
+            color: white;
+            padding: var(--space-16) var(--space-4);
+            text-align: center;
+        }
+        
+        .blog-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--space-8) var(--space-4);
+        }
+        
+        .blog-post {
+            margin-bottom: var(--space-12);
+            padding-bottom: var(--space-12);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .blog-post:last-child {
+            border-bottom: none;
+        }
+        
+        .post-date {
+            color: var(--color-text-tertiary);
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--space-2);
+        }
+        
+        .post-title {
+            color: var(--color-text-primary);
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--space-3);
+            text-decoration: none;
+            display: block;
+            transition: color 0.2s;
+        }
+        
+        .post-title:hover {
+            color: var(--color-brand-primary);
+        }
+        
+        .post-excerpt {
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+            margin-bottom: var(--space-4);
+        }
+        
+        .read-more {
+            color: var(--color-brand-primary);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+            transition: opacity 0.2s;
+        }
+        
+        .read-more:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="nav-header">
+        <div class="nav-left">
+            <a href="/"><img src="../icons/Dollhouse-org.png" alt="DollhouseMCP Logo" class="logo" /></a>
+            <nav class="nav-links">
+                <a href="/">Home</a>
+                <a href="/#story">About</a>
+                <a href="/blog" class="active">Blog</a>
+                <a href="https://github.com/DollhouseMCP/mcp-server" target="_blank">GitHub</a>
+            </nav>
+        </div>
+        <button class="btn btn-secondary" onclick="toggleTheme()">
+            <span class="icon-moon">🌙</span>
+            <span class="icon-sun">☀️</span>
+        </button>
+    </header>
+    
+    <!-- Blog Header -->
+    <section class="blog-header">
+        <h1>DollhouseMCP Blog</h1>
+        <p>Updates, tutorials, and insights from the team</p>
+    </section>
+    
+    <!-- Blog Posts -->
+    <div class="blog-container">
+        <article class="blog-post">
+            <div class="post-date">September 4, 2025</div>
+            <a href="/blog/launch-announcement.html" class="post-title">Introducing DollhouseMCP: Vibe Tooling for AI</a>
+            <p class="post-excerpt">
+                After two years of building with AI tools, we're excited to announce DollhouseMCP - a new way to create persistent, 
+                evolving tools using natural language. Learn about our journey from scattered prompts to a comprehensive system that 
+                remembers, adapts, and grows with your needs.
+            </p>
+            <a href="/blog/launch-announcement.html" class="read-more">Read more →</a>
+        </article>
+        
+        <article class="blog-post">
+            <div class="post-date">Coming Soon</div>
+            <h2 class="post-title">Getting Started with DollhouseMCP</h2>
+            <p class="post-excerpt">
+                A comprehensive guide to setting up DollhouseMCP with Claude Desktop, creating your first personas and skills, 
+                and understanding the difference between vibe coding and vibe tooling.
+            </p>
+        </article>
+    </div>
+    
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+</body>
+</html>
