@@ -10,11 +10,11 @@
     </linearGradient>
   </defs>
   
+  <!-- Chimney (behind roof) -->
+  <rect x="125" y="55" width="15" height="35" fill="#8b5cf6" />
+  
   <!-- Roof -->
   <path d="M 100 40 L 150 90 L 50 90 Z" fill="url(#roofGradient)" />
-  
-  <!-- Chimney -->
-  <rect x="125" y="55" width="15" height="35" fill="#8b5cf6" />
   
   <!-- House body -->
   <rect x="55" y="90" width="90" height="70" fill="url(#wallGradient)" rx="2" />
