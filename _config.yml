@@ -1,0 +1,83 @@
+# Jekyll Configuration for DollhouseMCP Website
+# Built for GitHub Pages compatibility
+
+# Site Settings
+title: DollhouseMCP
+description: "Vibe Tooling for AI - Build persistent AI tools with natural language"
+url: "https://dollhousemcp.com"
+baseurl: ""
+author: Mick Darling
+email: mick@mickdarling.com
+
+# Build Settings
+markdown: kramdown
+theme: null # Using custom theme
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Blog Configuration
+permalink: /blog/:year/:month/:title/
+paginate: 10
+paginate_path: "/blog/page:num/"
+
+# Collections
+collections:
+  posts:
+    output: true
+    permalink: /blog/:year/:month/:title/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      author: "Mick Darling"
+  - scope:
+      path: "content/blog"
+    values:
+      layout: "post"
+      is_blog_post: true
+
+# Exclude from processing
+exclude:
+  - README.md
+  - LICENSE
+  - CNAME
+  - .git
+  - .github
+  - docs/security
+  - mockups
+  - SECURITY.md
+
+# Include specific files
+include:
+  - _pages
+  - .well-known
+
+# Sass/SCSS (if we convert CSS to SCSS later)
+sass:
+  style: compressed
+  sass_dir: styles
+
+# SEO and Social
+twitter:
+  username: mickdarling
+  card: summary_large_image
+
+social:
+  name: DollhouseMCP
+  links:
+    - https://github.com/DollhouseMCP
+    - https://twitter.com/mickdarling
+
+# Analytics (for future use)
+google_analytics: # Add tracking ID when ready
+
+# Feed settings
+feed:
+  posts_limit: 20
+  path: /blog/feed.xml
