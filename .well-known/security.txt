@@ -1,0 +1,34 @@
+# DollhouseMCP Security Policy
+#
+# This file implements the security.txt standard (RFC 9116)
+# For more information: https://securitytxt.org/
+
+# Our security email address
+Contact: mailto:security@dollhousemcp.com
+
+# Our security policy page
+Policy: https://github.com/DollhouseMCP/website/security/policy
+
+# Our preferred languages for communication
+Preferred-Languages: en
+
+# Acknowledgments page for security researchers
+Acknowledgments: https://github.com/DollhouseMCP/website/security/advisories
+
+# Expiration date for this file (6 months from now)
+Expires: 2026-03-16T00:00:00.000Z
+
+# Organization responsible for this domain
+Organization: DollhouseMCP
+
+# Canonical location of this file
+Canonical: https://dollhousemcp.com/.well-known/security.txt
+
+# PGP key for encrypted communication (when available)
+# Encryption: https://dollhousemcp.com/pgp-key.txt
+
+# Bug bounty program (future)
+# Bounty: https://dollhousemcp.com/bug-bounty
+
+# Signature for this file (when we have signing set up)
+# Signature: https://dollhousemcp.com/.well-known/security.txt.sig

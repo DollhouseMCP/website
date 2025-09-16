@@ -1,0 +1,31 @@
+# DollhouseMCP Website - robots.txt
+#
+# This file tells search engine crawlers which parts of the site they can access
+# We want search engines to index our site for discoverability
+
+# Allow all legitimate search engines
+User-agent: *
+Allow: /
+
+# Block bad bots and scrapers
+User-agent: AhrefsBot
+User-agent: SemrushBot
+User-agent: DotBot
+User-agent: MJ12bot
+User-agent: PetalBot
+Disallow: /
+
+# Point to sitemap (when we have one)
+# Sitemap: https://dollhousemcp.com/sitemap.xml
+
+# Security.txt location for security researchers
+# See https://securitytxt.org/
+Security.txt: https://dollhousemcp.com/.well-known/security.txt
+
+# Crawl-delay to be respectful of resources (in seconds)
+# Most modern bots ignore this, but it's good practice
+Crawl-delay: 1
+
+# Specify preference for HTTPS (though most bots use HTTPS by default now)
+# This is a non-standard directive but doesn't hurt
+Prefer-https: true
