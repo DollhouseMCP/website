@@ -15,6 +15,7 @@
 
 /* Page-Specific Styles */
 @import 'pages/landing.css';
+@import 'pages/blog.css';
 
 /* Theme-specific adjustments */
 [data-theme="dark"] {
