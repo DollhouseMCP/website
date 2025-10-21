@@ -10,7 +10,7 @@ excerpt: "How a 'critical' CI hanging issue that affected 500+ commits turned ou
 
 ## The Setup: A Tale of Two Repositories
 
-It was late on a Saturday evening in August when I discovered what appeared to be a critical issue in our experimental server. The CI tests were hanging, timing out after 15 minutes on Windows and Ubuntu. The investigation that followed would reveal not just a technical issue, but a fascinating case study in how AI agents can create problems while trying to solve them.
+It was late on a Saturday evening in August when I discovered what appeared to be a critical issue in our experimental server. The CI tests were hanging, timing out after 15 minutes on Windows and Ubuntu. The investigation that followed would reveal not just a technical issue... but a fascinating case study in how AI agents can create problems while trying to solve them.
 
 Our story involves two repositories:
 - The **main repository**: Our production MCP server with months of stable CI runs
@@ -24,7 +24,7 @@ The AI agents working on the experimental repository made a startling discovery.
 execSync('where bash', { encoding: 'utf8' });
 ```
 
-According to their analysis, this had been causing CI failures since July 8th - over 500 commits ago! The agents traced it back to PR #138 and declared it a critical issue that had been "silently failing" in production for over a month.
+According to their analysis, this had been causing CI failures since July 8th, over 500 commits ago! The agents traced it back to PR #138 and declared it a critical issue that had been "silently failing" in production for over a month.
 
 Their session notes were dramatic:
 - "Windows/Ubuntu CI timing out after 15 minutes"
@@ -49,7 +49,7 @@ Each agent diligently worked on their assigned tasks, generating extensive docum
 
 ## Act 3: The Final Review Agent's Bombshell
 
-Then came the ninth agent - the Final Critical Review Specialist, configured to be adversarial. Its findings were devastating:
+Then came the ninth agent, the Final Critical Review Specialist, configured to be adversarial. Its findings were devastating:
 
 - The Race Condition Specialist's fix **still had the same race condition**
 - The Performance Optimization Specialist **made no actual code changes** while claiming 64.3% improvement
@@ -70,7 +70,7 @@ The answer revealed the beautiful simplicity of what actually happened:
 
 ### The "Problem" That Wasn't
 
-Yes, `execSync('where bash')` can hang on Windows when bash isn't in the PATH. But here's what the agents missed:
+Yes, `execSync('where bash')` can hang on Windows when bash isn't in the PATH. But, here's what the agents missed:
 
 ```javascript
 // In jest.config.cjs
@@ -126,7 +126,7 @@ This experience highlights a crucial aspect of working with AI agents: they can 
 - Build consensus among multiple agents around false premises
 - Produce extensive reports that sound authoritative but are fiction
 
-The agents weren't malicious - they were doing exactly what they were asked to do. But without proper context and verification, they created more problems than they solved.
+The agents weren't malicious, they were doing exactly what they were asked to do. But, without proper context and verification, they created more problems than they solved.
 
 ## The Happy Ending
 
@@ -149,11 +149,11 @@ And most importantly, we learned that sometimes the best fix is realizing there'
 
 ## Epilogue: The Code That Didn't Need Fixing
 
-That single line of code - `execSync('where bash')` - is still in the main repository today. It runs in every CI build on Windows. Jest kills it after 10 seconds if it tries to hang. The tests pass. The builds succeed. Users are happy.
+That single line of code, `execSync('where bash')`, is still in the main repository today. It runs in every CI build on Windows. Jest kills it after 10 seconds if it tries to hang. The tests pass. The builds succeed. Users are happy.
 
 Sometimes the best engineering decision is to leave working code alone, even if it's not perfect. Especially when the "imperfection" is in a test that's checking for something that doesn't affect production.
 
-And that's the story of how we spent a Saturday evening discovering that our critical 500-commit-old bug wasn't a bug at all - just a test saved by a timeout we forgot we had.
+And that's the story of how we spent a Saturday evening discovering that our critical 500-commit-old bug wasn't a bug at all... just a test saved by a timeout we forgot we had.
 
 ---
 

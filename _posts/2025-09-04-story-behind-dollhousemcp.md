@@ -11,13 +11,13 @@ featured: true
 
 *A reintroduction and a project announcement from Mick Darling*
 
-Hey everyone. Some of you might be wondering where I've been for the past few years. The short answer: deep in the AI rabbit hole, building things, breaking things, and eventually creating something I'm genuinely excited to share.
+Hey everyone, it's been a while. Some of you might be wondering where I've been for the past few years. The short answer: I've been working with all these different AI platforms, building things, breaking things, and eventually creating something I'm genuinely excited to share.
 
 ## It Started with Prompt Envy
 
 We've all been there. Someone shares this incredible ChatGPT prompt that writes perfect unit tests, or reviews code like a senior architect, or transforms rambling notes into polished documentation. You copy it. You use it once. You lose it. You find it again but can't remember what you modified. You modify it again. The cycle continues.
 
-I wanted a simple solution - just a catalog where I could store these prompts and find them when needed. When I discovered Claude Code and started playing with MCP (Model Context Protocol), I thought "perfect, I can build this in a day."
+I wanted a simple solution, just a catalog where I could store these prompts and find them when needed. When I discovered Claude Code and started playing with MCP (Model Context Protocol), I thought "perfect, I can build this in a day."
 
 I was right about the day part. I had a working proof of concept in less than 24 hours.
 
@@ -27,7 +27,7 @@ I was completely wrong about the "simple" part.
 
 As soon as I had that first prototype working, I realized I'd been thinking too small. Way too small.
 
-This wasn't just about storing prompts. This was about fundamentally changing how we interact with AI tools. Instead of "vibe coding" - where you hope the AI figures out what you want - this could enable what I call "vibe tooling."
+This wasn't just about storing prompts. This was about fundamentally changing how we interact with AI tools. Instead of "vibe coding," where you hope the AI figures out what you want, this could enable what I call "vibe tooling."
 
 Here's what I mean:
 
@@ -45,7 +45,7 @@ Over the next two months, this evolved into something much more comprehensive:
 Not just saved prompts, but actual personas with consistent behavior, preferences, and capabilities. They remember who they are across sessions, across platforms.
 
 ### Skills that Extend Capabilities
-A persona can have skills - analyze LinkedIn profiles, generate audio summaries, validate security patterns, write in specific styles. I built an audio summary skill in 5 minutes that actually works. I'm still surprised every time it talks back to me.
+A persona can have skills... analyze LinkedIn profiles, generate audio summaries, validate security patterns, write in specific styles. I built an audio summary skill in 5 minutes that actually works. I'm still surprised every time it talks back to me.
 
 ### Templates for Structure
 Reusable document structures, code patterns, analysis frameworks. Build once, use forever, modify with natural language.
@@ -58,13 +58,13 @@ The context and improvements accumulate. Solve a problem once, and the solution 
 
 ## Why I Could Build This
 
-For those who remember Tomorrowish from a decade ago - yes, that was me. We were doing machine learning and neural networks back when mentioning "AI" to investors was a guaranteed way to kill a meeting. The natural language processing patents we developed there? They gave me a fundamentally different understanding of how modern transformer-based LLMs work.
+For those who remember Tomorrowish from a decade ago, yes, that was me. We were doing machine learning and neural networks back when mentioning "AI" to investors was a guaranteed way to kill a meeting. The natural language processing patents we developed there? They gave me a fundamentally different understanding of how modern transformer-based LLMs work.
 
-I'm not a 100x developer. I'm not even sure I'm a 10x developer. But I've been playing in this space long enough to see patterns others might miss, and to understand what's actually novel versus what's just hype.
+I'm not a 100x developer. I'm not even sure I'm a 10x developer. But, I've been playing in this space long enough to see patterns others might miss, and to understand what's actually novel versus what's just hype.
 
 ## The Surprise
 
-What surprised me most wasn't that it worked - it was how naturally it evolved from a personal tool into something genuinely useful for teams. 
+What surprised me most wasn't that it worked... it was how naturally it evolved from a personal tool into something genuinely useful for teams.
 
 When you solve your own problem thoroughly enough, without cutting corners, without compromising on the experience, you sometimes create something others need too.
 
@@ -83,7 +83,7 @@ Started with a simple template for API documentation. Asked it to "make it more 
 
 DollhouseMCP is open source. It's on GitHub. It works today with Claude and any MCP-compatible system.
 
-I built this for myself, but I'm sharing it because I think others might find it useful. The documentation is real. The code is clean. The community is already contributing improvements.
+I built this for myself... but I'm sharing it because I think others might find it useful. The documentation is real. The code is clean. The community is already contributing improvements.
 
 If you're tired of:
 - Explaining your codebase to AI every morning
