@@ -16,6 +16,9 @@ _site/
 .jekyll-metadata
 Gemfile.lock
 vendor/
+blog/20*/
+blog/all-posts.html
+blog/posts-preview.html
 
 # Environment
 .env
