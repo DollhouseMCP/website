@@ -9,6 +9,14 @@ dist/
 build/
 *.tsbuildinfo
 
+# Jekyll
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+Gemfile.lock
+vendor/
+
 # Environment
 .env
 .env.local

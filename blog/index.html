@@ -14,7 +14,7 @@ description: Technical articles, case studies, and insights about AI tooling and
 
     <div class="container">
         <div class="blog-posts">
-            {% for post in site.posts %}
+            {% for post in paginator.posts %}
             <article class="blog-card">
                 <div class="blog-card-meta">
                     <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%B %d, %Y" }}</time>

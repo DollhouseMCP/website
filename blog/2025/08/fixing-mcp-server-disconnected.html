@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Story Behind DollhouseMCP - DollhouseMCP Blog</title>
+    <meta name="description" content="A reintroduction and a project announcement - how a simple prompt catalog evolved into something much bigger">
+    <link rel="stylesheet" href="../../../styles/main.css">
+    <style>
+        .nav-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--color-background);
+            border-bottom: 1px solid var(--color-border);
+            z-index: var(--z-sticky);
+            padding: var(--space-3) var(--space-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-6);
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            display: block;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-6);
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--color-brand-primary);
+        }
+
+        body {
+            padding-top: 60px;
+        }
+
+        .blog-post-full {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--space-8) var(--space-4);
+        }
+
+        .post-header {
+            background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-secondary));
+            color: white;
+            padding: var(--space-12) var(--space-4);
+            margin: 0 0 var(--space-8) 0;
+            text-align: center;
+        }
+
+        .post-meta {
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
+            margin-bottom: var(--space-4);
+        }
+
+        .post-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: var(--space-4);
+            line-height: 1.2;
+        }
+
+        .post-content {
+            font-size: var(--font-size-lg);
+            line-height: 1.7;
+            color: var(--color-text-primary);
+        }
+
+        .post-content h2 {
+            margin-top: var(--space-10);
+            margin-bottom: var(--space-4);
+            font-size: var(--font-size-2xl);
+            color: var(--color-text-primary);
+        }
+
+        .post-content h3 {
+            margin-top: var(--space-8);
+            margin-bottom: var(--space-3);
+            font-size: var(--font-size-xl);
+        }
+
+        .post-content p {
+            margin-bottom: var(--space-4);
+        }
+
+        .post-content ul,
+        .post-content ol {
+            margin-bottom: var(--space-4);
+            padding-left: var(--space-6);
+        }
+
+        .post-content li {
+            margin-bottom: var(--space-2);
+        }
+
+        .post-content strong {
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+        }
+
+        .post-content em {
+            font-style: italic;
+            color: var(--color-text-secondary);
+        }
+
+        .post-content a {
+            color: var(--color-brand-primary);
+            text-decoration: underline;
+        }
+
+        .post-content a:hover {
+            text-decoration: none;
+        }
+
+        .post-tags {
+            display: flex;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: var(--space-4);
+        }
+
+        .tag {
+            padding: var(--space-1) var(--space-3);
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+        }
+
+        .featured-badge {
+            display: inline-block;
+            padding: var(--space-1) var(--space-3);
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .post-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: var(--space-12);
+            padding-top: var(--space-6);
+            border-top: 1px solid var(--color-border);
+        }
+
+        .post-nav a {
+            color: var(--color-brand-primary);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+        }
+
+        .post-nav a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="nav-header">
+        <div class="nav-left">
+            <a href="/"><img src="../../../icons/Dollhouse-org.png" alt="DollhouseMCP Logo" class="logo" /></a>
+            <nav class="nav-links">
+                <a href="/">Home</a>
+                <a href="/#story">About</a>
+                <a href="/blog" class="active">Blog</a>
+                <a href="https://github.com/DollhouseMCP/mcp-server" target="_blank">GitHub</a>
+            </nav>
+        </div>
+        <button class="btn btn-secondary" onclick="toggleTheme()">
+            <span class="icon-moon">🌙</span>
+            <span class="icon-sun">☀️</span>
+        </button>
+    </header>
+
+    <article class="blog-post-full">
+        <header class="post-header">
+            <div class="post-meta">
+                September 4, 2025 • Mick Darling
+                <span class="featured-badge">Featured</span>
+            </div>
+            <h1 class="post-title">The Story Behind DollhouseMCP: From Prompt Envy to Vibe Tooling</h1>
+            <p>A reintroduction and a project announcement - how a simple prompt catalog evolved into something much bigger</p>
+            <div class="post-tags">
+                <span class="tag">AI</span>
+                <span class="tag">Open Source</span>
+                <span class="tag">MCP</span>
+                <span class="tag">Product Story</span>
+                <span class="tag">Natural Language</span>
+            </div>
+        </header>
+
+        <div class="post-content">
+            <p><em>A reintroduction and a project announcement from Mick Darling</em></p>
+
+            <p>Hey everyone. Some of you might be wondering where I've been for the past few years. The short answer: deep in the AI rabbit hole, building things, breaking things, and eventually creating something I'm genuinely excited to share.</p>
+
+            <h2>It Started with Prompt Envy</h2>
+
+            <p>We've all been there. Someone shares this incredible ChatGPT prompt that writes perfect unit tests, or reviews code like a senior architect, or transforms rambling notes into polished documentation. You copy it. You use it once. You lose it. You find it again but can't remember what you modified. You modify it again. The cycle continues.</p>
+
+            <p>I wanted a simple solution - just a catalog where I could store these prompts and find them when needed. When I discovered Claude Code and started playing with MCP (Model Context Protocol), I thought "perfect, I can build this in a day."</p>
+
+            <p>I was right about the day part. I had a working proof of concept in less than 24 hours.</p>
+
+            <p>I was completely wrong about the "simple" part.</p>
+
+            <h2>The Rabbit Hole</h2>
+
+            <p>As soon as I had that first prototype working, I realized I'd been thinking too small. Way too small.</p>
+
+            <p>This wasn't just about storing prompts. This was about fundamentally changing how we interact with AI tools. Instead of "vibe coding" - where you hope the AI figures out what you want - this could enable what I call "vibe tooling."</p>
+
+            <p>Here's what I mean:</p>
+
+            <p><strong>Traditional AI interaction</strong>: Every session starts fresh. You explain your context, your preferences, your standards. The AI responds. Next session? Start over.</p>
+
+            <p><strong>Vibe tooling</strong>: You build tools using natural language that persist and evolve. You don't write code to create these tools - you just describe what you want. "Be a security-focused code reviewer who's harsh but constructive." Done. That tool now exists.</p>
+
+            <p>Need to adjust it? "Be less harsh but maintain the security focus." Version 1.2 of your tool, created with one sentence.</p>
+
+            <h2>What DollhouseMCP Actually Does</h2>
+
+            <p>Over the next two months, this evolved into something much more comprehensive:</p>
+
+            <h3>Personas with Personality</h3>
+            <p>Not just saved prompts, but actual personas with consistent behavior, preferences, and capabilities. They remember who they are across sessions, across platforms.</p>
+
+            <h3>Skills that Extend Capabilities</h3>
+            <p>A persona can have skills - analyze LinkedIn profiles, generate audio summaries, validate security patterns, write in specific styles. I built an audio summary skill in 5 minutes that actually works. I'm still surprised every time it talks back to me.</p>
+
+            <h3>Templates for Structure</h3>
+            <p>Reusable document structures, code patterns, analysis frameworks. Build once, use forever, modify with natural language.</p>
+
+            <h3>Agents with Autonomy</h3>
+            <p>They work independently toward goals. When they need a new capability, they can find or create DollhouseMCP elements to solve problems. It's remarkably self-improving.</p>
+
+            <h3>Memory that Persists</h3>
+            <p>The context and improvements accumulate. Solve a problem once, and the solution is available forever. Each refinement makes the system more capable.</p>
+
+            <h2>Why I Could Build This</h2>
+
+            <p>For those who remember Tomorrowish from a decade ago - yes, that was me. We were doing machine learning and neural networks back when mentioning "AI" to investors was a guaranteed way to kill a meeting. The natural language processing patents we developed there? They gave me a fundamentally different understanding of how modern transformer-based LLMs work.</p>
+
+            <p>I'm not a 100x developer. I'm not even sure I'm a 10x developer. But I've been playing in this space long enough to see patterns others might miss, and to understand what's actually novel versus what's just hype.</p>
+
+            <h2>The Surprise</h2>
+
+            <p>What surprised me most wasn't that it worked - it was how naturally it evolved from a personal tool into something genuinely useful for teams.</p>
+
+            <p>When you solve your own problem thoroughly enough, without cutting corners, without compromising on the experience, you sometimes create something others need too.</p>
+
+            <h2>Real Examples That Made Me Realize This Was Different</h2>
+
+            <h3>The Code Review Persona</h3>
+            <p>I created "Marcus" - a senior architect persona who reviews code. Not revolutionary, right? Except Marcus remembers our entire codebase structure, our specific error handling patterns, our API conventions. When I tweaked him to be "less pedantic about naming but more strict about error handling," that preference stuck. Forever.</p>
+
+            <h3>The Audio Feedback Loop</h3>
+            <p>I was deep in a debugging session when I realized I'd been reading walls of text for hours. On a whim, I created a skill that summarizes progress in audio. Five minutes later, Claude was literally talking to me, summarizing what we'd found and what to try next. It sounds like a small thing, but it changed how I work.</p>
+
+            <h3>The Documentation Evolution</h3>
+            <p>Started with a simple template for API documentation. Asked it to "make it more like Stripe's docs." It adapted. Then "add examples in Python and JavaScript." It evolved. Now it generates documentation that looks like we hired Stripe's documentation team. Each refinement built on the last.</p>
+
+            <h2>What's Next</h2>
+
+            <p>DollhouseMCP is open source. It's on GitHub. It works today with Claude and any MCP-compatible system.</p>
+
+            <p>I built this for myself, but I'm sharing it because I think others might find it useful. The documentation is real. The code is clean. The community is already contributing improvements.</p>
+
+            <p>If you're tired of:</p>
+            <ul>
+                <li>Explaining your codebase to AI every morning</li>
+                <li>Losing track of prompts that worked perfectly</li>
+                <li>Inconsistent AI responses across your team</li>
+                <li>Starting from zero with every new session</li>
+            </ul>
+
+            <p>Then maybe this is for you.</p>
+
+            <h2>The Real Question</h2>
+
+            <p>What would you teach an AI once if you knew it would remember forever?</p>
+
+            <p>For me, it was my code review preferences. Then my documentation style. Then my debugging approach. Now it's dozens of patterns and preferences that make AI actually useful instead of just impressive.</p>
+
+            <p>What would it be for you?</p>
+
+            <h2>Try It</h2>
+
+            <p>The entire system is open source and available on <a href="https://github.com/DollhouseMCP/mcp-server">GitHub</a>. It takes about 5 minutes to set up if you're already using Claude Code.</p>
+
+            <p>Or just browse the <a href="https://github.com/DollhouseMCP/collection">community collection</a> to see what personas and skills others have built. Everything from harsh code reviewers to empathetic user researchers to technical documentation specialists.</p>
+
+            <p>The best part? If you build something useful, you can share it back with the community. Your solution to a problem might be exactly what someone else needs.</p>
+
+            <h2>Get In Touch</h2>
+
+            <p>I'm genuinely curious about how others might use this. If you build something interesting, let me know. If you hit a limitation, definitely let me know. If you think this is solving the wrong problem entirely, I want to hear that too.</p>
+
+            <p>Find me on <a href="https://linkedin.com/in/mickdarling">LinkedIn</a> or just open an issue on GitHub.</p>
+
+            <hr style="margin: var(--space-8) 0; border: 1px solid var(--color-border);">
+
+            <p><em>Mick Darling is the creator of DollhouseMCP and founder of Tomorrowish. He holds multiple patents in natural language processing and has been working with AI/ML since before it was cool (or funded).</em></p>
+        </div>
+
+        <nav class="post-nav">
+            <a href="/blog">← Back to Blog</a>
+            <a href="/blog/2025/08/mobile-development-workflow.html">Next Post →</a>
+        </nav>
+    </article>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+</body>
+</html>
