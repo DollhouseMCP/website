@@ -37,7 +37,8 @@
                 const savedTheme = localStorage.getItem('theme') || 'light';
                 document.documentElement.dataset.theme = savedTheme;
             } catch (e) {
-                // localStorage unavailable in private browsing
+                // localStorage unavailable in private browsing - fallback to light theme
+                console.warn('Theme preference unavailable, using default:', e.message);
                 document.documentElement.dataset.theme = 'light';
             }
         })();
