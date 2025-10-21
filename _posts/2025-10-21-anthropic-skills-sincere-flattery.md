@@ -1,5 +1,5 @@
 ---
-title: "Anthropic's 'Skills' or: Sincere Flattery Without the Acknowledgment"
+title: "Anthropic's 'Skills' for Sincere Flattery"
 date: 2025-10-21
 author: Mick Darling
 description: "What happens when you share detailed architecture in a contest and the company launches something similar six weeks later"
@@ -7,7 +7,7 @@ tags: ["AI", "Open Source", "MCP", "Anthropic", "Community", "Documentation"]
 featured: true
 ---
 
-# Anthropic's 'Skills' or: Sincere Flattery Without the Acknowledgment
+# Anthropic's 'Skills' for Sincere Flattery
 
 They say imitation is the sincerest form of flattery.
 
