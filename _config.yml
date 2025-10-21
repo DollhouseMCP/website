@@ -75,4 +75,4 @@ google_analytics: # Add tracking ID when ready
 # Feed settings
 feed:
   posts_limit: 20
-  path: feed.xml
+  path: blog/feed.xml

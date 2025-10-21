@@ -15,11 +15,22 @@
         const currentTheme = html.dataset.theme;
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         html.dataset.theme = newTheme;
-        localStorage.setItem('theme', newTheme);
+        try {
+            localStorage.setItem('theme', newTheme);
+        } catch (e) {
+            // localStorage may be unavailable in private browsing or when quota exceeded
+            console.warn('Unable to save theme preference:', e);
+        }
     }
 
     // Load saved theme
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    let savedTheme = 'light';
+    try {
+        savedTheme = localStorage.getItem('theme') || 'light';
+    } catch (e) {
+        // localStorage may be unavailable in private browsing
+        console.warn('Unable to load theme preference:', e);
+    }
     document.documentElement.dataset.theme = savedTheme;
 
     // Smooth scroll for anchor links
