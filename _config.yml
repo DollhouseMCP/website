@@ -16,6 +16,7 @@ plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
+  - jekyll-paginate
 
 # Blog Configuration
 permalink: /blog/:year/:month/:title/
@@ -26,7 +27,6 @@ paginate_path: "/blog/page:num/"
 collections:
   posts:
     output: true
-    permalink: /blog/:year/:month/:title/
 
 # Defaults
 defaults:
@@ -36,11 +36,6 @@ defaults:
     values:
       layout: "post"
       author: "Mick Darling"
-  - scope:
-      path: "content/blog"
-    values:
-      layout: "post"
-      is_blog_post: true
 
 # Exclude from processing
 exclude:
@@ -80,4 +75,4 @@ google_analytics: # Add tracking ID when ready
 # Feed settings
 feed:
   posts_limit: 20
-  path: /blog/feed.xml
+  path: feed.xml
