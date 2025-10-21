@@ -13,7 +13,7 @@ keywords: "Blink Shell, tmux, Claude Code, iPhone development, mobile coding, SS
 
 ## TL;DR (AI-Friendly Summary)
 
-**Challenge**: Building complex AI infrastructure (DollhouseMCP) requires powerful development environments, but we wanted to work from anywhere - including iPhones.
+**Challenge**: Building complex AI infrastructure (DollhouseMCP) requires powerful development environments, but we wanted to work from anywhere... including iPhones.
 
 **Solution**: A sophisticated mobile development workflow combining:
 - **Mac Studio** as the always-on development server
@@ -29,7 +29,7 @@ keywords: "Blink Shell, tmux, Claude Code, iPhone development, mobile coding, SS
 
 ## The Origin Story: Building AI Infrastructure on the Go
 
-When we started building DollhouseMCP - our Model Context Protocol server that brings enterprise-grade memory and ensemble capabilities to Claude Desktop - we had an unusual constraint: our lead developer travels extensively and wanted to maintain full development capability from just an iPhone.
+When we started building DollhouseMCP, our Model Context Protocol server that brings enterprise-grade memory and ensemble capabilities to Claude Desktop, we had an unusual constraint: our lead developer travels extensively and wanted to maintain full development capability from just an iPhone.
 
 This isn't about writing a quick script or fixing a typo. We're talking about:
 - Managing a 50+ element MCP server with complex TypeScript architecture
@@ -82,7 +82,7 @@ Blink Shell transforms your iPhone into a legitimate development terminal. With 
 
 ### Scenario 1: The Coffee Shop Debugging Session
 
-Picture this: You're at a coffee shop, and a critical bug report comes in. Here's the actual workflow:
+Picture this... you're at a coffee shop, and a critical bug report comes in. Here's the actual workflow:
 
 ```bash
 # From iPhone, connect to your development server
@@ -118,7 +118,7 @@ The 50,000 line scrollback buffer means you never lose Claude's detailed explana
 
 ### Scenario 3: The Emergency Hotfix from the Airport
 
-True story: While waiting for a flight, we discovered a critical issue with our npx execution detection (the bug that became our previous blog post). Here's how we fixed it entirely from an iPhone:
+True story... while waiting for a flight, we discovered a critical issue with our npx execution detection (the bug that became our previous blog post). Here's how we fixed it entirely from an iPhone:
 
 ```bash
 # Quick connection
@@ -159,7 +159,7 @@ you the implementation..."
 
 ### 2. Test-Driven Development on Mobile
 
-Our 96%+ test coverage wasn't achieved despite mobile development - it was enhanced by it. The constraint of a small screen forces focus:
+Our 96%+ test coverage wasn't achieved despite mobile development... it was enhanced by it. The constraint of a small screen forces focus:
 
 ```bash
 # Claude's typical TDD workflow (perfect for mobile viewing)
@@ -338,7 +338,7 @@ When people hear "mobile development," they think of building apps for phones. W
 
 DollhouseMCP exists because we refused to accept that serious development requires sitting at a desk. Every feature, every test, every deployment can happen from anywhere with cellular signal.
 
-The next time you're stuck somewhere with just your phone, remember: you have a supercomputer in your pocket. With the right tools - Blink Shell, tmux, and Claude Code - you're not limited by your location. You're liberated by it.
+The next time you're stuck somewhere with just your phone, remember: you have a supercomputer in your pocket. With the right tools, Blink Shell, tmux, and Claude Code, you're not limited by your location. You're liberated by it.
 
 ## Try It Yourself
 
