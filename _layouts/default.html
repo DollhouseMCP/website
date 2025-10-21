@@ -28,6 +28,20 @@
     {% if page.custom_css %}
     <link rel="stylesheet" href="{{ page.custom_css }}">
     {% endif %}
+
+    <!-- Theme Init (prevent FOUC) -->
+    <script>
+        // Load saved theme immediately to prevent flash of unstyled content
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                document.documentElement.dataset.theme = savedTheme;
+            } catch (e) {
+                // localStorage unavailable in private browsing
+                document.documentElement.dataset.theme = 'light';
+            }
+        })();
+    </script>
 </head>
 <body>
     <div class="layout-wrapper">

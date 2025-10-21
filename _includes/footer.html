@@ -2,8 +2,8 @@
 <footer class="section" style="text-align: center; padding: var(--space-8);">
     <p class="text-secondary">
         Built with DollhouseMCP • Open Source •
-        <a href="https://github.com/DollhouseMCP">GitHub</a> •
-        <a href="https://www.linkedin.com/in/mickdarling/">LinkedIn</a> •
+        <a href="https://github.com/DollhouseMCP" target="_blank" rel="noopener noreferrer">GitHub</a> •
+        <a href="https://www.linkedin.com/in/mickdarling/" target="_blank" rel="noopener noreferrer">LinkedIn</a> •
         <a href="/blog/feed.xml">RSS Feed</a>
     </p>
 </footer>
@@ -22,16 +22,6 @@
             console.warn('Unable to save theme preference:', e);
         }
     }
-
-    // Load saved theme
-    let savedTheme = 'light';
-    try {
-        savedTheme = localStorage.getItem('theme') || 'light';
-    } catch (e) {
-        // localStorage may be unavailable in private browsing
-        console.warn('Unable to load theme preference:', e);
-    }
-    document.documentElement.dataset.theme = savedTheme;
 
     // Smooth scroll for anchor links
     for (const anchor of document.querySelectorAll('a[href^="#"]')) {
