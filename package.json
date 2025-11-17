@@ -1,0 +1,35 @@
+{
+  "name": "dollhousemcp-website",
+  "version": "1.0.0",
+  "description": "DollhouseMCP - AI-native development tools for building better software",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:a11y": "vitest run --grep a11y"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@playwright/test": "^1.48.0",
+    "@testing-library/dom": "^10.4.0",
+    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/ui": "^2.1.8",
+    "axe-core": "^4.10.2",
+    "happy-dom": "^15.11.7",
+    "vitest": "^2.1.8"
+  },
+  "keywords": [
+    "mcp",
+    "ai",
+    "development",
+    "tools",
+    "agents"
+  ],
+  "author": "DollhouseMCP",
+  "license": "SEE LICENSE IN LICENSE"
+}
