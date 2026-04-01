@@ -56,11 +56,6 @@ include:
   - _pages
   - .well-known
 
-# Sass/SCSS (if we convert CSS to SCSS later)
-sass:
-  style: compressed
-  sass_dir: styles
-
 # SEO and Social
 twitter:
   username: mickdarling

@@ -7,9 +7,36 @@
   const themeToggleIcon = document.getElementById("theme-toggle-icon");
   const themeToggleLabel = document.getElementById("theme-toggle-label");
   const mediaDark = globalThis.matchMedia("(prefers-color-scheme: dark)");
+  const interactiveSelector = "a, button, input, textarea, select";
+
+  const closeNavigation = () => {
+    if (!menuToggle || !siteNav) {
+      return;
+    }
+    menuToggle.setAttribute("aria-expanded", "false");
+    siteNav.classList.remove("open");
+  };
+
+  const parseSafeSameOriginUrl = (value) => {
+    if (!value) {
+      return null;
+    }
+
+    try {
+      const url = new URL(value, globalThis.location.href);
+      if ((url.protocol !== "http:" && url.protocol !== "https:") || url.origin !== globalThis.location.origin) {
+        return null;
+      }
+      return url;
+    } catch {
+      return null;
+    }
+  };
+
+  const getStoredTheme = () => localStorage.getItem(storageKey);
 
   const getPreferredTheme = () => {
-    const savedTheme = localStorage.getItem(storageKey);
+    const savedTheme = getStoredTheme();
     if (savedTheme === "light" || savedTheme === "dark") {
       return savedTheme;
     }
@@ -38,14 +65,54 @@
 
     menuToggle.addEventListener("click", () => {
       const expanded = menuToggle.getAttribute("aria-expanded") === "true";
-      menuToggle.setAttribute("aria-expanded", String(!expanded));
-      siteNav.classList.toggle("open");
+      if (expanded) {
+        closeNavigation();
+        return;
+      }
+
+      menuToggle.setAttribute("aria-expanded", "true");
+      siteNav.classList.add("open");
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!(event.target instanceof Node) || !siteNav.classList.contains("open")) {
+        return;
+      }
+
+      if (menuToggle.contains(event.target) || siteNav.contains(event.target)) {
+        return;
+      }
+
+      closeNavigation();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !siteNav.classList.contains("open")) {
+        return;
+      }
+
+      closeNavigation();
+      menuToggle.focus();
     });
   };
 
   const initThemeToggle = () => {
     const initialTheme = getPreferredTheme();
     applyTheme(initialTheme);
+
+    const syncSystemTheme = () => {
+      const savedTheme = getStoredTheme();
+      if (savedTheme === "light" || savedTheme === "dark") {
+        return;
+      }
+      applyTheme(mediaDark.matches ? "dark" : "light");
+    };
+
+    if (typeof mediaDark.addEventListener === "function") {
+      mediaDark.addEventListener("change", syncSystemTheme);
+    } else if (typeof mediaDark.addListener === "function") {
+      mediaDark.addListener(syncSystemTheme);
+    }
 
     if (!themeToggle) {
       return;
@@ -61,19 +128,20 @@
 
   const initClickableCard = (card) => {
     const target = card.dataset.cardLink;
-    if (!target) {
+    const targetUrl = parseSafeSameOriginUrl(target);
+    if (!targetUrl) {
       return;
     }
 
     const go = () => {
-      globalThis.location.assign(target);
+      globalThis.location.assign(targetUrl.href);
     };
 
     card.setAttribute("role", "link");
     card.setAttribute("tabindex", "0");
 
     card.addEventListener("click", (event) => {
-      if (event.target instanceof Element && event.target.closest("a, button, input, textarea, select")) {
+      if (event.target instanceof Element && event.target.closest(interactiveSelector)) {
         return;
       }
       go();
@@ -112,6 +180,7 @@
     let currentIndex = 0;
     let sizeMode = "fit";
     let resizeFrame = null;
+    let disconnectObserver = null;
 
     const updateStatus = () => {
       if (status) {
@@ -162,12 +231,13 @@
       currentIndex = (nextIndex + thumbs.length) % thumbs.length;
       const active = thumbs[currentIndex];
       const { src, alt = "" } = active.dataset;
-      if (!src) {
+      const imageUrl = parseSafeSameOriginUrl(src);
+      if (!imageUrl) {
         return;
       }
 
       updateThumbState();
-      image.src = src;
+      image.src = imageUrl.href;
       image.alt = alt;
       applySizeMode();
       updateStatus();
@@ -197,6 +267,15 @@
       });
     };
 
+    const cleanup = () => {
+      if (resizeFrame !== null) {
+        globalThis.cancelAnimationFrame(resizeFrame);
+        resizeFrame = null;
+      }
+      globalThis.removeEventListener("resize", onResize);
+      disconnectObserver?.disconnect();
+    };
+
     thumbs.forEach((thumb, idx) => {
       thumb.addEventListener("click", () => loadPage(idx));
     });
@@ -210,6 +289,15 @@
     viewer.addEventListener("keydown", onArrowKeyNav);
     stage.addEventListener("click", () => stage.focus());
     globalThis.addEventListener("resize", onResize);
+    if (document.body && "MutationObserver" in globalThis) {
+      disconnectObserver = new MutationObserver(() => {
+        if (viewer.isConnected) {
+          return;
+        }
+        cleanup();
+      });
+      disconnectObserver.observe(document.body, { childList: true, subtree: true });
+    }
 
     loadPage(0);
   };

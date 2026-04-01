@@ -32,19 +32,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           fetch-depth: 0
 
       - name: Resolve base ref
         id: base
         shell: bash
+        env:
+          BASE_REF_INPUT: ${{ github.event.inputs.base_ref }}
         run: |
           set -euo pipefail
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "ref=origin/${{ github.base_ref }}" >> "$GITHUB_OUTPUT"
           else
-            ref="${{ github.event.inputs.base_ref }}"
+            ref="${BASE_REF_INPUT:-origin/main}"
             if [[ -z "$ref" ]]; then
               ref="origin/main"
             fi
@@ -72,11 +74,16 @@ jobs:
           import subprocess
           from pathlib import Path
 
-          base_ref = os.environ["BASE_REF"]
-          changed = subprocess.check_output(
-              ["git", "diff", "--name-only", f"{base_ref}...HEAD"],
-              text=True,
-          ).splitlines()
+          base_ref = os.environ["BASE_REF"].strip()
+          excluded_prefixes = ("docs/", "scripts/", ".github/")
+
+          try:
+              changed = subprocess.check_output(
+                  ["git", "diff", "--name-only", f"{base_ref}...HEAD"],
+                  text=True,
+              ).splitlines()
+          except subprocess.CalledProcessError as exc:
+              raise SystemExit(f"Failed to compute changed files against {base_ref}: {exc}") from exc
 
           routes_file = Path("/tmp/visidelta/routes.json")
           routes = json.loads(routes_file.read_text()) if routes_file.exists() else []
@@ -84,9 +91,7 @@ jobs:
           def normalize_route(route: str) -> str:
               if route == "/":
                   return route
-              while route.endswith("//"):
-                  route = route[:-1]
-              return route
+              return route.rstrip("/")
 
           seen = {normalize_route(item["route"]) for item in routes}
 
@@ -109,10 +114,12 @@ jobs:
           def markdown_route(path: str):
               if path in {"README.md", "LICENSE", "LICENSING.md"}:
                   return None
-              if path.startswith(("docs/", "scripts/", ".github/")):
+              if path.startswith(excluded_prefixes):
                   return None
               if path == "index.md":
                   return "/"
+              if path.startswith("content/blog/") and path.endswith(".md"):
+                  return f"/content/blog/{Path(path).stem}/"
               if path.startswith("_posts/"):
                   match = re.match(r"_posts/(\d{4})-(\d{2})-(\d{2})-(.+)\.md$", path)
                   if match:
@@ -145,8 +152,13 @@ jobs:
                   ("about.html", "/about.html"),
                   ("licensing.html", "/licensing.html"),
                   ("blog/launch-announcement.html", "/blog/launch-announcement.html"),
-                  ("_posts/2025-09-04-story-behind-dollhousemcp.md", "/blog/2025/09/story-behind-dollhousemcp/"),
               ]
+
+              for blog_post in sorted(Path("content/blog").glob("*.md")):
+                  route = markdown_route(blog_post.as_posix())
+                  if route:
+                      core_routes.append((blog_post.as_posix(), route))
+
               for source_file, route in core_routes:
                   add_route(source_file, route)
 
@@ -215,7 +227,7 @@ jobs:
           enable_jekyll: false
 
       - name: Upload VisiDelta Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: visidelta-${{ github.run_id }}-${{ github.run_attempt }}
           path: /tmp/visidelta
