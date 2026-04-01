@@ -11,7 +11,7 @@ description: Technical articles, case studies, and product writing about Dollhou
     Engineering lessons, product context, and real stories from building DollhouseMCP in public.
   </p>
 
-  {% assign posts = paginator.posts | default: site.posts %}
+  {% assign posts = site.blog_posts | sort: "date" | reverse %}
   {% if posts and posts.size > 0 %}
   <div class="card-grid">
     {% for post in posts %}
@@ -36,23 +36,6 @@ description: Technical articles, case studies, and product writing about Dollhou
   {% else %}
   <div class="callout">
     <p>No posts are published yet.</p>
-  </div>
-  {% endif %}
-
-  {% if paginator and paginator.total_pages > 1 %}
-  <div class="post-nav">
-    {% if paginator.previous_page %}
-    <a href="{{ paginator.previous_page_path | relative_url }}">
-      <em>Previous Page</em>
-      <strong>Page {{ paginator.previous_page }}</strong>
-    </a>
-    {% endif %}
-    {% if paginator.next_page %}
-    <a href="{{ paginator.next_page_path | relative_url }}">
-      <em>Next Page</em>
-      <strong>Page {{ paginator.next_page }}</strong>
-    </a>
-    {% endif %}
   </div>
   {% endif %}
 </section>

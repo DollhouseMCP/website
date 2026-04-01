@@ -16,23 +16,21 @@ plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
-  - jekyll-paginate
 
 # Blog Configuration
 permalink: /blog/:year/:month/:title/
-paginate: 10
-paginate_path: "/blog/page:num/"
 
 # Collections
 collections:
-  posts:
+  blog_posts:
     output: true
+    permalink: /blog/:name/
 
 # Defaults
 defaults:
   - scope:
-      path: ""
-      type: "posts"
+      path: "_blog_posts"
+      type: "blog_posts"
     values:
       layout: "post"
       author: "Mick Darling"
@@ -67,10 +65,8 @@ social:
     - https://github.com/DollhouseMCP
     - https://www.npmjs.com/package/@dollhousemcp/mcp-server
 
-# Analytics (for future use)
-google_analytics: # Add tracking ID when ready
-
 # Feed settings
 feed:
-  posts_limit: 20
-  path: blog/feed.xml
+  collections:
+    blog_posts:
+      path: blog/feed.xml

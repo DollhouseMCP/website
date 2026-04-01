@@ -18,10 +18,6 @@ on:
         required: false
         default: "origin/main"
 
-permissions:
-  contents: read
-  pull-requests: write
-
 env:
   PREVIEW_REPOSITORY: DollhouseMCP/website-visidelta-preview
   PREVIEW_SITE_BASE: https://dollhousemcp.github.io/website-visidelta-preview
@@ -30,6 +26,9 @@ jobs:
   visidelta:
     name: Build Rendered Diffs
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
@@ -118,8 +117,8 @@ jobs:
                   return None
               if path == "index.md":
                   return "/"
-              if path.startswith("content/blog/") and path.endswith(".md"):
-                  return f"/content/blog/{Path(path).stem}/"
+              if path.startswith("_blog_posts/") and path.endswith(".md"):
+                  return f"/blog/{Path(path).stem}/"
               if path.startswith("_posts/"):
                   match = re.match(r"_posts/(\d{4})-(\d{2})-(\d{2})-(.+)\.md$", path)
                   if match:
@@ -154,7 +153,7 @@ jobs:
                   ("blog/launch-announcement.html", "/blog/launch-announcement.html"),
               ]
 
-              for blog_post in sorted(Path("content/blog").glob("*.md")):
+              for blog_post in sorted(Path("_blog_posts").rglob("*.md")):
                   route = markdown_route(blog_post.as_posix())
                   if route:
                       core_routes.append((blog_post.as_posix(), route))
@@ -183,6 +182,7 @@ jobs:
           latest_path="${branch_path}/latest"
           preview_url="${PREVIEW_SITE_BASE}/${preview_path}/"
           latest_url="${PREVIEW_SITE_BASE}/${latest_path}/"
+          echo "branch_path=$branch_path" >> "$GITHUB_OUTPUT"
           echo "path=$preview_path" >> "$GITHUB_OUTPUT"
           echo "url=$preview_url" >> "$GITHUB_OUTPUT"
           echo "latest_path=$latest_path" >> "$GITHUB_OUTPUT"
@@ -226,6 +226,128 @@ jobs:
           force_orphan: false
           enable_jekyll: false
 
+      - name: Refresh Preview Host Index
+        if: ${{ steps.preview_setup.outputs.enabled == 'true' }}
+        shell: bash
+        env:
+          PREVIEW_TOKEN: ${{ secrets.VISIDELTA_PREVIEW_PAGES_TOKEN }}
+          PREVIEW_REPOSITORY: ${{ env.PREVIEW_REPOSITORY }}
+          PREVIEW_SITE_BASE: ${{ env.PREVIEW_SITE_BASE }}
+          BRANCH_PATH: ${{ steps.preview_meta.outputs.branch_path }}
+        run: |
+          set -euo pipefail
+          repo_dir="/tmp/visidelta-preview-host"
+          rm -rf "$repo_dir"
+          git clone --depth 1 --branch gh-pages "https://x-access-token:${PREVIEW_TOKEN}@github.com/${PREVIEW_REPOSITORY}.git" "$repo_dir"
+          python3 <<'PY'
+          import html
+          import os
+          import shutil
+          import textwrap
+          from pathlib import Path
+
+          repo = Path("/tmp/visidelta-preview-host")
+          site_base = os.environ["PREVIEW_SITE_BASE"].rstrip("/")
+          branch_path = os.environ["BRANCH_PATH"].strip("/")
+          branch_root = repo / branch_path
+
+          if branch_root.exists():
+              run_dirs = sorted(
+                  [item for item in branch_root.iterdir() if item.is_dir() and item.name != "latest"],
+                  key=lambda item: item.name,
+                  reverse=True,
+              )
+              for stale_dir in run_dirs[10:]:
+                  shutil.rmtree(stale_dir)
+
+          previews = []
+          website_root = repo / "website"
+          if website_root.exists():
+              for branch_dir in sorted([item for item in website_root.iterdir() if item.is_dir()], key=lambda item: item.name):
+                  latest_dir = branch_dir / "latest"
+                  if latest_dir.is_dir():
+                      rel_path = latest_dir.relative_to(repo).as_posix()
+                      previews.append(
+                          {
+                              "label": branch_dir.name,
+                              "url": f"{site_base}/{rel_path}/",
+                          }
+                      )
+
+          cards = "\n".join(
+              f"""      <li><a href="{html.escape(item['url'])}">{html.escape(item['label'])}</a></li>"""
+              for item in previews
+          )
+          if not cards:
+              cards = "      <li>No hosted previews have been published yet.</li>"
+
+          (repo / "index.html").write_text(
+              textwrap.dedent(
+                  f"""\
+                  <!doctype html>
+                  <html lang="en">
+                    <head>
+                      <meta charset="utf-8">
+                      <meta name="viewport" content="width=device-width, initial-scale=1">
+                      <title>VisiDelta Preview Host</title>
+                      <style>
+                        body {{
+                          margin: 0;
+                          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                          background: #f7f3ea;
+                          color: #2f2418;
+                        }}
+
+                        main {{
+                          max-width: 42rem;
+                          margin: 0 auto;
+                          padding: 4rem 1.5rem;
+                        }}
+
+                        h1 {{
+                          font-size: clamp(2rem, 4vw, 3.2rem);
+                          line-height: 1.05;
+                          margin: 0 0 1rem;
+                        }}
+
+                        p, li {{
+                          font-size: 1.05rem;
+                          line-height: 1.7;
+                        }}
+
+                        ul {{
+                          padding-left: 1.25rem;
+                        }}
+
+                        a {{
+                          color: #1d4ed8;
+                        }}
+                      </style>
+                    </head>
+                    <body>
+                      <main>
+                        <h1>VisiDelta Preview Host</h1>
+                        <p>Rendered previews are published under branch-specific latest aliases.</p>
+                        <ul>
+                  {cards}
+                        </ul>
+                      </main>
+                    </body>
+                  </html>
+                  """
+              ),
+              encoding="utf-8",
+          )
+          PY
+          cd "$repo_dir"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html website
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: refresh preview host index"
+            git push
+          fi
+
       - name: Upload VisiDelta Artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
@@ -244,6 +366,7 @@ jobs:
             - Base ref: `${{ steps.base.outputs.ref }}`
             - Hosted preview: [Open preview](${{ steps.preview_meta.outputs.url }})
             - Latest preview for this branch: [Open latest preview](${{ steps.preview_meta.outputs.latest_url }})
+            - Preview index: [Open preview index](${{ env.PREVIEW_SITE_BASE }}/)
             - Workflow run: [Run ${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
             - Artifact backup: `visidelta-${{ github.run_id }}-${{ github.run_attempt }}`
 

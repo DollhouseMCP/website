@@ -94,7 +94,7 @@ python -m http.server 8000
 ### Adding Content
 
 #### New Blog Post
-1. Create markdown file in `content/blog/`
+1. Create markdown file in `_blog_posts/`
 2. Add YAML frontmatter
 3. Write content using markdown
 

@@ -1,3 +1,35 @@
+@font-face {
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("../fonts/manrope-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 500 800;
+  font-display: swap;
+  src: url("../fonts/plus-jakarta-sans-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/ibm-plex-mono-latin-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/ibm-plex-mono-latin-500.woff2") format("woff2");
+}
+
 :root {
   --ink-950: #0a1020;
   --ink-900: #18243a;
@@ -684,28 +716,32 @@ main {
   outline-offset: 2px;
 }
 
-.card-core {
+.card-core,
+.card-family-core {
   --family-1: #4f8ffb;
   --family-2: #1e40af;
   --family-3: #60a5fa;
   --family-4: #2563eb;
 }
 
-.card-protocol {
+.card-protocol,
+.card-family-protocol {
   --family-1: #38bdf8;
   --family-2: #0e7490;
   --family-3: #22d3ee;
   --family-4: #06b6d4;
 }
 
-.card-research {
+.card-research,
+.card-family-research {
   --family-1: #e879f9;
   --family-2: #a21caf;
   --family-3: #c026d3;
   --family-4: #8b5cf6;
 }
 
-.card-tooling {
+.card-tooling,
+.card-family-tooling {
   --family-1: #34d399;
   --family-2: #15803d;
   --family-3: #22c55e;
@@ -734,34 +770,6 @@ main {
   background:
     radial-gradient(circle at 93% 8%, color-mix(in srgb, var(--family-1) 2.5%, transparent), transparent 43%),
     linear-gradient(168deg, color-mix(in srgb, var(--family-1) 1.5%, var(--paper-strong)), var(--paper-strong) 55%);
-}
-
-.card-family-core {
-  --family-1: #4f8ffb;
-  --family-2: #1e40af;
-  --family-3: #60a5fa;
-  --family-4: #2563eb;
-}
-
-.card-family-protocol {
-  --family-1: #38bdf8;
-  --family-2: #0e7490;
-  --family-3: #22d3ee;
-  --family-4: #06b6d4;
-}
-
-.card-family-research {
-  --family-1: #e879f9;
-  --family-2: #a21caf;
-  --family-3: #c026d3;
-  --family-4: #8b5cf6;
-}
-
-.card-family-tooling {
-  --family-1: #34d399;
-  --family-2: #15803d;
-  --family-3: #22c55e;
-  --family-4: #2fbf71;
 }
 
 .card-actions {
