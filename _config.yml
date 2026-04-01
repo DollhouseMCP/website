@@ -17,9 +17,6 @@ plugins:
   - jekyll-sitemap
   - jekyll-seo-tag
 
-# Blog Configuration
-permalink: /blog/:year/:month/:title/
-
 # Collections
 collections:
   blog_posts:

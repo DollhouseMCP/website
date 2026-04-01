@@ -31,7 +31,7 @@ env:
     -v "$DEST_DIR":/out
     -w /app
     ruby:3.1
-    bash -lc 'bundle install && bundle exec jekyll build --source /app --destination /out --baseurl "$BASEURL" --trace && chown -R "$HOST_UID:$HOST_GID" /out || true'
+    bash -lc 'bundle install && bundle exec jekyll build --source /app --destination /out --baseurl "$BASEURL" --trace && (chown -R "$HOST_UID:$HOST_GID" /out || true)'
 
 jobs:
   visidelta:
