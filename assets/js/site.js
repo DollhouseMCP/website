@@ -110,8 +110,6 @@
 
     if (typeof mediaDark.addEventListener === "function") {
       mediaDark.addEventListener("change", syncSystemTheme);
-    } else if (typeof mediaDark.addListener === "function") {
-      mediaDark.addListener(syncSystemTheme);
     }
 
     if (!themeToggle) {
