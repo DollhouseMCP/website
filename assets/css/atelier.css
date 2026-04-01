@@ -179,6 +179,12 @@ pre code {
   backdrop-filter: blur(8px);
 }
 
+@supports not ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))) {
+  .site-header {
+    background: var(--paper-strong);
+  }
+}
+
 .site-header::after {
   content: "";
   position: absolute;
