@@ -22,6 +22,10 @@ permissions:
   contents: read
   pull-requests: write
 
+env:
+  PREVIEW_REPOSITORY: DollhouseMCP/website-visidelta-preview
+  PREVIEW_SITE_BASE: https://dollhousemcp.github.io/website-visidelta-preview
+
 jobs:
   visidelta:
     name: Build Rendered Diffs
@@ -150,6 +154,66 @@ jobs:
           routes_file.write_text(json.dumps(routes, indent=2) + "\n")
           PY
 
+      - name: Compute Preview URL
+        id: preview_meta
+        shell: bash
+        env:
+          PREVIEW_SITE_BASE: ${{ env.PREVIEW_SITE_BASE }}
+        run: |
+          set -euo pipefail
+          ref_raw="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          ref_slug="$(echo "$ref_raw" | tr '[:upper:]' '[:lower:]' | sed -E 's#[^a-z0-9._-]+#-#g; s#^-+##; s#-+$##')"
+          if [[ -z "$ref_slug" ]]; then
+            ref_slug="run-${GITHUB_RUN_ID}"
+          fi
+          branch_path="website/${ref_slug}"
+          preview_path="${branch_path}/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          latest_path="${branch_path}/latest"
+          preview_url="${PREVIEW_SITE_BASE}/${preview_path}/"
+          latest_url="${PREVIEW_SITE_BASE}/${latest_path}/"
+          echo "path=$preview_path" >> "$GITHUB_OUTPUT"
+          echo "url=$preview_url" >> "$GITHUB_OUTPUT"
+          echo "latest_path=$latest_path" >> "$GITHUB_OUTPUT"
+          echo "latest_url=$latest_url" >> "$GITHUB_OUTPUT"
+
+      - name: Detect Hosted Preview Setup
+        id: preview_setup
+        shell: bash
+        env:
+          PREVIEW_TOKEN: ${{ secrets.VISIDELTA_PREVIEW_PAGES_TOKEN }}
+        run: |
+          if [[ -n "$PREVIEW_TOKEN" ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish Hosted Preview
+        if: ${{ steps.preview_setup.outputs.enabled == 'true' }}
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e
+        with:
+          personal_token: ${{ secrets.VISIDELTA_PREVIEW_PAGES_TOKEN }}
+          external_repository: ${{ env.PREVIEW_REPOSITORY }}
+          publish_branch: gh-pages
+          publish_dir: /tmp/visidelta
+          destination_dir: ${{ steps.preview_meta.outputs.path }}
+          keep_files: true
+          force_orphan: false
+          enable_jekyll: false
+
+      - name: Publish Hosted Preview (Latest Alias)
+        if: ${{ steps.preview_setup.outputs.enabled == 'true' }}
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e
+        with:
+          personal_token: ${{ secrets.VISIDELTA_PREVIEW_PAGES_TOKEN }}
+          external_repository: ${{ env.PREVIEW_REPOSITORY }}
+          publish_branch: gh-pages
+          publish_dir: /tmp/visidelta
+          destination_dir: ${{ steps.preview_meta.outputs.latest_path }}
+          keep_files: true
+          force_orphan: false
+          enable_jekyll: false
+
       - name: Upload VisiDelta Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -157,19 +221,33 @@ jobs:
           path: /tmp/visidelta
           retention-days: 14
 
-      - name: Comment Preview Instructions
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Comment Preview Links
+        if: ${{ github.event_name == 'pull_request' && steps.preview_setup.outputs.enabled == 'true' }}
         uses: marocchino/sticky-pull-request-comment@773744901bac0e8cbb5a0dc842800d45e9b2b405
         with:
           header: visidelta-preview
           message: |
-            VisiDelta preview artifact is ready.
+            VisiDelta preview is ready.
 
             - Base ref: `${{ steps.base.outputs.ref }}`
-            - Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            - Artifact: `visidelta-${{ github.run_id }}-${{ github.run_attempt }}`
+            - Hosted preview: [Open preview](${{ steps.preview_meta.outputs.url }})
+            - Latest preview for this branch: [Open latest preview](${{ steps.preview_meta.outputs.latest_url }})
+            - Workflow run: [Run ${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - Artifact backup: `visidelta-${{ github.run_id }}-${{ github.run_attempt }}`
 
-            Download the artifact from the workflow run, extract it locally, and open `index.html` to review the rendered diffs.
+      - name: Comment Preview Setup Needed
+        if: ${{ github.event_name == 'pull_request' && steps.preview_setup.outputs.enabled != 'true' }}
+        uses: marocchino/sticky-pull-request-comment@773744901bac0e8cbb5a0dc842800d45e9b2b405
+        with:
+          header: visidelta-preview
+          message: |
+            VisiDelta artifact is ready, but hosted preview links are not enabled yet.
+
+            - Base ref: `${{ steps.base.outputs.ref }}`
+            - Workflow run: [Run ${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - Artifact backup: `visidelta-${{ github.run_id }}-${{ github.run_attempt }}`
+
+            Add the `VISIDELTA_PREVIEW_PAGES_TOKEN` secret to enable hosted preview links published to `${{ env.PREVIEW_REPOSITORY }}`.
 
       - name: Add Run Summary
         shell: bash
@@ -179,7 +257,16 @@ jobs:
             echo ""
             echo "- Base ref: \`${{ steps.base.outputs.ref }}\`"
             echo "- Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            echo "- Artifact: \`visidelta-${{ github.run_id }}-${{ github.run_attempt }}\`"
+            echo "- Artifact backup: \`visidelta-${{ github.run_id }}-${{ github.run_attempt }}\`"
             echo ""
-            echo "Download the artifact, extract it, and open \`index.html\` to inspect the rendered comparison."
+            if [[ "${{ steps.preview_setup.outputs.enabled }}" == "true" ]]; then
+              echo "- Hosted preview: ${{ steps.preview_meta.outputs.url }}"
+              echo "- Latest preview for this branch: ${{ steps.preview_meta.outputs.latest_url }}"
+              echo ""
+              echo "Hosted preview is published to the dedicated preview Pages site."
+            else
+              echo "Hosted preview is not enabled yet."
+              echo "Add the \`VISIDELTA_PREVIEW_PAGES_TOKEN\` secret to publish previews to \`${{ env.PREVIEW_REPOSITORY }}\`."
+            fi
+            echo "Artifact is also uploaded for archival and debugging."
           } >> "$GITHUB_STEP_SUMMARY"
