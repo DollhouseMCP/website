@@ -1,0 +1,40 @@
+---
+layout: default
+---
+<article class="prose">
+  <p class="eyebrow">
+    {{ page.date | date: "%B %d, %Y" }}{% if page.author %} • {{ page.author }}{% endif %}
+  </p>
+  <h1>{{ page.title }}</h1>
+
+  {% if page.description %}
+  <p class="lead">{{ page.description }}</p>
+  {% endif %}
+
+  {% if page.tags %}
+  <div class="pill-row">
+    {% for tag in page.tags %}
+    <span class="pill">{{ tag }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {{ content }}
+
+  {% if page.previous or page.next %}
+  <div class="post-nav">
+    {% if page.previous %}
+    <a href="{{ page.previous.url | relative_url }}">
+      <em>Previous Post</em>
+      <strong>{{ page.previous.title }}</strong>
+    </a>
+    {% endif %}
+    {% if page.next %}
+    <a href="{{ page.next.url | relative_url }}">
+      <em>Next Post</em>
+      <strong>{{ page.next.title }}</strong>
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+</article>

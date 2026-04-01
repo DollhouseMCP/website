@@ -1,493 +1,156 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DollhouseMCP - Vibe Tooling for AI</title>
-    <meta name="description" content="Build persistent AI tools with natural language. Open source platform for creating, sharing, and evolving AI personas and skills.">
+---
+layout: default
+title: DollhouseMCP 2.0
+description: Open-source AI customization through modular elements, local portfolio workflows, MCP-AQL, and safety-aware agent execution.
+---
 
-    <!-- Security Headers (limited effectiveness as meta tags) -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
-    <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://api.github.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
+<section class="atelier-hero">
+  <div class="hero-grid">
+    <div class="reveal">
+      <span class="hero-kicker">DollhouseMCP 2.0</span>
+      <h1>Composable AI behavior, built from reusable elements.</h1>
+      <p class="lead">
+        DollhouseMCP turns prompts into portable building blocks you can create, activate, combine, version, and share:
+        personas, skills, templates, agents, memories, and ensembles.
+      </p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="https://github.com/DollhouseMCP/mcp-server">Get Started on GitHub</a>
+        <a class="button button-secondary" href="https://www.npmjs.com/package/@dollhousemcp/mcp-server">Install from NPM</a>
+        <a class="button button-secondary" href="https://collection.dollhousemcp.com/">Browse Collection</a>
+        <a class="button button-secondary" href="{{ '/blog/' | relative_url }}">Read Blog</a>
+      </div>
+    </div>
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    
-    <link rel="stylesheet" href="styles/main.css">
-    <style>
-        .hero {
-            min-height: 80vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: var(--space-8) var(--space-4);
-        }
-        
-        .hero-content {
-            max-width: 800px;
-        }
-        
-        .hero h1 {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            margin-bottom: var(--space-6);
-            background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .hero-subtitle {
-            font-size: var(--font-size-xl);
-            color: var(--color-text-secondary);
-            margin-bottom: var(--space-8);
-            line-height: 1.6;
-        }
-        
-        .hero-buttons {
-            display: flex;
-            gap: var(--space-4);
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .section {
-            padding: var(--space-16) var(--space-4);
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: var(--space-8);
-            margin-top: var(--space-12);
-        }
-        
-        .feature-card {
-            background: var(--color-surface);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-lg);
-            padding: var(--space-8);
-            transition: all 0.3s ease;
-        }
-        
-        .feature-card:hover {
-            border-color: var(--color-brand-primary);
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-        }
-        
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: var(--space-4);
-        }
-        
-        .feature-title {
-            font-size: var(--font-size-xl);
-            font-weight: var(--font-weight-semibold);
-            margin-bottom: var(--space-3);
-            color: var(--color-text-primary);
-        }
-        
-        .feature-description {
-            color: var(--color-text-secondary);
-            line-height: 1.6;
-        }
-        
-        .story-section {
-            background: var(--color-neutral-50);
-        }
-        
-        [data-theme="dark"] .story-section {
-            background: var(--color-neutral-900);
-        }
-        
-        .story-content {
-            max-width: 800px;
-            margin: 0 auto;
-            font-size: var(--font-size-lg);
-            line-height: 1.8;
-            color: var(--color-text-secondary);
-        }
-        
-        .story-content p {
-            margin-bottom: var(--space-6);
-        }
-        
-        .cta-section {
-            background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-secondary));
-            color: white;
-            text-align: center;
-        }
-        
-        .cta-section h2 {
-            color: white;
-            margin-bottom: var(--space-6);
-        }
-        
-        .cta-buttons {
-            display: flex;
-            gap: var(--space-4);
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        
-        .code-example {
-            background: var(--color-neutral-100);
-            border: 1px solid var(--color-neutral-200);
-            border-radius: var(--radius-md);
-            padding: var(--space-6);
-            margin: var(--space-8) 0;
-            overflow-x: auto;
-        }
-        
-        [data-theme="dark"] .code-example {
-            background: var(--color-neutral-900);
-            border-color: var(--color-neutral-800);
-        }
-        
-        .code-example pre {
-            color: var(--color-neutral-800);
-            font-family: var(--font-family-mono);
-            font-size: var(--font-size-sm);
-            line-height: 1.6;
-            margin: 0;
-        }
-        
-        [data-theme="dark"] .code-example pre {
-            color: var(--color-neutral-100);
-        }
-        
-        .highlight {
-            color: var(--color-brand-primary);
-            font-weight: var(--font-weight-semibold);
-        }
-        
-        .nav-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: var(--color-background);
-            border-bottom: 1px solid var(--color-border);
-            z-index: var(--z-sticky);
-            padding: var(--space-3) var(--space-6);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: var(--space-6);
-        }
-        
-        .logo {
-            width: 40px;
-            height: 40px;
-            display: block;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: var(--space-6);
-            align-items: center;
-        }
-        
-        .nav-links a {
-            color: var(--color-text-secondary);
-            text-decoration: none;
-            font-weight: var(--font-weight-medium);
-            transition: color 0.2s;
-        }
-        
-        .nav-links a:hover {
-            color: var(--color-brand-primary);
-        }
-        
-        body {
-            padding-top: 60px;
-        }
-        
-        @media (max-width: 768px) {
-            .nav-header {
-                padding: var(--space-2) var(--space-4);
-            }
-            .nav-links {
-                gap: var(--space-4);
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Navigation Header -->
-    <header class="nav-header">
-        <div class="nav-left">
-            <a href="#top"><img src="icons/Dollhouse-org.png" alt="DollhouseMCP Logo" class="logo" /></a>
-            <nav class="nav-links">
-                <a href="#top">Home</a>
-                <a href="#story">About</a>
-                <a href="https://github.com/DollhouseMCP/mcp-server" target="_blank">GitHub</a>
-            </nav>
-        </div>
-        <button class="btn btn-secondary" onclick="toggleTheme()">
-            <span class="icon-moon">🌙</span>
-            <span class="icon-sun">☀️</span>
-        </button>
-    </header>
-    
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>DollhouseMCP</h1>
-            <p class="hero-subtitle">
-                Your AI customizations shouldn't disappear every time you start a new chat.<br>
-                Create, save, and share tools that make AI work more intelligently.
-            </p>
-            <div class="hero-buttons">
-                <a href="https://github.com/DollhouseMCP/mcp-server" class="btn btn-primary btn-lg">
-                    Get Started on GitHub
-                </a>
-                <a href="#story" class="btn btn-secondary btn-lg">
-                    Read the Story
-                </a>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Features Section -->
-    <section class="section">
-        <div class="container">
-            <h2 class="text-center">Your Personal AI Toolkit</h2>
-            <p class="text-center text-lg text-secondary" style="max-width: 700px; margin: 0 auto;">
-                Every tool you create becomes part of your permanent collection.<br>
-                Customize AI to match how you actually work.<br>
-                From simple prompts to complex workflows—build the AI tools you need.
-            </p>
-            
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">💬</div>
-                    <h3 class="feature-title">Create Your Tools with Natural Language</h3>
-                    <p class="feature-description">
-                        Just describe what you need. If it doesn't work just right, 
-                        modify it. Make a new version. Your tools constantly improve.
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🧩</div>
-                    <h3 class="feature-title">Mix and Match Like Lego Blocks</h3>
-                    <p class="feature-description">
-                        Combine personas, skills, and other elements you create with tools others have shared. 
-                        Snap them together in different ways to help AI do exactly what you want, predictably.
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🚀</div>
-                    <h3 class="feature-title">Hundreds of MCP-Compatible Platforms</h3>
-                    <p class="feature-description">
-                        Works with Claude Code and Desktop and any MCP-compatible system. 
-                        Create once, use everywhere.
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">💾</div>
-                    <h3 class="feature-title">Save What Works</h3>
-                    <p class="feature-description">
-                        Every prompt you perfect, every persona you create, every workflow you build, 
-                        all become part of your permanent collection.
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🌟</div>
-                    <h3 class="feature-title">Share What's Great</h3>
-                    <p class="feature-description">
-                        Share your best tools with others. Discover what's already been built. 
-                        Learn from real implementations that solve real problems.
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">📈</div>
-                    <h3 class="feature-title">Constantly Improve</h3>
-                    <p class="feature-description">
-                        Your tools evolve with you. Refine based on what works. 
-                        Version control keeps track as you make things better.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Example Section -->
-    <section class="section story-section">
-        <div class="container">
-            <h2 class="text-center">Getting Started</h2>
-            <div class="code-example">
-                <pre><span class="highlight"># Option 1: Local installation (recommended)</span>
-mkdir ~/mcp-servers && cd ~/mcp-servers
-npm init -y
-npm install @dollhousemcp/mcp-server
+    <aside class="panel panel-primary reveal">
+      <div class="panel-head">Quick Start</div>
+      <div class="panel-body">
+        <ul class="metric-list">
+          <li><strong>Package</strong><span><code>@dollhousemcp/mcp-server</code></span></li>
+          <li><strong>Core model</strong><span>6 element types + ensembles</span></li>
+          <li><strong>Runtime</strong><span>Local portfolio + MCP-AQL</span></li>
+          <li><strong>Software license</strong><span>AGPL-3.0</span></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</section>
 
-<span class="highlight"># Option 2: Use npx (no installation needed)</span>
-<span class="text-secondary">Run directly without installing:</span>
-npx @dollhousemcp/mcp-server
+<section class="motif-band">
+  <div class="section-wrap">
+    <div class="motif-strip reveal" aria-hidden="true">
+      <span class="motif-tile motif-a"></span>
+      <span class="motif-tile motif-b"></span>
+      <span class="motif-tile motif-c"></span>
+      <span class="motif-tile motif-d"></span>
+      <span class="motif-tile motif-e"></span>
+      <span class="motif-tile motif-f"></span>
+    </div>
+    <p class="motif-caption reveal">
+      Local-first portfolio workflows, community distribution, and safety-aware execution in one platform.
+    </p>
+  </div>
+</section>
 
-<span class="highlight"># Configure Claude Desktop</span>
-<span class="text-secondary">Add to your config file:</span>
-<span class="text-secondary">• macOS: ~/Library/Application Support/Claude/claude_desktop_config.json</span>
-<span class="text-secondary">• Windows: %APPDATA%\Claude\claude_desktop_config.json</span>
-<span class="text-secondary">• Linux: ~/.config/Claude/claude_desktop_config.json</span>
+<section class="showcase showcase-slab">
+  <div class="section-wrap">
+    <h2 class="section-heading reveal">What Ships With DollhouseMCP</h2>
+    <p class="section-subtle reveal">
+      The 2.0 architecture brings the product surface into one coherent system: reusable elements, a local portfolio,
+      a public collection, and a structured query layer for MCP operations.
+    </p>
 
-<span class="text-secondary">For local installation:</span>
-{
-  "mcpServers": {
-    "dollhousemcp": {
-      "command": "node",
-      "args": ["/Users/YOU/mcp-servers/node_modules/@dollhousemcp/mcp-server/dist/index.js"]
-    }
-  }
-}
+    <div class="card-grid card-grid-featured">
+      <article class="card card-core card-featured reveal">
+        <span class="pill">Elements</span>
+        <div class="card-family card-family-core" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <h3>Six reusable element types</h3>
+        <p>Personas, skills, templates, agents, memories, and ensembles give you a composable model for persistent AI behavior.</p>
+      </article>
 
-<span class="text-secondary">For npx:</span>
-{
-  "mcpServers": {
-    "dollhousemcp": {
-      "command": "npx",
-      "args": ["@dollhousemcp/mcp-server"]
-    }
-  }
-}
+      <article class="card card-core reveal">
+        <span class="pill">Portfolio</span>
+        <div class="card-family card-family-core" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <h3>Local-first portfolio workflow</h3>
+        <p>Your Dollhouse elements live in a readable local portfolio you can edit, back up, sync, and activate across sessions.</p>
+      </article>
 
-<span class="highlight"># Restart Claude Desktop and you're ready!</span>
-<span class="text-secondary">Your AI now has access to persistent tools that remember and evolve.</span></pre>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Story Section -->
-    <section id="story" class="section">
-        <div class="container">
-            <h2 class="text-center">The Story Behind DollhouseMCP</h2>
-            <div class="story-content">
-                <p>
-                    <strong>Hey everyone,</strong>
-                </p>
-                <p>
-                    It's been a while since I've posted about my work.
-                </p>
-                <p>
-                    Over two years, I've been building with AI tools, searching for something with real spark. I've worked on Chrome extensions, robotics demos, writing tools, collaborative platforms. Some were interesting, some optimized my workflow, but nothing felt like it could both help people and be a product people would actually love... until recently.
-                </p>
-                <p>
-                    I've been working with ChatGPT, Claude, Claude Code, Gemini, Groq, and others. I found cool and useful prompts scattered across Reddit, Discord, and LinkedIn, but it became messy and hard to find what I wanted when I needed it. I had an incredibly bad system for organizing them.
-                </p>
-                <p>
-                    So I started building a catalog system for prompts using Claude Code and MCP. Day one: proof of concept worked. Week two: hey, this is pretty cool. Month two: I can create a collection for everyone to use and share. I just finished my second month and it all works remarkably well.
-                </p>
-                <p>
-                    <strong>I call it DollhouseMCP.</strong> The simplest way to describe it is "vibe tooling" instead of vibe coding.
-                </p>
-                <p>
-                    Vibe coding's ideal is zero to 100% done in one prompt. When that fails (always), you tweak and try again. Maybe you get something good. Even when it works, you can't repeat that success reliably. You haven't built tools to make the next project easier.
-                </p>
-                <p>
-                    With DollhouseMCP and vibe tooling, you build individual tools using natural language. These tools persist. They can be modified, even evolve on their own as needed. The system saves everything. When multiple personas and skills interact, the whole becomes greater than the sum of its parts.
-                </p>
-                <p>
-                    Tell it once "be a harsh security-focused code reviewer," and it remembers forever. Need it less harsh? Say "dial back the harshness and add Web security focus." Version 1.2, done.
-                </p>
-                <p>
-                    The personas have personality and skills: analyzing LinkedIn profiles, copy editing, generating audio summaries that speak in clear, contextual language. The audio skill took five minutes to build, which felt incredibly sci-fi. They can maintain context across sessions and platforms.
-                </p>
-                <p>
-                    For those who remember Tomorrowish, this builds on more than a decade of ML/AI work. I think the patents in natural language processing we received provided me a unique lens for blending programmatic tools with LLMs.
-                </p>
-                <p>
-                    <strong>It's open source. It's on GitHub. It works today.</strong>
-                </p>
-                <p>
-                    This platform is incredibly useful every day. I'm using it right now for copy editing through verbal instructions. It's helped me solve dozens of problems. And it's remarkably fun to use.
-                </p>
-                <p>
-                    I'll continue developing this as open source. The core will always be free, with compelling business applications worth exploring. People are already sharing creative uses I never dreamed of.
-                </p>
-                <p>
-                    For my friends in media tech: there are exciting possibilities here beyond typical AI applications.
-                </p>
-                <p>
-                    There's a lot more to explore here.
-                </p>
-            </div>
-        </div>
-    </section>
-    
-    <!-- CTA Section -->
-    <section class="section cta-section">
-        <div class="container">
-            <h2>Start Building Your AI Toolkit</h2>
-            <p class="text-lg" style="margin-bottom: var(--space-8);">
-                Create tools that work the way you need them to.<br>
-                Save what works. Share what's great.
-            </p>
-            <div class="cta-buttons">
-                <a href="https://github.com/DollhouseMCP/mcp-server" class="btn btn-white btn-lg">
-                    View on GitHub
-                </a>
-                <a href="https://github.com/DollhouseMCP/mcp-server#quick-start" class="btn btn-outline-white btn-lg">
-                    Quick Start Guide
-                </a>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Footer -->
-    <footer class="section" style="text-align: center; padding: var(--space-8);">
-        <p class="text-secondary">
-            Built with DollhouseMCP • Open Source • 
-            <a href="https://github.com/DollhouseMCP">GitHub</a> • 
-            <a href="https://www.linkedin.com/in/mickdarling/">LinkedIn</a>
-        </p>
-    </footer>
-    
-    <script>
-        // Theme toggle
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        }
-        
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+      <article class="card card-protocol reveal">
+        <span class="pill">MCP-AQL</span>
+        <div class="card-family card-family-protocol" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <h3>Semantic CRUDE endpoints</h3>
+        <p>MCP-AQL groups operations into Create, Read, Update, Delete, and Execute so the AI can discover capabilities with introspection instead of juggling dozens of flat tools.</p>
+      </article>
+
+      <article class="card card-tooling reveal">
+        <span class="pill">Safety</span>
+        <div class="card-family card-family-tooling" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <h3>Gatekeeper and approval-aware execution</h3>
+        <p>Server-side permission checks, approval flows, and execution telemetry keep agent behavior auditable even when the client is highly permissive.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="prose">
+  <h2 class="reveal">How the platform works</h2>
+  <p class="reveal">
+    Create or edit a Dollhouse element in natural language. Store it in your local portfolio. Activate it when you need
+    it. Combine it with other elements in ensembles. Install community-built elements from the Collection when you want
+    a faster starting point.
+  </p>
+
+  <pre class="reveal"><code>npm install @dollhousemcp/mcp-server
+npx @dollhousemcp/mcp-server@latest</code></pre>
+
+  <figure class="reveal">
+    <img src="{{ '/assets/images/project-dollhousemcp-home.png' | relative_url }}" alt="DollhouseMCP interface preview" />
+  </figure>
+
+  <div class="focus-grid reveal">
+    <div class="focus-panel">
+      <h2>Element model</h2>
+      <p>Personas shape behavior, skills add capabilities, templates structure output, agents run goals, memories persist context, and ensembles coordinate multiple elements together.</p>
+    </div>
+    <div class="focus-panel">
+      <h2>Local portfolio</h2>
+      <p>DollhouseMCP works from a local portfolio, so the things you build stay readable, portable, and under your control.</p>
+    </div>
+    <div class="focus-panel">
+      <h2>Collection and sharing</h2>
+      <p>The Dollhouse Collection is the public browse-and-install path for community elements, making it easier to discover working building blocks instead of reinventing them.</p>
+    </div>
+    <div class="focus-panel">
+      <h2>Agent execution</h2>
+      <p>Runtime execution stays inside an approval-aware loop with server-side checks, step recording, and a clear path for human input when autonomy should pause.</p>
+    </div>
+  </div>
+
+  <h2 class="reveal">Why 2.0 matters</h2>
+  <ul class="timeline reveal">
+    <li>
+      <strong>MCP-AQL</strong>
+      <p>Five semantic endpoints reduce tool sprawl, improve discoverability, and let the server describe itself at runtime through introspection.</p>
+    </li>
+    <li>
+      <strong>Gatekeeper</strong>
+      <p>Permissions are enforced server-side, so active Dollhouse elements can shape what the AI can do, not just how it sounds.</p>
+    </li>
+    <li>
+      <strong>Portfolio and backups</strong>
+      <p>Elements stay local-first with backup, sync, and collection workflows instead of disappearing into one-off chat history.</p>
+    </li>
+    <li>
+      <strong>Composable execution</strong>
+      <p>Agents, memories, and ensembles turn isolated prompts into reusable workflows that can be inspected, refined, and run again.</p>
+    </li>
+  </ul>
+
+  <div class="callout reveal">
+    <p>
+      Start with the <a href="https://github.com/DollhouseMCP/mcp-server">GitHub repository</a> or the
+      <a href="https://www.npmjs.com/package/@dollhousemcp/mcp-server">NPM package</a>, then explore
+      <a href="https://collection.dollhousemcp.com/">the Collection</a> for reusable elements and
+      <a href="{{ '/blog/' | relative_url }}">the blog</a> for deeper technical context.
+    </p>
+  </div>
+</section>

@@ -1,0 +1,31 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dollhouse logo with orange chimney">
+  <defs>
+    <linearGradient id="roofBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f8ff7" />
+      <stop offset="100%" stop-color="#2f6ddd" />
+    </linearGradient>
+    <linearGradient id="baseBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2b5ec8" />
+      <stop offset="100%" stop-color="#1f4caf" />
+    </linearGradient>
+    <linearGradient id="chimneyOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fb923c" />
+      <stop offset="100%" stop-color="#f97316" />
+    </linearGradient>
+  </defs>
+
+  <!-- Chimney first so roof overlaps and keeps it behind the roof line -->
+  <rect x="23" y="16" width="9" height="15" rx="2" fill="url(#chimneyOrange)" />
+  <path d="M50 10 L88 32 H12 Z" fill="url(#roofBlue)" />
+
+  <rect x="17" y="32" width="66" height="46" rx="4" fill="#4f8ff7" />
+  <!-- Inner panel inset is 5px on all sides so wall thickness matches top/sides/bottom -->
+  <rect x="22" y="37" width="56" height="36" rx="4" fill="#ffffff" />
+
+  <rect x="26" y="40" width="22" height="12" rx="3" fill="#3b82f6" />
+  <rect x="52" y="40" width="22" height="12" rx="3" fill="#6366f1" />
+  <rect x="26" y="56" width="22" height="12" rx="3" fill="#7c3aed" />
+  <rect x="52" y="56" width="22" height="12" rx="3" fill="#a855f7" />
+
+  <rect x="14" y="78" width="72" height="7" rx="3" fill="url(#baseBlue)" />
+</svg>

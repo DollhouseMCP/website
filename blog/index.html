@@ -1,0 +1,58 @@
+---
+layout: default
+title: Blog
+description: Technical articles, case studies, and product writing about DollhouseMCP and AI customization workflows.
+---
+
+<section class="prose">
+  <p class="eyebrow">Blog</p>
+  <h1>Technical writing and product notes.</h1>
+  <p class="lead">
+    Engineering lessons, product context, and real stories from building DollhouseMCP in public.
+  </p>
+
+  {% assign posts = paginator.posts | default: site.posts %}
+  {% if posts and posts.size > 0 %}
+  <div class="card-grid">
+    {% for post in posts %}
+    <article class="card card-core reveal">
+      <span class="pill">{{ post.date | date: "%b %d, %Y" }}</span>
+      <div class="card-family card-family-core" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
+      <p>{{ post.description | default: post.excerpt | strip_html | truncate: 220 }}</p>
+      {% if post.tags %}
+      <div class="pill-row">
+        {% for tag in post.tags limit:4 %}
+        <span class="pill">{{ tag }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <div class="link-row">
+        <a href="{{ post.url | relative_url }}">Read post</a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="callout">
+    <p>No posts are published yet.</p>
+  </div>
+  {% endif %}
+
+  {% if paginator and paginator.total_pages > 1 %}
+  <div class="post-nav">
+    {% if paginator.previous_page %}
+    <a href="{{ paginator.previous_page_path | relative_url }}">
+      <em>Previous Page</em>
+      <strong>Page {{ paginator.previous_page }}</strong>
+    </a>
+    {% endif %}
+    {% if paginator.next_page %}
+    <a href="{{ paginator.next_page_path | relative_url }}">
+      <em>Next Page</em>
+      <strong>Page {{ paginator.next_page }}</strong>
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
