@@ -21,11 +21,23 @@ on:
 env:
   PREVIEW_REPOSITORY: DollhouseMCP/website-visidelta-preview
   PREVIEW_SITE_BASE: https://dollhousemcp.github.io/website-visidelta-preview
+  VISIDELTA_JEKYLL_BUILD_CMD: >-
+    docker run --rm
+    -e BASEURL="$BASEURL"
+    -e JEKYLL_ENV=production
+    -e HOST_UID="$(id -u)"
+    -e HOST_GID="$(id -g)"
+    -v "$SRC_DIR":/app
+    -v "$DEST_DIR":/out
+    -w /app
+    ruby:3.1
+    bash -lc 'bundle install && bundle exec jekyll build --source /app --destination /out --baseurl "$BASEURL" --trace && chown -R "$HOST_UID:$HOST_GID" /out || true'
 
 jobs:
   visidelta:
     name: Build Rendered Diffs
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
       pull-requests: write
@@ -58,6 +70,8 @@ jobs:
           base_ref: ${{ steps.base.outputs.ref }}
           out_dir: /tmp/visidelta
           mode: build
+          build_old_cmd: ${{ env.VISIDELTA_JEKYLL_BUILD_CMD }}
+          build_new_cmd: ${{ env.VISIDELTA_JEKYLL_BUILD_CMD }}
 
       - name: Augment Route List For HTML And Jekyll Pages
         shell: bash
