@@ -31,7 +31,7 @@ env:
     -v "$DEST_DIR":/out
     -w /app
     ruby:3.1
-    bash -lc 'bundle install && bundle exec jekyll build --source /app --destination /out --baseurl "$BASEURL" --trace && (chown -R "$HOST_UID:$HOST_GID" /out || true)'
+    bash -lc 'if [ -f /app/Gemfile ]; then bundle install && bundle exec jekyll build --source /app --destination /out --baseurl "$BASEURL" --trace; else cp -R /app/. /out/ && find /out -name "*.html" -print0 | xargs -0 perl -0pi -e '"'"'\'"'"''"'"'s{(["'"'"'"'"'"'"'"'"'=])/(favicon-16x16\.png|favicon-32x32\.png|apple-touch-icon\.png)}{$1$ENV{BASEURL}/$2}g'"'"'\'"'"''"'"'; fi && (chown -R "$HOST_UID:$HOST_GID" /out || true)'
 
 jobs:
   visidelta:
