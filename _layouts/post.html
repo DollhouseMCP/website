@@ -37,10 +37,11 @@ layout: default
   </div>
   {% endif %}
 
-  <div class="prose-width-toggle" role="group" aria-label="Reading width">
+  <fieldset class="prose-width-toggle">
+    <legend class="sr-only">Reading width</legend>
     <button class="prose-width-button is-active" type="button" data-prose-width="standard">Standard Width</button>
     <button class="prose-width-button" type="button" data-prose-width="wide">Full Width</button>
-  </div>
+  </fieldset>
 
   <div class="post-content">
     {{ content }}

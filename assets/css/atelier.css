@@ -1273,6 +1273,7 @@ main {
   align-items: center;
   gap: 0.3rem;
   padding: 0.28rem;
+  margin-left: 0;
   border: 1px solid color-mix(in srgb, var(--line) 88%, var(--paper-strong));
   border-radius: 999px;
   background: color-mix(in srgb, var(--surface-2) 84%, var(--paper-strong));

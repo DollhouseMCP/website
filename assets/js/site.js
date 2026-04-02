@@ -160,6 +160,34 @@
     clickableCards.forEach(initClickableCard);
   };
 
+  const resetCopyState = (button, originalTitle) => {
+    delete button.dataset.copyState;
+    button.title = originalTitle;
+  };
+
+  const handleCopyButtonClick = async (button) => {
+    const copyText = button.dataset.copyText;
+    if (!copyText) {
+      return;
+    }
+
+    const originalTitle = button.title || "Copy";
+    delete button.dataset.copyState;
+
+    try {
+      await navigator.clipboard.writeText(copyText);
+      button.dataset.copyState = "copied";
+      button.title = "Copied";
+    } catch {
+      button.dataset.copyState = "failed";
+      button.title = "Copy failed";
+    }
+
+    globalThis.setTimeout(() => {
+      resetCopyState(button, originalTitle);
+    }, 1400);
+  };
+
   const initCopyButtons = () => {
     const copyButtons = document.querySelectorAll("[data-copy-text]");
     copyButtons.forEach((button) => {
@@ -167,28 +195,39 @@
         return;
       }
 
-      button.addEventListener("click", async () => {
-        const copyText = button.dataset.copyText;
-        if (!copyText) {
-          return;
-        }
+      button.addEventListener("click", () => {
+        void handleCopyButtonClick(button);
+      });
+    });
+  };
 
-        const originalTitle = button.getAttribute("title") || "Copy";
-        button.removeAttribute("data-copy-state");
+  const applyWidth = (shell, mode) => {
+    shell.classList.toggle("is-wide", mode === "wide");
+    const buttons = shell.querySelectorAll("[data-prose-width]");
+    buttons.forEach((button) => {
+      if (!(button instanceof HTMLButtonElement)) {
+        return;
+      }
+      button.classList.toggle("is-active", button.dataset.proseWidth === mode);
+    });
+  };
 
-        try {
-          await navigator.clipboard.writeText(copyText);
-          button.dataset.copyState = "copied";
-          button.setAttribute("title", "Copied");
-        } catch {
-          button.dataset.copyState = "failed";
-          button.setAttribute("title", "Copy failed");
-        }
+  const handleProseWidthButtonClick = (button, proseShells) => {
+    const mode = button.dataset.proseWidth === "wide" ? "wide" : "standard";
+    localStorage.setItem(blogWidthStorageKey, mode);
+    proseShells.forEach((targetShell) => applyWidth(targetShell, mode));
+  };
 
-        globalThis.setTimeout(() => {
-          button.removeAttribute("data-copy-state");
-          button.setAttribute("title", originalTitle);
-        }, 1400);
+  const initProseWidthButtons = (shell, proseShells, initialMode) => {
+    applyWidth(shell, initialMode);
+
+    const buttons = shell.querySelectorAll("[data-prose-width]");
+    buttons.forEach((button) => {
+      if (!(button instanceof HTMLButtonElement)) {
+        return;
+      }
+      button.addEventListener("click", () => {
+        handleProseWidthButtonClick(button, proseShells);
       });
     });
   };
@@ -200,26 +239,10 @@
     }
 
     const savedWidth = localStorage.getItem(blogWidthStorageKey);
-    const applyWidth = (shell, mode) => {
-      shell.classList.toggle("is-wide", mode === "wide");
-      const buttons = shell.querySelectorAll("[data-prose-width]");
-      buttons.forEach((button) => {
-        button.classList.toggle("is-active", button.getAttribute("data-prose-width") === mode);
-      });
-    };
+    const initialMode = savedWidth === "wide" ? "wide" : "standard";
 
     proseShells.forEach((shell) => {
-      const initialMode = savedWidth === "wide" ? "wide" : "standard";
-      applyWidth(shell, initialMode);
-
-      const buttons = shell.querySelectorAll("[data-prose-width]");
-      buttons.forEach((button) => {
-        button.addEventListener("click", () => {
-          const mode = button.getAttribute("data-prose-width") === "wide" ? "wide" : "standard";
-          localStorage.setItem(blogWidthStorageKey, mode);
-          proseShells.forEach((targetShell) => applyWidth(targetShell, mode));
-        });
-      });
+      initProseWidthButtons(shell, proseShells, initialMode);
     });
   };
 
