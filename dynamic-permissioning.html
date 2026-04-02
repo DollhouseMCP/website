@@ -1,0 +1,100 @@
+---
+layout: default
+title: Dynamic Permissioning
+description: How active elements dynamically change what the AI can do in DollhouseMCP.
+main_class: prose
+---
+
+<p class="eyebrow">Dynamic Permissioning</p>
+<h1>Active elements can change the AI's permission surface.</h1>
+
+<p class="lead">
+  In DollhouseMCP, customization is not only about tone or expertise. Personas, skills, and ensembles can act as
+  security principals, changing what the AI can do, what needs approval, and what gets blocked.
+</p>
+
+<h2>How it works</h2>
+<p>
+  Every MCP-AQL operation passes through the Gatekeeper. When you activate a Dollhouse Persona, Skill, or Ensemble, its
+  permission policies take effect immediately. That means active elements can shape the runtime, not just the style of
+  the response.
+</p>
+
+<pre><code>persona: read-only-analyst
+
+gatekeeper:
+  allow: [list_elements, search, get_element, introspect]
+  deny: [create_element, edit_element, delete_element, execute_agent, confirm_operation]</code></pre>
+
+<pre><code>deny  &gt;  confirm  &gt;  allow  &gt;  route default</code></pre>
+
+<div class="focus-grid">
+  <div class="focus-panel">
+    <h3>Element deny</h3>
+    <p>Hard-blocked operations cannot be confirmed or bypassed by the model or the client.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>Element confirm</h3>
+    <p>Specific actions can require approval even when the route default is more permissive.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>Element allow</h3>
+    <p>Trusted workflows can auto-approve operations that would otherwise need confirmation.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>Route default</h3>
+    <p>If no active element overrides the policy, the endpoint's built-in permission level still applies.</p>
+  </div>
+</div>
+
+<p>
+  This still applies even if the MCP client has "Always Allow" enabled. The Gatekeeper runs server-side after the client
+  approves the tool call, so a deny from any active element cannot be overridden by the LLM or the client.
+</p>
+
+<h2>Why this is different</h2>
+<ul class="timeline">
+  <li>
+    <strong>Server-side enforcement</strong>
+    <p>The Gatekeeper still applies even if the MCP client is set to always allow tool calls.</p>
+  </li>
+  <li>
+    <strong>Identity-based behavior</strong>
+    <p>A read-only analyst persona and a security-focused ensemble can produce completely different permission surfaces on the same client.</p>
+  </li>
+  <li>
+    <strong>Composable policies</strong>
+    <p>Policies stack across active elements, so a restrictive persona can lock things down while a skill adds focused capability.</p>
+  </li>
+  <li>
+    <strong>Works with agent execution</strong>
+    <p>Gatekeeper, autonomy evaluation, and danger-zone checks all participate in the agent loop so higher agency stays observable and bounded.</p>
+  </li>
+</ul>
+
+<h2>What this means in practice</h2>
+<ul class="timeline">
+  <li>
+    <strong>Read-only analyst persona</strong>
+    <p>The LLM can browse and search even if the client is permissive, but cannot create, edit, delete, or run agents.</p>
+  </li>
+  <li>
+    <strong>Security analyst ensemble</strong>
+    <p>Destructive commands like <code>rm -rf *</code> or sensitive delete operations can be denied while code-review workflows still work normally.</p>
+  </li>
+  <li>
+    <strong>Nuclear sandbox</strong>
+    <p>Blocking <code>confirm_operation</code> makes the session effectively read-only until the restrictive element is deactivated.</p>
+  </li>
+  <li>
+    <strong>CLI approval visibility</strong>
+    <p>The platform also exposes <code>get_effective_cli_policies</code>, <code>get_pending_cli_approvals</code>, and <code>approve_cli_permission</code> so the active policy stack is inspectable.</p>
+  </li>
+</ul>
+
+<div class="callout">
+  <p>
+    This is the core reason DollhouseMCP describes elements as building blocks for AI customization. The active blocks
+    change both how the AI behaves and what it is allowed to do.
+  </p>
+</div>

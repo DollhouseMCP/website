@@ -1,0 +1,66 @@
+---
+layout: default
+---
+{% assign posts = site.blog_posts | sort: "date" %}
+{% assign current_index = nil %}
+{% for candidate in posts %}
+  {% if candidate.url == page.url %}
+    {% assign current_index = forloop.index0 %}
+  {% endif %}
+{% endfor %}
+{% if current_index != nil %}
+  {% assign next_index = current_index | plus: 1 %}
+  {% if current_index > 0 %}
+    {% assign previous_index = current_index | minus: 1 %}
+    {% assign previous_post = posts[previous_index] %}
+  {% endif %}
+  {% if next_index < posts.size %}
+    {% assign next_post = posts[next_index] %}
+  {% endif %}
+{% endif %}
+
+<article class="prose prose-post" data-prose-shell>
+  <p class="eyebrow">
+    {{ page.date | date: "%B %d, %Y" }}{% if page.author %} • {{ page.author }}{% endif %}
+  </p>
+  <h1>{{ page.title }}</h1>
+
+  {% if page.description %}
+  <p class="lead">{{ page.description }}</p>
+  {% endif %}
+
+  {% if page.tags %}
+  <div class="pill-row">
+    {% for tag in page.tags %}
+    <span class="pill">{{ tag }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <fieldset class="prose-width-toggle">
+    <legend class="sr-only">Reading width</legend>
+    <button class="prose-width-button is-active" type="button" data-prose-width="standard">Standard Width</button>
+    <button class="prose-width-button" type="button" data-prose-width="wide">Full Width</button>
+  </fieldset>
+
+  <div class="post-content">
+    {{ content }}
+  </div>
+
+  {% if previous_post or next_post %}
+  <div class="post-nav">
+    {% if previous_post %}
+    <a href="{{ previous_post.url | relative_url }}">
+      <em>Previous Post</em>
+      <strong>{{ previous_post.title }}</strong>
+    </a>
+    {% endif %}
+    {% if next_post %}
+    <a href="{{ next_post.url | relative_url }}">
+      <em>Next Post</em>
+      <strong>{{ next_post.title }}</strong>
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+</article>

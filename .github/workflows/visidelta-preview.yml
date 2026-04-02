@@ -1,0 +1,328 @@
+name: VisiDelta Preview
+
+on:
+  pull_request:
+    paths:
+      - "**/*.md"
+      - "**/*.html"
+      - "_layouts/**"
+      - "_includes/**"
+      - "_config.yml"
+      - "assets/**"
+      - "styles/**"
+      - ".github/workflows/visidelta-preview.yml"
+  workflow_dispatch:
+    inputs:
+      base_ref:
+        description: "Base ref to compare against for manual runs"
+        required: false
+        default: "origin/main"
+
+env:
+  PREVIEW_REPOSITORY: DollhouseMCP/website-visidelta-preview
+  PREVIEW_SITE_BASE: https://dollhousemcp.github.io/website-visidelta-preview
+  VISIDELTA_SITE_BUILD_CMD: bash "$GITHUB_WORKSPACE/.github/scripts/visidelta-build-site.sh"
+
+jobs:
+  visidelta:
+    name: Build Rendered Diffs
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 0
+
+      - name: Resolve base ref
+        id: base
+        shell: bash
+        env:
+          BASE_REF_INPUT: ${{ github.event.inputs.base_ref }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_REF: ${{ github.base_ref }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            echo "ref=origin/${PR_BASE_REF}" >> "$GITHUB_OUTPUT"
+          else
+            ref="${BASE_REF_INPUT:-origin/main}"
+            if [[ -z "$ref" ]]; then
+              ref="origin/main"
+            fi
+            echo "ref=$ref" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate VisiDelta Output
+        uses: DollhouseMCP/visidelta@b8f19974591d94a7c5445dfd5bea68b63bb5db61
+        with:
+          base_ref: ${{ steps.base.outputs.ref }}
+          out_dir: /tmp/visidelta
+          mode: build
+          build_old_cmd: ${{ env.VISIDELTA_SITE_BUILD_CMD }}
+          build_new_cmd: ${{ env.VISIDELTA_SITE_BUILD_CMD }}
+
+      - name: Augment Route List For HTML And Jekyll Pages
+        shell: bash
+        env:
+          BASE_REF: ${{ steps.base.outputs.ref }}
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/visidelta_route_manifest.py \
+            --base-ref "$BASE_REF" \
+            --routes-file /tmp/visidelta/routes.json
+
+      - name: Compute Preview URL
+        id: preview_meta
+        shell: bash
+        env:
+          PREVIEW_SITE_BASE: ${{ env.PREVIEW_SITE_BASE }}
+        run: |
+          set -euo pipefail
+          ref_raw="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          ref_slug="$(echo "$ref_raw" | tr '[:upper:]' '[:lower:]' | sed -E 's#[^a-z0-9._-]+#-#g; s#^-+##; s#-+$##')"
+          if [[ -z "$ref_slug" ]]; then
+            ref_slug="run-${GITHUB_RUN_ID}"
+          fi
+          branch_path="website/${ref_slug}"
+          preview_path="${branch_path}/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          latest_path="${branch_path}/latest"
+          preview_url="${PREVIEW_SITE_BASE}/${preview_path}/"
+          latest_url="${PREVIEW_SITE_BASE}/${latest_path}/"
+          echo "branch_path=$branch_path" >> "$GITHUB_OUTPUT"
+          echo "path=$preview_path" >> "$GITHUB_OUTPUT"
+          echo "url=$preview_url" >> "$GITHUB_OUTPUT"
+          echo "latest_path=$latest_path" >> "$GITHUB_OUTPUT"
+          echo "latest_url=$latest_url" >> "$GITHUB_OUTPUT"
+
+      - name: Detect Hosted Preview Setup
+        id: preview_setup
+        shell: bash
+        env:
+          PREVIEW_TOKEN: ${{ secrets.VISIDELTA_PREVIEW_PAGES_TOKEN }}
+        run: |
+          if [[ -n "$PREVIEW_TOKEN" ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish Hosted Preview
+        if: ${{ steps.preview_setup.outputs.enabled == 'true' }}
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e
+        with:
+          personal_token: ${{ secrets.VISIDELTA_PREVIEW_PAGES_TOKEN }}
+          external_repository: ${{ env.PREVIEW_REPOSITORY }}
+          publish_branch: gh-pages
+          publish_dir: /tmp/visidelta
+          destination_dir: ${{ steps.preview_meta.outputs.path }}
+          keep_files: true
+          force_orphan: false
+          enable_jekyll: false
+
+      - name: Publish Hosted Preview (Latest Alias)
+        if: ${{ steps.preview_setup.outputs.enabled == 'true' }}
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e
+        with:
+          personal_token: ${{ secrets.VISIDELTA_PREVIEW_PAGES_TOKEN }}
+          external_repository: ${{ env.PREVIEW_REPOSITORY }}
+          publish_branch: gh-pages
+          publish_dir: /tmp/visidelta
+          destination_dir: ${{ steps.preview_meta.outputs.latest_path }}
+          keep_files: true
+          force_orphan: false
+          enable_jekyll: false
+
+      - name: Refresh Preview Host Index
+        if: ${{ steps.preview_setup.outputs.enabled == 'true' }}
+        shell: bash
+        env:
+          PREVIEW_TOKEN: ${{ secrets.VISIDELTA_PREVIEW_PAGES_TOKEN }}
+          PREVIEW_REPOSITORY: ${{ env.PREVIEW_REPOSITORY }}
+          PREVIEW_SITE_BASE: ${{ env.PREVIEW_SITE_BASE }}
+          BRANCH_PATH: ${{ steps.preview_meta.outputs.branch_path }}
+        run: |
+          set -euo pipefail
+          repo_dir="/tmp/visidelta-preview-host"
+          askpass="${RUNNER_TEMP}/visidelta-preview-askpass.sh"
+          rm -rf "$repo_dir"
+          trap 'rm -f "$askpass"' EXIT
+          printf '%s\n' \
+            '#!/usr/bin/env bash' \
+            'case "$1" in' \
+            '  *Username*) printf "%s\n" "x-access-token" ;;' \
+            '  *Password*) printf "%s\n" "$PREVIEW_TOKEN" ;;' \
+            '  *) printf "\n" ;;' \
+            'esac' > "$askpass"
+          chmod 700 "$askpass"
+          GIT_ASKPASS="$askpass" GIT_TERMINAL_PROMPT=0 \
+            git clone --depth 1 --branch gh-pages "https://github.com/${PREVIEW_REPOSITORY}.git" "$repo_dir"
+          python3 <<'PY'
+          import html
+          import os
+          import shutil
+          import textwrap
+          from pathlib import Path
+
+          repo = Path("/tmp/visidelta-preview-host")
+          site_base = os.environ["PREVIEW_SITE_BASE"].rstrip("/")
+          branch_path = os.environ["BRANCH_PATH"].strip("/")
+          branch_root = repo / branch_path
+
+          if branch_root.exists():
+              run_dirs = sorted(
+                  [item for item in branch_root.iterdir() if item.is_dir() and item.name != "latest"],
+                  key=lambda item: item.name,
+                  reverse=True,
+              )
+              for stale_dir in run_dirs[10:]:
+                  shutil.rmtree(stale_dir)
+
+          previews = []
+          website_root = repo / "website"
+          if website_root.exists():
+              for branch_dir in sorted([item for item in website_root.iterdir() if item.is_dir()], key=lambda item: item.name):
+                  latest_dir = branch_dir / "latest"
+                  if latest_dir.is_dir():
+                      rel_path = latest_dir.relative_to(repo).as_posix()
+                      previews.append(
+                          {
+                              "label": branch_dir.name,
+                              "url": f"{site_base}/{rel_path}/",
+                          }
+                      )
+
+          cards = "\n".join(
+              f"""      <li><a href="{html.escape(item['url'])}">{html.escape(item['label'])}</a></li>"""
+              for item in previews
+          )
+          if not cards:
+              cards = "      <li>No hosted previews have been published yet.</li>"
+
+          (repo / "index.html").write_text(
+              textwrap.dedent(
+                  f"""\
+                  <!doctype html>
+                  <html lang="en">
+                    <head>
+                      <meta charset="utf-8">
+                      <meta name="viewport" content="width=device-width, initial-scale=1">
+                      <title>VisiDelta Preview Host</title>
+                      <style>
+                        body {{
+                          margin: 0;
+                          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                          background: #f7f3ea;
+                          color: #2f2418;
+                        }}
+
+                        main {{
+                          max-width: 42rem;
+                          margin: 0 auto;
+                          padding: 4rem 1.5rem;
+                        }}
+
+                        h1 {{
+                          font-size: clamp(2rem, 4vw, 3.2rem);
+                          line-height: 1.05;
+                          margin: 0 0 1rem;
+                        }}
+
+                        p, li {{
+                          font-size: 1.05rem;
+                          line-height: 1.7;
+                        }}
+
+                        ul {{
+                          padding-left: 1.25rem;
+                        }}
+
+                        a {{
+                          color: #1d4ed8;
+                        }}
+                      </style>
+                    </head>
+                    <body>
+                      <main>
+                        <h1>VisiDelta Preview Host</h1>
+                        <p>Rendered previews are published under branch-specific latest aliases.</p>
+                        <ul>
+                  {cards}
+                        </ul>
+                      </main>
+                    </body>
+                  </html>
+                  """
+              ),
+              encoding="utf-8",
+          )
+          PY
+          cd "$repo_dir"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html website
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: refresh preview host index"
+            GIT_ASKPASS="$askpass" GIT_TERMINAL_PROMPT=0 git push
+          fi
+
+      - name: Upload VisiDelta Artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: visidelta-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/visidelta
+          retention-days: 14
+
+      - name: Comment Preview Links
+        if: ${{ github.event_name == 'pull_request' && steps.preview_setup.outputs.enabled == 'true' }}
+        uses: marocchino/sticky-pull-request-comment@773744901bac0e8cbb5a0dc842800d45e9b2b405
+        with:
+          header: visidelta-preview
+          message: |
+            VisiDelta preview is ready.
+
+            - Base ref: `${{ steps.base.outputs.ref }}`
+            - Hosted preview: [Open preview](${{ steps.preview_meta.outputs.url }})
+            - Latest preview for this branch: [Open latest preview](${{ steps.preview_meta.outputs.latest_url }})
+            - Preview index: [Open preview index](${{ env.PREVIEW_SITE_BASE }}/)
+            - Workflow run: [Run ${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - Artifact backup: `visidelta-${{ github.run_id }}-${{ github.run_attempt }}`
+
+      - name: Comment Preview Setup Needed
+        if: ${{ github.event_name == 'pull_request' && steps.preview_setup.outputs.enabled != 'true' }}
+        uses: marocchino/sticky-pull-request-comment@773744901bac0e8cbb5a0dc842800d45e9b2b405
+        with:
+          header: visidelta-preview
+          message: |
+            VisiDelta artifact is ready, but hosted preview links are not enabled yet.
+
+            - Base ref: `${{ steps.base.outputs.ref }}`
+            - Workflow run: [Run ${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - Artifact backup: `visidelta-${{ github.run_id }}-${{ github.run_attempt }}`
+
+            Add the `VISIDELTA_PREVIEW_PAGES_TOKEN` secret to enable hosted preview links published to `${{ env.PREVIEW_REPOSITORY }}`.
+
+      - name: Add Run Summary
+        shell: bash
+        run: |
+          {
+            echo "## VisiDelta Output"
+            echo ""
+            echo "- Base ref: \`${{ steps.base.outputs.ref }}\`"
+            echo "- Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo "- Artifact backup: \`visidelta-${{ github.run_id }}-${{ github.run_attempt }}\`"
+            echo ""
+            if [[ "${{ steps.preview_setup.outputs.enabled }}" == "true" ]]; then
+              echo "- Hosted preview: ${{ steps.preview_meta.outputs.url }}"
+              echo "- Latest preview for this branch: ${{ steps.preview_meta.outputs.latest_url }}"
+              echo ""
+              echo "Hosted preview is published to the dedicated preview Pages site."
+            else
+              echo "Hosted preview is not enabled yet."
+              echo "Add the \`VISIDELTA_PREVIEW_PAGES_TOKEN\` secret to publish previews to \`${{ env.PREVIEW_REPOSITORY }}\`."
+            fi
+            echo "Artifact is also uploaded for archival and debugging."
+          } >> "$GITHUB_STEP_SUMMARY"

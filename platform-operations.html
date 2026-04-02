@@ -1,0 +1,108 @@
+---
+layout: default
+title: Platform Operations
+description: The wider 2.0 operational surface beyond simple element activation.
+main_class: prose
+---
+
+<p class="eyebrow">Platform Operations</p>
+<h1>More than activation: a full platform surface.</h1>
+
+<p class="lead">
+  DollhouseMCP 2.0 is not a thin persona switcher. It includes portfolio management, collection workflows, skill
+  conversion, search, execution lifecycle control, and structured introspection for the entire platform.
+</p>
+
+<div class="card-grid starter-grid">
+  <article class="card card-protocol">
+    <span class="pill">Discovery</span>
+    <h2>Search and browse</h2>
+    <p>List elements, search everything, browse the Collection, open the portfolio browser, and inspect operation schemas at runtime.</p>
+  </article>
+  <article class="card card-core">
+    <span class="pill">Portfolio</span>
+    <h2>Sync and manage</h2>
+    <p>Initialize a GitHub portfolio, push and pull elements, run bulk syncs, and inspect portfolio status through MCP-AQL operations.</p>
+  </article>
+  <article class="card card-tooling">
+    <span class="pill">Collection</span>
+    <h2>Install and submit</h2>
+    <p>Install community content directly into the local portfolio and submit finished work back to the Collection.</p>
+  </article>
+  <article class="card card-protocol">
+    <span class="pill">Interoperability</span>
+    <h2>Convert skills</h2>
+    <p>Import and export compatible skill formats so useful building blocks can move between ecosystems instead of staying siloed.</p>
+  </article>
+  <article class="card card-tooling">
+    <span class="pill">Execution</span>
+    <h2>Lifecycle control</h2>
+    <p>Execute agents, record steps, prepare handoffs, resume from handoffs, and continue or abort execution with explicit state.</p>
+  </article>
+  <article class="card card-core">
+    <span class="pill">Introspection</span>
+    <h2>Self-describing platform</h2>
+    <p>The server can describe its operations, formats, policies, and relationships to the LLM at runtime instead of forcing hard-coded assumptions.</p>
+  </article>
+</div>
+
+<h2>Representative operation surface</h2>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Operations</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Core element management</td>
+        <td><code>create_element</code>, <code>list_elements</code>, <code>get_element_details</code>, <code>edit_element</code>, <code>delete_element</code>, <code>validate_element</code>, <code>render</code>, <code>export_element</code></td>
+      </tr>
+      <tr>
+        <td>Search and discovery</td>
+        <td><code>search</code>, <code>search_portfolio</code>, <code>search_all</code>, <code>search_collection_enhanced</code>, <code>find_similar_elements</code>, <code>search_by_verb</code>, <code>get_relationship_stats</code></td>
+      </tr>
+      <tr>
+        <td>Collection and portfolio</td>
+        <td><code>browse_collection</code>, <code>get_collection_content</code>, <code>install_collection_content</code>, <code>submit_collection_content</code>, <code>portfolio_status</code>, <code>portfolio_config</code>, <code>open_portfolio_browser</code></td>
+      </tr>
+      <tr>
+        <td>Interoperability and config</td>
+        <td><code>convert_skill_format</code>, <code>dollhouse_config</code>, <code>get_build_info</code>, <code>get_cache_budget_report</code>, <code>query_logs</code>, <code>oauth_helper_status</code></td>
+      </tr>
+      <tr>
+        <td>Execution lifecycle</td>
+        <td><code>execute_agent</code>, <code>record_execution_step</code>, <code>complete_execution</code>, <code>continue_execution</code>, <code>abort_execution</code>, <code>prepare_handoff</code>, <code>resume_from_handoff</code></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>What 2.0 adds beyond “activate a persona”</h2>
+<ul class="timeline">
+  <li>
+    <strong>Enhanced index operations</strong>
+    <p>The platform can score similarity, expose relationships, and search by verb rather than stopping at filename or keyword lookup.</p>
+  </li>
+  <li>
+    <strong>Operational diagnostics</strong>
+    <p>Build metadata, cache-budget reporting, and queryable in-memory logs turn the server into an inspectable runtime instead of an opaque background process.</p>
+  </li>
+  <li>
+    <strong>Skill interoperability</strong>
+    <p>The converter path means skills can move in and out of the Dollhouse ecosystem without flattening the element model.</p>
+  </li>
+  <li>
+    <strong>Execution state as a first-class concept</strong>
+    <p>Handoff, resume, gather-data, and step recording make agent execution recoverable and inspectable instead of all-or-nothing.</p>
+  </li>
+</ul>
+
+<div class="callout">
+  <p>
+    The point of 2.0 is that behavior, permissions, content, discovery, and execution all live in one coherent surface
+    instead of a pile of disconnected tools.
+  </p>
+</div>
