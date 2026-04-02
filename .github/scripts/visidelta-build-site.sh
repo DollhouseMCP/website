@@ -8,10 +8,16 @@ if [[ -z "${SRC_DIR:-}" || -z "${DEST_DIR:-}" ]]; then
 fi
 
 mkdir -p "$DEST_DIR"
+export BASEURL="${BASEURL:-}"
+
+if [[ -z "$BASEURL" ]]; then
+  echo "BASEURL must be set for VisiDelta builds" >&2
+  exit 1
+fi
 
 if [[ -f "$SRC_DIR/Gemfile" ]]; then
   docker run --rm \
-    -e BASEURL="${BASEURL:-}" \
+    -e BASEURL="$BASEURL" \
     -e JEKYLL_ENV=production \
     -e HOST_UID="$(id -u)" \
     -e HOST_GID="$(id -g)" \
@@ -26,16 +32,12 @@ fi
 cp -R "$SRC_DIR"/. "$DEST_DIR"/
 
 export DEST_DIR
-export BASEURL="${BASEURL:-}"
 python3 <<'PY'
 import os
 from pathlib import Path
 
 dest_dir = Path(os.environ["DEST_DIR"])
 baseurl = os.environ["BASEURL"].rstrip("/")
-
-if not baseurl:
-    raise SystemExit("BASEURL must be set for VisiDelta static builds")
 
 replacements = {
     'href="/favicon-16x16.png"': f'href="{baseurl}/favicon-16x16.png"',

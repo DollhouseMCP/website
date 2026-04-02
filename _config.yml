@@ -37,6 +37,8 @@ exclude:
   - README.md
   - LICENSE
   - CNAME
+  - AGENTS.md
+  - CLAUDE.md
   - .git
   - .github
   - docs/security

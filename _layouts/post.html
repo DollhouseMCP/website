@@ -2,16 +2,21 @@
 layout: default
 ---
 {% assign posts = site.blog_posts | sort: "date" %}
+{% assign current_index = nil %}
 {% for candidate in posts %}
   {% if candidate.url == page.url %}
     {% assign current_index = forloop.index0 %}
   {% endif %}
 {% endfor %}
 {% if current_index != nil %}
-  {% assign previous_index = current_index | minus: 1 %}
   {% assign next_index = current_index | plus: 1 %}
-  {% assign previous_post = posts[previous_index] %}
-  {% assign next_post = posts[next_index] %}
+  {% if current_index > 0 %}
+    {% assign previous_index = current_index | minus: 1 %}
+    {% assign previous_post = posts[previous_index] %}
+  {% endif %}
+  {% if next_index < posts.size %}
+    {% assign next_post = posts[next_index] %}
+  {% endif %}
 {% endif %}
 
 <article class="prose prose-post" data-prose-shell>
