@@ -149,18 +149,17 @@ jobs:
           repo_dir="/tmp/visidelta-preview-host"
           askpass="${RUNNER_TEMP}/visidelta-preview-askpass.sh"
           rm -rf "$repo_dir"
-          cat > "$askpass" <<'EOF'
-          #!/usr/bin/env bash
-          case "$1" in
-            *Username*) printf '%s\n' "x-access-token" ;;
-            *Password*) printf '%s\n' "$PREVIEW_TOKEN" ;;
-            *) printf '\n' ;;
-          esac
-          EOF
+          trap 'rm -f "$askpass"' EXIT
+          printf '%s\n' \
+            '#!/usr/bin/env bash' \
+            'case "$1" in' \
+            '  *Username*) printf "%s\n" "x-access-token" ;;' \
+            '  *Password*) printf "%s\n" "$PREVIEW_TOKEN" ;;' \
+            '  *) printf "\n" ;;' \
+            'esac' > "$askpass"
           chmod 700 "$askpass"
           GIT_ASKPASS="$askpass" GIT_TERMINAL_PROMPT=0 \
             git clone --depth 1 --branch gh-pages "https://github.com/${PREVIEW_REPOSITORY}.git" "$repo_dir"
-          rm -f "$askpass"
           python3 <<'PY'
           import html
           import os
@@ -267,7 +266,7 @@ jobs:
           git add index.html website
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh preview host index"
-            git push
+            GIT_ASKPASS="$askpass" GIT_TERMINAL_PROMPT=0 git push
           fi
 
       - name: Upload VisiDelta Artifact

@@ -2,9 +2,8 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-
-
 import sys
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -45,13 +44,25 @@ class VisiDeltaRouteManifestTests(unittest.TestCase):
 
     def test_writes_stable_json_manifest(self):
         with tempfile.TemporaryDirectory() as tmp:
-          manifest = Path(tmp) / "routes.json"
-          manifest.write_text(json.dumps([{"id": "seed", "file": "index.html", "route": "/"}]))
-          updated = routes.augment_routes(json.loads(manifest.read_text()), ["about.html"], [])
-          manifest.write_text(json.dumps(updated, indent=2) + "\n")
-          payload = json.loads(manifest.read_text())
-          self.assertEqual(payload[0]["route"], "/")
-          self.assertEqual(payload[1]["route"], "/about.html")
+            manifest = Path(tmp) / "routes.json"
+            manifest.write_text(json.dumps([{"id": "seed", "file": "index.html", "route": "/"}]))
+            updated = routes.augment_routes(json.loads(manifest.read_text()), ["about.html"], [])
+            manifest.write_text(json.dumps(updated, indent=2) + "\n")
+            payload = json.loads(manifest.read_text())
+            self.assertEqual(payload[0]["route"], "/")
+            self.assertEqual(payload[1]["route"], "/about.html")
+
+    @patch("visidelta_route_manifest.subprocess.check_output")
+    def test_changed_files_from_git_uses_git_diff(self, mock_check_output):
+        mock_check_output.return_value = "index.html\n_blog_posts/story.md\n"
+
+        changed = routes.changed_files_from_git("origin/main")
+
+        self.assertEqual(changed, ["index.html", "_blog_posts/story.md"])
+        mock_check_output.assert_called_once_with(
+            ["git", "diff", "--name-only", "origin/main...HEAD"],
+            text=True,
+        )
 
 
 if __name__ == "__main__":

@@ -34,7 +34,21 @@
     }
   };
 
-  const getStoredTheme = () => localStorage.getItem(storageKey);
+  const getStoredTheme = () => {
+    try {
+      return localStorage.getItem(storageKey);
+    } catch {
+      return null;
+    }
+  };
+
+  const setStoredValue = (key, value) => {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      return;
+    }
+  };
 
   const getPreferredTheme = () => {
     const savedTheme = getStoredTheme();
@@ -120,7 +134,7 @@
     themeToggle.addEventListener("click", () => {
       const current = root.dataset.theme === "dark" ? "dark" : "light";
       const next = current === "dark" ? "light" : "dark";
-      localStorage.setItem(storageKey, next);
+      setStoredValue(storageKey, next);
       applyTheme(next);
     });
   };
@@ -214,7 +228,7 @@
 
   const handleProseWidthButtonClick = (button, proseShells) => {
     const mode = button.dataset.proseWidth === "wide" ? "wide" : "standard";
-    localStorage.setItem(blogWidthStorageKey, mode);
+    setStoredValue(blogWidthStorageKey, mode);
     proseShells.forEach((targetShell) => applyWidth(targetShell, mode));
   };
 
