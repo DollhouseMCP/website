@@ -1,0 +1,172 @@
+---
+layout: default
+title: Portfolio Workflows
+description: How the local Dollhouse portfolio works with GitHub sync and community sharing.
+main_class: prose
+---
+
+<p class="eyebrow">Portfolio Workflows</p>
+<h1>Local-first portfolio, with GitHub when you want it.</h1>
+
+<p class="lead">
+  DollhouseMCP keeps your elements in a local portfolio first. GitHub sync, backup, and community submission are
+  optional workflows layered on top, not requirements for getting value out of the platform.
+</p>
+
+<div class="focus-grid">
+  <div class="focus-panel">
+    <h3>Works immediately offline</h3>
+    <p>Your portfolio lives in <code>~/.dollhouse/portfolio/</code>, so you can create, activate, and edit elements without creating an account.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>GitHub as backup and sync</h3>
+    <p>When you are ready, you can authenticate with GitHub, initialize a portfolio repo, and synchronize changes across machines.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>Share back to the Collection</h3>
+    <p>Portfolio workflows also support submitting elements to the community collection when something becomes broadly useful.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>Readable files, not hidden state</h3>
+    <p>Elements remain inspectable markdown or YAML instead of disappearing into chat history or proprietary storage.</p>
+  </div>
+</div>
+
+<h2>Core portfolio operations</h2>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Operation</th>
+        <th>Endpoint</th>
+        <th>Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>check_github_auth</code></td>
+        <td>Read</td>
+        <td>Verify current GitHub authentication status.</td>
+      </tr>
+      <tr>
+        <td><code>setup_github_auth</code></td>
+        <td>Create</td>
+        <td>Start the OAuth device flow.</td>
+      </tr>
+      <tr>
+        <td><code>init_portfolio</code></td>
+        <td>Create</td>
+        <td>Create the GitHub portfolio repository.</td>
+      </tr>
+      <tr>
+        <td><code>portfolio_status</code></td>
+        <td>Read</td>
+        <td>Inspect repository existence, URLs, and element counts.</td>
+      </tr>
+      <tr>
+        <td><code>portfolio_element_manager</code></td>
+        <td>Create</td>
+        <td>Upload, download, list, or compare individual elements.</td>
+      </tr>
+      <tr>
+        <td><code>sync_portfolio</code></td>
+        <td>Create</td>
+        <td>Bulk sync between local portfolio and GitHub.</td>
+      </tr>
+      <tr>
+        <td><code>submit_collection_content</code></td>
+        <td>Create</td>
+        <td>Submit an element to the community Collection.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Core GitHub portfolio flow</h2>
+<ul class="timeline">
+  <li>
+    <strong>Check GitHub auth</strong>
+    <p>Verify authentication or start the OAuth setup flow directly through DollhouseMCP.</p>
+  </li>
+  <li>
+    <strong>Initialize the repo</strong>
+    <p>Create a dedicated portfolio repository and seed the standard element directories.</p>
+  </li>
+  <li>
+    <strong>Push or pull elements</strong>
+    <p>Upload individual elements, bulk sync changes, or mirror updates conservatively with dry-run support.</p>
+  </li>
+  <li>
+    <strong>Submit to the Collection</strong>
+    <p>Move from private portfolio use to community distribution when a building block is ready to share.</p>
+  </li>
+</ul>
+
+<h2>Repository layout</h2>
+<p>
+  There are two related layouts here. The first is the local filesystem portfolio that works immediately on your
+  machine. The second is the optional GitHub portfolio repository created by <code>init_portfolio</code> so you can sync,
+  back up, and share across devices.
+</p>
+
+<h3>Local portfolio on disk</h3>
+<pre><code>~/.dollhouse/
+  portfolio/
+    personas/
+    skills/
+    templates/
+    agents/
+    memories/
+    ensembles/
+  config/
+  logs/</code></pre>
+
+<h3>GitHub portfolio repository mirror</h3>
+<pre><code>dollhouse-portfolio/
+  personas/
+    creative-writer.md
+    technical-analyst.md
+  skills/
+    code-review.md
+    research.md
+  templates/
+    meeting-notes.md
+  agents/
+    session-monitor.md
+  memories/
+    project-context.yaml
+  ensembles/
+    dollhouse-expert-suite.md
+  README.md</code></pre>
+
+<p>
+  The GitHub repository mirrors the local portfolio model directly. That matters because the local layout, the optional
+  GitHub backup/sync layout, and the activation model all stay aligned instead of drifting into separate abstractions.
+</p>
+
+<h2>Operational details</h2>
+<ul class="timeline">
+  <li>
+    <strong>Dry runs and conservative sync</strong>
+    <p><code>sync_portfolio</code> supports dry-run and additive modes so you can inspect changes before pushing or pulling in bulk.</p>
+  </li>
+  <li>
+    <strong>Portfolio browser support</strong>
+    <p><code>open_portfolio_browser</code> exposes the local portfolio visually at a localhost UI while the underlying files stay readable on disk.</p>
+  </li>
+  <li>
+    <strong>Search stays unified</strong>
+    <p><code>search_portfolio</code> and <code>search_all</code> let you search across local, GitHub, and collection sources rather than treating each surface as isolated.</p>
+  </li>
+  <li>
+    <strong>Config is explicit</strong>
+    <p><code>portfolio_config</code> supports options like <code>auto_sync</code>, <code>auto_submit</code>, and custom repository naming instead of burying those choices in app state.</p>
+  </li>
+</ul>
+
+<div class="callout">
+  <p>
+    The portfolio model is intentionally additive: you do not need GitHub to use DollhouseMCP, but GitHub becomes a
+    strong upgrade path for backup, collaboration, and distribution.
+  </p>
+</div>

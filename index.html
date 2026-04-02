@@ -1,41 +1,46 @@
 ---
 layout: default
 title: DollhouseMCP 2.0
-description: Open-source AI customization through modular elements, local portfolio workflows, MCP-AQL, and safety-aware agent execution.
+description: Open-source AI customization through modular building blocks, local portfolio workflows, MCP-AQL, and safety-aware agent execution.
 ---
 
 <section class="atelier-hero">
   <div class="hero-grid">
     <div class="reveal">
       <span class="hero-kicker">DollhouseMCP 2.0</span>
-      <h1>Composable AI behavior, built from reusable elements.</h1>
+      <h1>Building blocks for AI customization.</h1>
       <p class="lead">
-        DollhouseMCP turns prompts into portable building blocks you can create, activate, combine, version, and share:
+        DollhouseMCP turns prompts into modular building blocks you can create, activate, combine, version, and share:
         personas, skills, templates, agents, memories, and ensembles.
       </p>
       <div class="hero-actions">
         <a class="button button-primary" href="https://github.com/DollhouseMCP/mcp-server">Get Started on GitHub</a>
         <a class="button button-secondary" href="https://www.npmjs.com/package/@dollhousemcp/mcp-server">Install from NPM</a>
         <a class="button button-secondary" href="https://collection.dollhousemcp.com/">Browse Collection</a>
+        <a class="button button-secondary" href="https://dollhouseresearch.com/">Dollhouse Research</a>
         <a class="button button-secondary" href="{{ '/blog/' | relative_url }}">Read Blog</a>
       </div>
+      <p class="section-subtle">
+        DollhouseMCP is part of <a href="https://dollhouseresearch.com/">Dollhouse Research</a>, the broader platform
+        for user-owned AI customization and control.
+      </p>
     </div>
 
     <aside class="panel panel-primary reveal">
-      <div class="panel-head">Quick Start</div>
+      <div class="panel-head">At a Glance</div>
       <div class="panel-body">
         <ul class="metric-list">
           <li><strong>Package</strong><span><code>@dollhousemcp/mcp-server</code></span></li>
-          <li><strong>Core model</strong><span>6 element types + ensembles</span></li>
-          <li><strong>Runtime</strong><span>Local portfolio + MCP-AQL</span></li>
-          <li><strong>Software license</strong><span>AGPL-3.0</span></li>
+          <li><strong>Starter content</strong><span>38 bundled elements</span></li>
+          <li><strong>Runtime</strong><span>MCP-AQL + Gatekeeper + agent loop</span></li>
+          <li><strong>Software license</strong><span>AGPL-3.0-or-later</span></li>
         </ul>
       </div>
     </aside>
   </div>
 </section>
 
-<section class="motif-band">
+<section class="motif-band motif-band-install">
   <div class="section-wrap">
     <div class="motif-strip reveal" aria-hidden="true">
       <span class="motif-tile motif-a"></span>
@@ -45,9 +50,50 @@ description: Open-source AI customization through modular elements, local portfo
       <span class="motif-tile motif-e"></span>
       <span class="motif-tile motif-f"></span>
     </div>
-    <p class="motif-caption reveal">
-      Local-first portfolio workflows, community distribution, and safety-aware execution in one platform.
-    </p>
+    <div class="install-band reveal">
+      <div class="install-band-copy">
+        <p class="eyebrow">Quick Install</p>
+        <h2>Install fast, then point your MCP client at the server.</h2>
+        <p>
+          DollhouseMCP runs on Claude Code, Claude Desktop, Cursor, Gemini, Codex, and other MCP-compatible clients.
+          Pick the setup you want, hit copy once, and paste it directly into your terminal or config workflow.
+        </p>
+      </div>
+      <div class="install-band-code install-option-grid">
+        <section class="install-option">
+          <h3>Local install</h3>
+          <p>Best for stable setups and multiple configurations.</p>
+          <div class="install-code-block">
+            <button
+              class="copy-button copy-button-code"
+              type="button"
+              data-copy-text="mkdir -p ~/mcp-servers
+cd ~/mcp-servers
+npm install @dollhousemcp/mcp-server"
+              aria-label="Copy local install command"
+              title="Copy local install command"
+            ><span class="sr-only">Copy local install command</span></button>
+            <pre><code>mkdir -p ~/mcp-servers
+cd ~/mcp-servers
+npm install @dollhousemcp/mcp-server</code></pre>
+          </div>
+        </section>
+        <section class="install-option">
+          <h3>Run latest with <code>npx</code></h3>
+          <p>Best for quick trials or always pulling the newest package.</p>
+          <div class="install-code-block">
+            <button
+              class="copy-button copy-button-code"
+              type="button"
+              data-copy-text="npx @dollhousemcp/mcp-server@latest"
+              aria-label="Copy npx command"
+              title="Copy npx command"
+            ><span class="sr-only">Copy npx command</span></button>
+            <pre><code>npx @dollhousemcp/mcp-server@latest</code></pre>
+          </div>
+        </section>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -55,37 +101,65 @@ description: Open-source AI customization through modular elements, local portfo
   <div class="section-wrap">
     <h2 class="section-heading reveal">What Ships With DollhouseMCP</h2>
     <p class="section-subtle reveal">
-      The 2.0 architecture brings the product surface into one coherent system: reusable elements, a local portfolio,
-      a public collection, and a structured query layer for MCP operations.
+      The 2.0 platform is more than personas. It ships a complete element model, a local portfolio, a public collection,
+      MCP-AQL for structured operations, and a safety-aware execution layer for real agent workflows.
     </p>
 
-    <div class="card-grid card-grid-featured">
-      <article class="card card-core card-featured reveal">
+    <div class="card-grid card-grid-featured card-grid-ships">
+      <article class="card card-core card-featured reveal" data-card-link="{{ '/building-blocks.html' | relative_url }}">
         <span class="pill">Elements</span>
         <div class="card-family card-family-core" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
         <h3>Six reusable element types</h3>
-        <p>Personas, skills, templates, agents, memories, and ensembles give you a composable model for persistent AI behavior.</p>
+        <p>Personas, skills, templates, agents, memories, and ensembles are modular building blocks for AI customization across behavior, capabilities, structure, execution, context, and coordinated stacks.</p>
       </article>
 
-      <article class="card card-core reveal">
+      <article class="card card-core reveal" data-card-link="{{ '/starter-elements.html' | relative_url }}">
         <span class="pill">Portfolio</span>
         <div class="card-family card-family-core" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-        <h3>Local-first portfolio workflow</h3>
-        <p>Your Dollhouse elements live in a readable local portfolio you can edit, back up, sync, and activate across sessions.</p>
+        <h3>38 bundled starter elements</h3>
+        <p>The server ships with starter personas, skills, templates, agents, memories, and ensembles, including the Dollhouse expert suite and a session monitor agent.</p>
       </article>
 
-      <article class="card card-protocol reveal">
+      <article class="card card-protocol reveal" data-card-link="{{ '/mcp-aql.html' | relative_url }}">
         <span class="pill">MCP-AQL</span>
         <div class="card-family card-family-protocol" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-        <h3>Semantic CRUDE endpoints</h3>
-        <p>MCP-AQL groups operations into Create, Read, Update, Delete, and Execute so the AI can discover capabilities with introspection instead of juggling dozens of flat tools.</p>
+        <h3>CRUDE semantic endpoints</h3>
+        <p>MCP-AQL groups operations into Create, Read, Update, Delete, and Execute, with introspection built in so an LLM can discover what the server supports at runtime.</p>
       </article>
 
-      <article class="card card-tooling reveal">
-        <span class="pill">Safety</span>
+      <article class="card card-tooling reveal" data-card-link="{{ '/dynamic-permissioning.html' | relative_url }}">
+        <span class="pill">Permissioning</span>
         <div class="card-family card-family-tooling" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-        <h3>Gatekeeper and approval-aware execution</h3>
-        <p>Server-side permission checks, approval flows, and execution telemetry keep agent behavior auditable even when the client is highly permissive.</p>
+        <h3>Dynamic permissioning through active elements</h3>
+        <p>Personas, skills, and ensembles can act as security principals, changing what the AI can do, what needs approval, and what gets denied outright.</p>
+      </article>
+
+      <article class="card card-core reveal" data-card-link="{{ '/portfolio-workflows.html' | relative_url }}">
+        <span class="pill">Portfolio</span>
+        <div class="card-family card-family-core" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <h3>Local portfolio with GitHub sync</h3>
+        <p>Your elements live in a readable local portfolio that works offline, can sync to GitHub, and can submit community-ready content back into the collection.</p>
+      </article>
+
+      <article class="card card-protocol reveal" data-card-link="{{ '/platform-operations.html' | relative_url }}">
+        <span class="pill">Operations</span>
+        <div class="card-family card-family-protocol" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <h3>Full platform operations, not just activation</h3>
+        <p>2.0 includes collection install and submission, portfolio sync, browser opening, enhanced search, skill conversion, execution lifecycle control, and handoff/resume flows.</p>
+      </article>
+
+      <article class="card card-tooling reveal" data-card-link="{{ '/agent-runtime.html' | relative_url }}">
+        <span class="pill">Security</span>
+        <div class="card-family card-family-tooling" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <h3>Autonomy evaluator and danger zone enforcement</h3>
+        <p>Agents receive continue, pause, or escalate guidance every step, while high-risk operations like destructive commands and external calls can be hard-blocked.</p>
+      </article>
+
+      <article class="card card-core reveal" data-card-link="{{ '/licensing.html' | relative_url }}">
+        <span class="pill">Licensing</span>
+        <div class="card-family card-family-core" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <h3>AGPL core, commercial licensing available</h3>
+        <p>The software is open source under AGPL-3.0-or-later, with commercial licensing available for teams that need proprietary, hosted, or enterprise procurement terms.</p>
       </article>
     </div>
   </div>
@@ -99,32 +173,41 @@ description: Open-source AI customization through modular elements, local portfo
     a faster starting point.
   </p>
 
-  <pre class="reveal"><code>npm install @dollhousemcp/mcp-server
-npx @dollhousemcp/mcp-server@latest</code></pre>
-
-  <figure class="reveal">
-    <img
-      src="{{ '/assets/images/project-dollhousemcp-home.png' | relative_url }}"
-      alt="DollhouseMCP interface preview"
-      width="1920"
-      height="1129"
-      loading="lazy"
-      decoding="async"
-    />
-  </figure>
+  <div class="workflow-grid reveal">
+    <div class="workflow-step">
+      <span class="workflow-step-label">1</span>
+      <h3>Create, edit, or import</h3>
+      <p>Build elements from chat, install them from the Collection, or convert compatible skills into first-class Dollhouse elements.</p>
+    </div>
+    <div class="workflow-step">
+      <span class="workflow-step-label">2</span>
+      <h3>Keep them in your portfolio</h3>
+      <p>The portfolio lives locally, works offline, and can be backed up or synced to GitHub without giving up file-level ownership.</p>
+    </div>
+    <div class="workflow-step">
+      <span class="workflow-step-label">3</span>
+      <h3>Activate stacks, not one-off prompts</h3>
+      <p>Mix personas, skills, templates, memories, and ensembles so your AI has reusable behavior instead of re-explaining preferences every session.</p>
+    </div>
+    <div class="workflow-step">
+      <span class="workflow-step-label">4</span>
+      <h3>Run agents inside a controlled loop</h3>
+      <p>Execution flows back through Gatekeeper, autonomy evaluation, and danger-zone checks so higher agency does not mean less control.</p>
+    </div>
+  </div>
 
   <div class="focus-grid reveal">
     <div class="focus-panel">
       <h2>Element model</h2>
-      <p>Personas shape behavior, skills add capabilities, templates structure output, agents run goals, memories persist context, and ensembles coordinate multiple elements together.</p>
+      <p>Personas shape behavior, skills add capabilities, templates structure outputs, agents pursue goals, memories persist context, and ensembles package multiple elements together.</p>
     </div>
     <div class="focus-panel">
       <h2>Local portfolio</h2>
-      <p>DollhouseMCP works from a local portfolio, so the things you build stay readable, portable, and under your control.</p>
+      <p>DollhouseMCP works from a local portfolio, so the things you build stay readable, portable, and under your control before you ever connect GitHub or share publicly.</p>
     </div>
     <div class="focus-panel">
       <h2>Collection and sharing</h2>
-      <p>The Dollhouse Collection is the public browse-and-install path for community elements, making it easier to discover working building blocks instead of reinventing them.</p>
+      <p>The Dollhouse Collection is the public browse-and-install path for community elements, with install and submission flows built into the platform instead of bolted on later.</p>
     </div>
     <div class="focus-panel">
       <h2>Agent execution</h2>
@@ -143,12 +226,16 @@ npx @dollhousemcp/mcp-server@latest</code></pre>
       <p>Permissions are enforced server-side, so active Dollhouse elements can shape what the AI can do, not just how it sounds.</p>
     </li>
     <li>
-      <strong>Portfolio and backups</strong>
-      <p>Elements stay local-first with backup, sync, and collection workflows instead of disappearing into one-off chat history.</p>
+      <strong>Portfolio and GitHub workflows</strong>
+      <p>Elements stay local-first with backup, sync, portfolio browser, and collection workflows instead of disappearing into one-off chat history.</p>
     </li>
     <li>
       <strong>Composable execution</strong>
-      <p>Agents, memories, and ensembles turn isolated prompts into reusable workflows that can be inspected, refined, and run again.</p>
+      <p>Agents, memories, and ensembles turn isolated prompts into reusable workflows that can be inspected, refined, handed off, resumed, and run again.</p>
+    </li>
+    <li>
+      <strong>Licensing clarity</strong>
+      <p>The open-source core stays under AGPL-3.0-or-later, while commercial licensing is available for proprietary or hosted deployment models.</p>
     </li>
   </ul>
 

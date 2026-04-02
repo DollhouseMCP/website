@@ -1,0 +1,161 @@
+---
+layout: default
+title: MCP-AQL
+description: How CRUDE semantic endpoints make DollhouseMCP easier for LLMs to use.
+main_class: prose
+---
+
+<p class="eyebrow">MCP-AQL</p>
+<h1>CRUDE semantic endpoints for LLM-native control.</h1>
+
+<p class="lead">
+  Most MCP servers expose a flat list of tools. DollhouseMCP uses MCP-AQL instead, grouping operations by what they do
+  to state so the AI gets semantic clarity before it acts.
+</p>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Endpoint</th>
+        <th>Purpose</th>
+        <th>Permission level</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Create</td>
+        <td>Add new elements, install from the Collection, add memory entries</td>
+        <td>Confirm once per session</td>
+      </tr>
+      <tr>
+        <td>Read</td>
+        <td>List, search, get details, activate, introspect</td>
+        <td>Auto-approved</td>
+      </tr>
+      <tr>
+        <td>Update</td>
+        <td>Edit existing elements</td>
+        <td>Confirm each time</td>
+      </tr>
+      <tr>
+        <td>Delete</td>
+        <td>Remove elements, clear entries</td>
+        <td>Confirm each time</td>
+      </tr>
+      <tr>
+        <td>Execute</td>
+        <td>Run agents, manage execution lifecycle, confirm operations</td>
+        <td>Confirm each time</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Endpoint modes</h2>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Mode</th>
+        <th>Endpoints</th>
+        <th>Tokens</th>
+        <th>Env variable</th>
+        <th>Best for</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CRUDE</td>
+        <td>5</td>
+        <td>~4,300</td>
+        <td><code>MCP_AQL_ENDPOINT_MODE=crude</code></td>
+        <td>Default semantic grouping with host-level permission control</td>
+      </tr>
+      <tr>
+        <td>Single</td>
+        <td>1</td>
+        <td>~350</td>
+        <td><code>MCP_AQL_ENDPOINT_MODE=single</code></td>
+        <td>Constrained multi-server environments</td>
+      </tr>
+      <tr>
+        <td>Discrete</td>
+        <td>~40</td>
+        <td>~29,600</td>
+        <td><code>MCP_INTERFACE_MODE=discrete</code></td>
+        <td>Backward compatibility with older tool naming</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Why CRUDE matters</h2>
+<ul class="timeline">
+  <li>
+    <strong>Semantic clarity</strong>
+    <p>The model knows that read calls are safe and delete calls are destructive without guessing from dozens of tool names.</p>
+  </li>
+  <li>
+    <strong>Progressive disclosure</strong>
+    <p>The AI starts with a small endpoint surface and discovers operations, parameters, and formats through introspection.</p>
+  </li>
+  <li>
+    <strong>Token efficiency</strong>
+    <p>The consolidated interface is dramatically lighter than exposing the entire discrete tool catalog up front.</p>
+  </li>
+  <li>
+    <strong>Better host policies</strong>
+    <p>MCP clients can apply different approval rules per endpoint because the operation intent is already grouped.</p>
+  </li>
+</ul>
+
+<h2>Representative operations by endpoint</h2>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Endpoint</th>
+        <th>Representative operations</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Create</td>
+        <td><code>create_element</code>, <code>addEntry</code>, <code>install_collection_content</code>, <code>submit_collection_content</code>, <code>record_execution_step</code></td>
+      </tr>
+      <tr>
+        <td>Read</td>
+        <td><code>list_elements</code>, <code>search_all</code>, <code>search_collection_enhanced</code>, <code>open_portfolio_browser</code>, <code>convert_skill_format</code>, <code>get_relationship_stats</code></td>
+      </tr>
+      <tr>
+        <td>Update</td>
+        <td><code>edit_element</code>, <code>upgrade_element</code></td>
+      </tr>
+      <tr>
+        <td>Delete</td>
+        <td><code>delete_element</code>, <code>clear</code>, <code>clear_github_auth</code></td>
+      </tr>
+      <tr>
+        <td>Execute</td>
+        <td><code>execute_agent</code>, <code>complete_execution</code>, <code>continue_execution</code>, <code>prepare_handoff</code>, <code>resume_from_handoff</code>, <code>approve_cli_permission</code></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<pre><code>{ "operation": "introspect", "params": { "query": "operations" } }
+{ "operation": "introspect", "params": { "query": "format", "name": "persona" } }</code></pre>
+
+<p>
+  The same progressive-disclosure principle applies to elements themselves: metadata in frontmatter gives the model a
+  quick scan of what exists, and the full markdown body is only loaded when the element is activated or inspected more
+  deeply.
+</p>
+
+<div class="callout">
+  <p>
+    MCP-AQL is not just a naming layer. It is the structure that lets the server describe itself at runtime while
+    keeping permission behavior legible to both the LLM and the human operator.
+  </p>
+</div>

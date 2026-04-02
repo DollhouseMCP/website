@@ -1,7 +1,20 @@
 ---
 layout: default
 ---
-<article class="prose">
+{% assign posts = site.blog_posts | sort: "date" %}
+{% for candidate in posts %}
+  {% if candidate.url == page.url %}
+    {% assign current_index = forloop.index0 %}
+  {% endif %}
+{% endfor %}
+{% if current_index != nil %}
+  {% assign previous_index = current_index | minus: 1 %}
+  {% assign next_index = current_index | plus: 1 %}
+  {% assign previous_post = posts[previous_index] %}
+  {% assign next_post = posts[next_index] %}
+{% endif %}
+
+<article class="prose prose-post" data-prose-shell>
   <p class="eyebrow">
     {{ page.date | date: "%B %d, %Y" }}{% if page.author %} • {{ page.author }}{% endif %}
   </p>
@@ -19,20 +32,27 @@ layout: default
   </div>
   {% endif %}
 
-  {{ content }}
+  <div class="prose-width-toggle" role="group" aria-label="Reading width">
+    <button class="prose-width-button is-active" type="button" data-prose-width="standard">Standard Width</button>
+    <button class="prose-width-button" type="button" data-prose-width="wide">Full Width</button>
+  </div>
 
-  {% if page.previous or page.next %}
+  <div class="post-content">
+    {{ content }}
+  </div>
+
+  {% if previous_post or next_post %}
   <div class="post-nav">
-    {% if page.previous %}
-    <a href="{{ page.previous.url | relative_url }}">
+    {% if previous_post %}
+    <a href="{{ previous_post.url | relative_url }}">
       <em>Previous Post</em>
-      <strong>{{ page.previous.title }}</strong>
+      <strong>{{ previous_post.title }}</strong>
     </a>
     {% endif %}
-    {% if page.next %}
-    <a href="{{ page.next.url | relative_url }}">
+    {% if next_post %}
+    <a href="{{ next_post.url | relative_url }}">
       <em>Next Post</em>
-      <strong>{{ page.next.title }}</strong>
+      <strong>{{ next_post.title }}</strong>
     </a>
     {% endif %}
   </div>

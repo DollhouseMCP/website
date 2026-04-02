@@ -1,0 +1,107 @@
+---
+layout: default
+title: Agent Runtime
+description: How autonomy evaluation, danger-zone enforcement, and Gatekeeper work together in DollhouseMCP.
+main_class: prose
+---
+
+<p class="eyebrow">Agent Runtime</p>
+<h1>Autonomy with visibility, pause points, and hard limits.</h1>
+
+<p class="lead">
+  Dollhouse Agents do not run in a black box. Every execution step passes through the server, through the Gatekeeper,
+  and back through structured autonomy guidance so higher agency stays visible and bounded.
+</p>
+
+<div class="focus-grid">
+  <div class="focus-panel">
+    <h3>Gatekeeper checks policy</h3>
+    <p>Every operation is evaluated against active element policies before it executes.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>Autonomy evaluator scores the step</h3>
+    <p>The runtime decides whether the agent should continue, pause for human input, or escalate.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>Danger zone enforces hard blocks</h3>
+    <p>High-risk actions like destructive commands or sensitive external operations can be blocked outright.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>Step recording preserves an audit trail</h3>
+    <p>Each decision and outcome can be recorded so execution is inspectable instead of opaque.</p>
+  </div>
+</div>
+
+<h2>Runtime loop</h2>
+<pre><code>1. Gatekeeper checks policy
+2. Autonomy Evaluator scores the step
+3. Danger Zone enforces hard blocks
+4. The server executes or blocks
+5. The LLM receives result + continue/pause/escalate guidance
+6. The loop repeats until completion or pause</code></pre>
+
+<h2>Execution operations</h2>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Operation</th>
+        <th>Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>execute_agent</code></td>
+        <td>Start a new execution with goal state tracking.</td>
+      </tr>
+      <tr>
+        <td><code>record_execution_step</code></td>
+        <td>Append step results and receive autonomy guidance.</td>
+      </tr>
+      <tr>
+        <td><code>complete_execution</code> / <code>abort_execution</code></td>
+        <td>Finish or terminate the running execution explicitly.</td>
+      </tr>
+      <tr>
+        <td><code>prepare_handoff</code> / <code>resume_from_handoff</code></td>
+        <td>Serialize and resume execution state for handoff between sessions.</td>
+      </tr>
+      <tr>
+        <td><code>confirm_operation</code> / <code>approve_cli_permission</code></td>
+        <td>Handle gated actions that require explicit user approval.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Why this matters</h2>
+<ul class="timeline">
+  <li>
+    <strong>No silent escalation</strong>
+    <p>The model does not get to quietly keep going without the server continuing to evaluate what it is doing.</p>
+  </li>
+  <li>
+    <strong>Human input stays available</strong>
+    <p>When autonomy should pause, the runtime has an explicit path to ask for guidance instead of guessing.</p>
+  </li>
+  <li>
+    <strong>Permissioning and execution stay connected</strong>
+    <p>Active elements can shape both the agent's behavior and its permission surface at the same time.</p>
+  </li>
+  <li>
+    <strong>Runtime policy survives client permissiveness</strong>
+    <p>Server-side enforcement still matters even when the MCP client itself is configured loosely.</p>
+  </li>
+</ul>
+
+<p>
+  The platform note from the server docs matters here too: the execution loop has been tested extensively on Claude
+  Code and the DollhouseMCP Bridge, while the server-side enforcement model itself remains platform-independent.
+</p>
+
+<div class="callout">
+  <p>
+    This is the key shift from “AI agent” as a vibe to “AI agent” as a runtime with explicit policy, visibility, and
+    recoverable state.
+  </p>
+</div>

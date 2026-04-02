@@ -36,16 +36,20 @@
   --ink-700: #324563;
   --ink-500: #677893;
   --line: #c8d5e9;
-  --paper: #f3f7ff;
+  --paper: #eef4ff;
   --paper-strong: #ffffff;
-  --surface-1: #eaf1ff;
-  --surface-2: #f8fbff;
+  --surface-1: #dbe8ff;
+  --surface-2: #f6f9ff;
   --signal: #1e40af;
-  --signal-2: #3b82f6;
+  --signal-2: #2563eb;
+  --protocol: #0e7490;
+  --protocol-2: #38bdf8;
+  --tooling: #15803d;
+  --tooling-2: #34d399;
   --accent: #f97316;
-  --accent-soft: #fff1e5;
+  --accent-soft: #fff2e8;
   --violet: #7c3aed;
-  --teal: #2d8c80;
+  --teal: #15803d;
   --success: #27695f;
   --radius-sm: 0.42rem;
   --radius-md: 0.85rem;
@@ -72,16 +76,20 @@
   --ink-700: #a8bcce;
   --ink-500: #7b93a7;
   --line: #2b3445;
-  --paper: #111318;
+  --paper: #0f1522;
   --paper-strong: #161b24;
-  --surface-1: #1c2230;
-  --surface-2: #212838;
+  --surface-1: #182235;
+  --surface-2: #1b263c;
   --signal: #7aa7f5;
-  --signal-2: #5e96e8;
+  --signal-2: #5b8ff2;
+  --protocol: #5cc5d8;
+  --protocol-2: #8ddff0;
+  --tooling: #5dcf89;
+  --tooling-2: #8de0b1;
   --accent: #fb923c;
   --accent-soft: #37271d;
   --violet: #9a83dd;
-  --teal: #4ba193;
+  --teal: #5dcf89;
   --shadow-soft: 0 1rem 2rem -1rem rgba(0, 0, 0, 0.4);
   --shadow-card: 0 1.55rem 2.95rem -1.2rem rgba(0, 0, 0, 0.5);
 }
@@ -103,7 +111,7 @@ body {
   color: var(--ink-900);
   background:
     radial-gradient(120% 70% at 0% 0%, color-mix(in srgb, var(--signal-2) 15%, transparent), transparent 58%),
-    radial-gradient(95% 55% at 100% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 55%),
+    radial-gradient(95% 55% at 100% 0%, color-mix(in srgb, var(--protocol) 10%, transparent), transparent 55%),
     var(--paper);
   font-family: var(--font-body);
   font-size: var(--step-0);
@@ -115,14 +123,14 @@ body {
   color-scheme: dark;
   background:
     radial-gradient(120% 70% at 0% 0%, color-mix(in srgb, var(--signal-2) 2%, var(--paper)), transparent 58%),
-    radial-gradient(95% 55% at 100% 0%, color-mix(in srgb, var(--accent) 2%, var(--paper)), transparent 55%),
+    radial-gradient(95% 55% at 100% 0%, color-mix(in srgb, var(--protocol) 2%, var(--paper)), transparent 55%),
     var(--paper);
 }
 
 [data-theme="dark"] .page-noise {
   background-image:
     linear-gradient(135deg, color-mix(in srgb, var(--signal) 2.6%, transparent) 0.75px, transparent 0.75px),
-    linear-gradient(45deg, color-mix(in srgb, var(--accent) 1.8%, transparent) 0.75px, transparent 0.75px);
+    linear-gradient(45deg, color-mix(in srgb, var(--protocol) 1.8%, transparent) 0.75px, transparent 0.75px);
 }
 
 .page-noise {
@@ -131,7 +139,7 @@ body {
   pointer-events: none;
   background-image:
     linear-gradient(135deg, color-mix(in srgb, var(--signal) 5.2%, transparent) 0.75px, transparent 0.75px),
-    linear-gradient(45deg, color-mix(in srgb, var(--accent) 3.8%, transparent) 0.75px, transparent 0.75px);
+    linear-gradient(45deg, color-mix(in srgb, var(--protocol) 3.8%, transparent) 0.75px, transparent 0.75px);
   background-size: 24px 24px, 34px 34px;
   z-index: -3;
 }
@@ -224,7 +232,7 @@ pre code {
   right: 0;
   bottom: -1px;
   height: 2px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 12%, transparent), color-mix(in srgb, var(--accent) 16%, transparent), color-mix(in srgb, var(--signal) 12%, transparent));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 18%, transparent), color-mix(in srgb, var(--protocol) 22%, transparent), color-mix(in srgb, var(--signal) 18%, transparent));
   pointer-events: none;
 }
 
@@ -417,7 +425,7 @@ main {
   inset: 0;
   background:
     linear-gradient(168deg, color-mix(in srgb, var(--signal-2) 20%, transparent), transparent 53%),
-    linear-gradient(22deg, color-mix(in srgb, var(--accent) 12%, transparent), transparent 43%);
+    linear-gradient(22deg, color-mix(in srgb, var(--protocol) 12%, transparent), transparent 43%);
   z-index: -2;
 }
 
@@ -428,7 +436,7 @@ main {
   right: 0;
   bottom: -1px;
   height: 1.35rem;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 15%, transparent), color-mix(in srgb, var(--accent) 15%, transparent));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 18%, transparent), color-mix(in srgb, var(--protocol) 20%, transparent), color-mix(in srgb, var(--tooling) 14%, transparent));
   clip-path: polygon(0 65%, 8% 15%, 16% 65%, 24% 15%, 32% 65%, 40% 15%, 48% 65%, 56% 15%, 64% 65%, 72% 15%, 80% 65%, 88% 15%, 96% 65%, 100% 65%, 100% 100%, 0 100%);
   opacity: 0.65;
   z-index: -1;
@@ -522,7 +530,7 @@ main {
   height: 0.72rem;
   transform: rotate(45deg);
   border-radius: 0.18rem;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 70%, var(--paper-strong)), color-mix(in srgb, var(--signal-2) 70%, var(--paper-strong)));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--protocol) 72%, var(--paper-strong)), color-mix(in srgb, var(--signal-2) 72%, var(--paper-strong)));
   opacity: 0.9;
 }
 
@@ -631,15 +639,143 @@ main {
 
 .motif-a { background: linear-gradient(90deg, var(--signal-2), color-mix(in srgb, var(--signal) 80%, #fff)); }
 .motif-b { background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 80%, #fff), var(--signal)); }
-.motif-c { background: linear-gradient(90deg, var(--violet), color-mix(in srgb, var(--violet) 70%, #fff)); }
-.motif-d { background: linear-gradient(90deg, color-mix(in srgb, var(--teal) 80%, #fff), var(--teal)); }
+.motif-c { background: linear-gradient(90deg, var(--protocol-2), color-mix(in srgb, var(--protocol) 78%, #fff)); }
+.motif-d { background: linear-gradient(90deg, color-mix(in srgb, var(--tooling-2) 78%, #fff), var(--tooling)); }
 .motif-e { background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 65%, #fff)); }
-.motif-f { background: linear-gradient(90deg, color-mix(in srgb, var(--signal-2) 40%, #fff), color-mix(in srgb, var(--accent) 30%, #fff)); }
+.motif-f { background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 32%, #fff), color-mix(in srgb, var(--protocol) 28%, #fff)); }
 
 .motif-caption {
   margin: 0.5rem 0 0;
   font-size: var(--step--1);
   color: var(--ink-700);
+}
+
+.motif-band-install {
+  padding: 0.8rem 0 1.1rem;
+}
+
+.install-band {
+  margin-top: 0.85rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+  gap: 1rem;
+  align-items: start;
+  border: 1px solid color-mix(in srgb, var(--line) 85%, var(--paper-strong));
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--signal-2) 10%, transparent), transparent 38%),
+    linear-gradient(165deg, color-mix(in srgb, var(--surface-1) 76%, var(--paper-strong)), color-mix(in srgb, var(--surface-2) 78%, var(--paper-strong)) 58%);
+  box-shadow: var(--shadow-soft);
+  padding: 1rem;
+}
+
+.install-band-copy h2 {
+  margin-bottom: 0.45rem;
+}
+
+.install-band-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.install-band-code pre {
+  margin: 0;
+  min-height: 100%;
+}
+
+.install-option-grid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.install-option {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.install-option h3 {
+  margin: 0;
+  font-size: var(--step-1);
+}
+
+.install-option p {
+  margin: 0;
+  color: var(--ink-700);
+  font-size: var(--step--1);
+}
+
+.install-code-block {
+  position: relative;
+}
+
+.install-code-block pre {
+  padding-top: 1.2rem;
+}
+
+.copy-button {
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--signal) 30%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--paper-strong) 88%, var(--surface-1));
+  color: var(--signal);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+  padding: 0.38rem 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.copy-button:hover,
+.copy-button:focus-visible {
+  background: color-mix(in srgb, var(--surface-1) 85%, var(--paper-strong));
+}
+
+.copy-button-code {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  z-index: 2;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border-radius: 0.55rem;
+  background: color-mix(in srgb, var(--ink-950) 16%, #0b1629);
+  border-color: color-mix(in srgb, #ffffff 18%, transparent);
+  color: #f7fbff;
+}
+
+.copy-button-code::before,
+.copy-button-code::after {
+  content: "";
+  position: absolute;
+  border: 1.6px solid currentColor;
+  border-radius: 0.16rem;
+  width: 0.64rem;
+  height: 0.74rem;
+}
+
+.copy-button-code::before {
+  top: 0.52rem;
+  left: 0.82rem;
+}
+
+.copy-button-code::after {
+  top: 0.68rem;
+  left: 0.58rem;
+}
+
+.copy-button-code:hover,
+.copy-button-code:focus-visible {
+  background: color-mix(in srgb, var(--signal-2) 28%, #0b1629);
+  color: #ffffff;
+}
+
+.copy-button-code[data-copy-state="copied"] {
+  background: color-mix(in srgb, var(--success) 42%, #0b1629);
+}
+
+.copy-button-code[data-copy-state="failed"] {
+  background: color-mix(in srgb, var(--accent) 42%, #0b1629);
 }
 
 .showcase {
@@ -657,12 +793,12 @@ main {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(112deg, color-mix(in srgb, var(--signal) 4.5%, transparent), transparent 38%);
+  background: linear-gradient(112deg, color-mix(in srgb, var(--signal) 5.5%, transparent), color-mix(in srgb, var(--protocol) 2.2%, transparent) 38%, transparent 62%);
   pointer-events: none;
 }
 
 [data-theme="dark"] .showcase-slab::before {
-  background: linear-gradient(112deg, color-mix(in srgb, var(--signal) 2%, transparent), transparent 38%);
+  background: linear-gradient(112deg, color-mix(in srgb, var(--signal) 2.2%, transparent), color-mix(in srgb, var(--protocol) 1.3%, transparent) 38%, transparent 62%);
 }
 
 .card-grid {
@@ -823,6 +959,7 @@ main {
 .section-subtle {
   color: var(--ink-700);
   margin-top: -0.25rem;
+  max-width: 68ch;
 }
 
 .project-focus {
@@ -943,6 +1080,45 @@ main {
   gap: 0.85rem;
 }
 
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.95rem;
+  margin: 1.35rem 0;
+}
+
+.workflow-step {
+  border: 1px solid color-mix(in srgb, var(--signal) 20%, var(--line));
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--surface-1) 42%, var(--paper-strong)), var(--paper-strong));
+  padding: 0.95rem 1rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.workflow-step h3 {
+  margin: 0.25rem 0 0.42rem;
+  font-size: var(--step-1);
+}
+
+.workflow-step p {
+  margin: 0;
+}
+
+.workflow-step-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--signal-2), var(--accent));
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 .prose {
   width: min(var(--max-width), calc(100% - 2 * var(--gutter)));
   margin: 0 auto;
@@ -1050,6 +1226,82 @@ main {
   margin: 0 auto;
 }
 
+.prose-post {
+  width: min(48rem, calc(100% - 2 * var(--gutter)));
+  padding-top: clamp(1.55rem, 4vw, 2.7rem);
+}
+
+.prose-post .lead {
+  font-size: clamp(1.18rem, 1.05rem + 0.45vw, 1.42rem);
+  line-height: 1.7;
+}
+
+.prose-post .post-content {
+  margin-top: 1.5rem;
+}
+
+.prose-post .post-content > h1:first-child {
+  display: none;
+}
+
+.prose-post .post-content > * + * {
+  margin-top: 1.08rem;
+}
+
+.prose-post .post-content p,
+.prose-post .post-content li {
+  max-width: 72ch;
+  font-size: clamp(1.02rem, 0.98rem + 0.18vw, 1.08rem);
+  line-height: 1.82;
+}
+
+.prose-post .post-content h2,
+.prose-post .post-content h3 {
+  margin-top: 1.8rem;
+}
+
+.prose-post .post-content pre {
+  margin: 1.2rem 0;
+}
+
+.prose-post .pill-row {
+  margin-top: 1rem;
+}
+
+.prose-width-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem;
+  border: 1px solid color-mix(in srgb, var(--line) 88%, var(--paper-strong));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-2) 84%, var(--paper-strong));
+  margin-top: 1.05rem;
+}
+
+.prose-width-button {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-700);
+  font: inherit;
+  font-size: var(--step--1);
+  font-weight: 700;
+  padding: 0.38rem 0.8rem;
+  cursor: pointer;
+}
+
+.prose-width-button.is-active {
+  background: color-mix(in srgb, var(--paper-strong) 92%, var(--surface-1));
+  color: var(--ink-950);
+  box-shadow: var(--shadow-soft);
+}
+
+.prose-post.is-wide {
+  width: min(var(--max-width), calc(100% - 2 * var(--gutter)));
+}
+
 .timeline {
   margin: 1.15rem 0 0;
   padding: 0;
@@ -1090,6 +1342,97 @@ main {
   background: color-mix(in srgb, var(--accent-soft) 55%, var(--paper-strong));
   border-radius: var(--radius-md);
   padding: 0.84rem;
+}
+
+.callout-inline {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.9rem 1.1rem;
+  align-items: center;
+}
+
+.callout-inline p {
+  margin: 0;
+  max-width: none;
+}
+
+.callout-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.65rem;
+}
+
+.blog-roll {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.45rem;
+}
+
+.blog-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem 1.3rem;
+  align-items: start;
+  padding: 1.2rem 1.25rem;
+}
+
+.blog-card-main {
+  min-width: 0;
+}
+
+.blog-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.7rem;
+}
+
+.blog-card h2 {
+  margin: 0 0 0.45rem;
+  font-size: clamp(1.45rem, 1.28rem + 0.55vw, 1.88rem);
+}
+
+.blog-card h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.blog-card h2 a:hover,
+.blog-card h2 a:focus-visible {
+  color: var(--signal);
+}
+
+.blog-card p {
+  margin: 0;
+  max-width: 68ch;
+}
+
+.blog-card-side {
+  min-width: 12rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.85rem;
+}
+
+.starter-grid {
+  margin-top: 1.4rem;
+}
+
+.starter-list {
+  margin: 0.35rem 0 0;
+  padding-left: 1.15rem;
+}
+
+.starter-list li + li {
+  margin-top: 0.18rem;
+}
+
+.building-block-grid .card h2 {
+  margin-bottom: 0.35rem;
 }
 
 .table-wrap {
@@ -1182,12 +1525,30 @@ th {
 @media (max-width: 64rem) {
   .hero-grid,
   .card-grid,
+  .workflow-grid,
   .swatch-grid {
     grid-template-columns: 1fr;
   }
 
   .focus-grid {
     grid-template-columns: 1fr;
+  }
+
+  .install-band,
+  .blog-card {
+    grid-template-columns: 1fr;
+  }
+
+  .callout-inline {
+    grid-template-columns: 1fr;
+  }
+
+  .callout-actions {
+    justify-content: flex-start;
+  }
+
+  .blog-card-side {
+    min-width: 0;
   }
 
   .motif-strip {

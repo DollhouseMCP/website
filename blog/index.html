@@ -13,22 +13,28 @@ description: Technical articles, case studies, and product writing about Dollhou
 
   {% assign posts = site.blog_posts | sort: "date" | reverse %}
   {% if posts and posts.size > 0 %}
-  <div class="card-grid">
+  <div class="blog-roll">
     {% for post in posts %}
-    <article class="card card-core reveal">
-      <span class="pill">{{ post.date | date: "%b %d, %Y" }}</span>
-      <div class="card-family card-family-core" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-      <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
-      <p>{{ post.description | default: post.excerpt | strip_html | truncate: 220 }}</p>
-      {% if post.tags %}
-      <div class="pill-row">
-        {% for tag in post.tags limit:4 %}
-        <span class="pill">{{ tag }}</span>
-        {% endfor %}
+    <article class="card card-core blog-card reveal">
+      <div class="blog-card-main">
+        <div class="blog-card-meta">
+          <span class="pill">{{ post.date | date: "%b %d, %Y" }}</span>
+          <div class="card-family card-family-core" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        </div>
+        <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+        <p>{{ post.description | default: post.excerpt | strip_html | truncate: 240 }}</p>
       </div>
-      {% endif %}
-      <div class="link-row">
-        <a href="{{ post.url | relative_url }}">Read post</a>
+      <div class="blog-card-side">
+        {% if post.tags %}
+        <div class="pill-row">
+          {% for tag in post.tags limit:4 %}
+          <span class="pill">{{ tag }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <div class="link-row">
+          <a href="{{ post.url | relative_url }}">Read post</a>
+        </div>
       </div>
     </article>
     {% endfor %}

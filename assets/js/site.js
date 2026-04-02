@@ -8,6 +8,7 @@
   const themeToggleLabel = document.getElementById("theme-toggle-label");
   const mediaDark = globalThis.matchMedia("(prefers-color-scheme: dark)");
   const interactiveSelector = "a, button, input, textarea, select";
+  const blogWidthStorageKey = "dollhousemcp-blog-width";
 
   const closeNavigation = () => {
     if (!menuToggle || !siteNav) {
@@ -157,6 +158,69 @@
   const initClickableCards = () => {
     const clickableCards = document.querySelectorAll("[data-card-link]");
     clickableCards.forEach(initClickableCard);
+  };
+
+  const initCopyButtons = () => {
+    const copyButtons = document.querySelectorAll("[data-copy-text]");
+    copyButtons.forEach((button) => {
+      if (!(button instanceof HTMLButtonElement)) {
+        return;
+      }
+
+      button.addEventListener("click", async () => {
+        const copyText = button.dataset.copyText;
+        if (!copyText) {
+          return;
+        }
+
+        const originalTitle = button.getAttribute("title") || "Copy";
+        button.removeAttribute("data-copy-state");
+
+        try {
+          await navigator.clipboard.writeText(copyText);
+          button.dataset.copyState = "copied";
+          button.setAttribute("title", "Copied");
+        } catch {
+          button.dataset.copyState = "failed";
+          button.setAttribute("title", "Copy failed");
+        }
+
+        globalThis.setTimeout(() => {
+          button.removeAttribute("data-copy-state");
+          button.setAttribute("title", originalTitle);
+        }, 1400);
+      });
+    });
+  };
+
+  const initProseWidthToggle = () => {
+    const proseShells = document.querySelectorAll("[data-prose-shell]");
+    if (proseShells.length === 0) {
+      return;
+    }
+
+    const savedWidth = localStorage.getItem(blogWidthStorageKey);
+    const applyWidth = (shell, mode) => {
+      shell.classList.toggle("is-wide", mode === "wide");
+      const buttons = shell.querySelectorAll("[data-prose-width]");
+      buttons.forEach((button) => {
+        button.classList.toggle("is-active", button.getAttribute("data-prose-width") === mode);
+      });
+    };
+
+    proseShells.forEach((shell) => {
+      const initialMode = savedWidth === "wide" ? "wide" : "standard";
+      applyWidth(shell, initialMode);
+
+      const buttons = shell.querySelectorAll("[data-prose-width]");
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const mode = button.getAttribute("data-prose-width") === "wide" ? "wide" : "standard";
+          localStorage.setItem(blogWidthStorageKey, mode);
+          proseShells.forEach((targetShell) => applyWidth(targetShell, mode));
+        });
+      });
+    });
   };
 
   const bindClick = (element, handler) => {
@@ -333,6 +397,8 @@
   initNavigation();
   initThemeToggle();
   initClickableCards();
+  initCopyButtons();
+  initProseWidthToggle();
   initScreenshotViewers();
   initRevealAnimations();
 })();
