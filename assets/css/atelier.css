@@ -657,7 +657,7 @@ main {
 .install-band {
   margin-top: 0.85rem;
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+  grid-template-columns: minmax(0, 0.85fr) minmax(20rem, 1.15fr);
   gap: 1rem;
   align-items: start;
   border: 1px solid color-mix(in srgb, var(--line) 85%, var(--paper-strong));
@@ -709,6 +709,33 @@ main {
 
 .install-code-block pre {
   padding-top: 1.2rem;
+}
+
+.install-hint {
+  margin: 0.15rem 0 0;
+  font-size: var(--step--1);
+  color: var(--ink-700);
+  font-style: italic;
+}
+
+.install-cta {
+  margin-top: 0.25rem;
+}
+
+.install-cta .button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.install-more {
+  margin: 0.65rem 0 0;
+  font-size: var(--step--1);
+  color: var(--ink-700);
+}
+
+.install-more a {
+  color: var(--signal);
 }
 
 .copy-button {

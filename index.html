@@ -53,44 +53,35 @@ description: Open-source AI customization through modular building blocks, local
     <div class="install-band reveal">
       <div class="install-band-copy">
         <p class="eyebrow">Quick Install</p>
-        <h2>Install fast, then point your MCP client at the server.</h2>
+        <h2>One command. Guided install for popular MCP clients.</h2>
         <p>
-          DollhouseMCP runs on Claude Code, Claude Desktop, Cursor, Gemini, Codex, and other MCP-compatible clients.
-          Pick the setup you want, hit copy once, and paste it directly into your terminal or config workflow.
+          Run the guided installer and DollhouseMCP opens a local web flow that walks you through setup for Claude Desktop,
+          Claude Code, Cursor, VS Code, Codex, Gemini CLI, and other popular MCP clients.
         </p>
       </div>
-      <div class="install-band-code install-option-grid">
+      <div class="install-band-code">
         <section class="install-option">
-          <h3>Local install</h3>
-          <p>Best for stable setups and multiple configurations.</p>
+          <h3>Launch the guided installer</h3>
+          <p>
+            This starts the local web installer and walks you through setup for the major AI MCP clients from one place.
+          </p>
           <div class="install-code-block">
             <button
               class="copy-button copy-button-code"
               type="button"
-              data-copy-text="mkdir -p ~/mcp-servers
-cd ~/mcp-servers
-npm install @dollhousemcp/mcp-server"
-              aria-label="Copy local install command"
-              title="Copy local install command"
-            ><span class="sr-only">Copy local install command</span></button>
-            <pre><code>mkdir -p ~/mcp-servers
-cd ~/mcp-servers
-npm install @dollhousemcp/mcp-server</code></pre>
+              data-copy-text="npx @dollhousemcp/mcp-server@latest --web"
+              aria-label="Copy guided installer command"
+              title="Copy guided installer command"
+            ><span class="sr-only">Copy guided installer command</span></button>
+            <pre><code>npx @dollhousemcp/mcp-server@latest --web</code></pre>
           </div>
-        </section>
-        <section class="install-option">
-          <h3>Run latest with <code>npx</code></h3>
-          <p>Best for quick trials or always pulling the newest package.</p>
-          <div class="install-code-block">
-            <button
-              class="copy-button copy-button-code"
-              type="button"
-              data-copy-text="npx @dollhousemcp/mcp-server@latest"
-              aria-label="Copy npx command"
-              title="Copy npx command"
-            ><span class="sr-only">Copy npx command</span></button>
-            <pre><code>npx @dollhousemcp/mcp-server@latest</code></pre>
-          </div>
+          <p class="install-hint">
+            The guided flow opens a local web server and helps install DollhouseMCP into the most popular MCP clients.
+          </p>
+          <p class="install-more">
+            Prefer to configure things yourself? See the
+            <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/docs/guides/quick-start.md">full setup guide</a>.
+          </p>
         </section>
       </div>
     </div>
