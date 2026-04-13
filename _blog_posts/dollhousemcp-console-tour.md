@@ -19,7 +19,7 @@ Run this in a terminal:
 npx @dollhousemcp/mcp-server@latest --web
 ```
 
-That launches the local DollhouseMCP console at `http://dollhouse.localhost:3939` and gives you five major views:
+That launches the local DollhouseMCP console and prints the local console URL in your terminal. From there you get five major views:
 
 - **Setup** for guided install across popular MCP clients
 - **Portfolio** for browsing your local Dollhouse elements visually
@@ -69,7 +69,7 @@ The logging surface is designed for actual debugging work, not just decoration. 
 
 ![DollhouseMCP logs tab](/assets/images/blog/dollhouse-console-logs.png)
 
-At the moment, we are still tightening up the live data path in this view, so the screenshot here is more about the shape of the interface than a fully populated stream. Even so, it shows where operational visibility is headed inside the local console.
+This screenshot shows a couple of intentionally simple warning events, which is actually useful: the tab is not just a pretty shell, it is already a workable way to confirm that ingestion routes, filters, and severity handling are doing what you expect.
 
 ## Metrics: What the Server Is Doing Internally
 
@@ -88,7 +88,7 @@ The public front-end and docs show metrics cards for things like:
 
 ![DollhouseMCP metrics tab](/assets/images/blog/dollhouse-console-metrics.png)
 
-Like the Logs tab, this view is still in the process of getting richer live data in our current build, so this screenshot is best read as a product surface preview rather than a finished telemetry dashboard. The important thing is that observability is part of the platform design, not an afterthought.
+Metrics take a moment to warm up because the first snapshot is collected on an interval after the server starts. Once that first snapshot lands, the dashboard becomes a genuinely useful quick read on memory, CPU, cache activity, security counters, and metrics pipeline health.
 
 ## Permissions: Making Gatekeeper Visible
 
@@ -123,4 +123,4 @@ Copy this, paste it into a terminal, and run it:
 npx @dollhousemcp/mcp-server@latest --web
 ```
 
-Then open `http://dollhouse.localhost:3939` and take a look around.
+Then open the local console URL printed by the server and take a look around.
