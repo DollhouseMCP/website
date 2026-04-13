@@ -41,7 +41,7 @@ Based on the public quick-start docs, the setup flow supports:
 - copyable manual config blocks when you want to wire it up yourself
 - detection of existing installs so you can see what is already configured
 
-![DollhouseMCP setup tab](/Users/mick/Developer/Organizations/DollhouseMCP/active/website/assets/images/blog/dollhouse-console-setup.png)
+![DollhouseMCP setup tab](/assets/images/blog/dollhouse-console-setup.png)
 
 This is also why the new homepage install flow is now centered on the web launcher. It is the easiest on-ramp we have.
 
@@ -51,7 +51,7 @@ DollhouseMCP elements live in your local portfolio at `~/.dollhouse/portfolio/`.
 
 The portfolio browser is especially useful when you already have a meaningful library of elements. You can browse by type, search by name or description, and move between your local portfolio and collection-aware surfaces without leaving the console.
 
-![DollhouseMCP portfolio tab](/Users/mick/Developer/Organizations/DollhouseMCP/active/website/assets/images/blog/dollhouse-console-portfolio.png)
+![DollhouseMCP portfolio tab](/assets/images/blog/dollhouse-console-portfolio.png)
 
 For people new to DollhouseMCP, this tab makes the model of the system much easier to understand: elements are not abstract ideas floating around in a prompt. They are concrete, local building blocks you can browse and manage.
 
@@ -67,7 +67,7 @@ The logging surface is designed for actual debugging work, not just decoration. 
 - live updates over Server-Sent Events
 - backfill on connect so you are not only seeing brand-new events
 
-![DollhouseMCP logs tab](/Users/mick/Developer/Organizations/DollhouseMCP/active/website/assets/images/blog/dollhouse-console-logs.png)
+![DollhouseMCP logs tab](/assets/images/blog/dollhouse-console-logs.png)
 
 At the moment, we are still tightening up the live data path in this view, so the screenshot here is more about the shape of the interface than a fully populated stream. Even so, it shows where operational visibility is headed inside the local console.
 
@@ -86,7 +86,7 @@ The public front-end and docs show metrics cards for things like:
 - locks and I/O
 - metrics system status
 
-![DollhouseMCP metrics tab](/Users/mick/Developer/Organizations/DollhouseMCP/active/website/assets/images/blog/dollhouse-console-metrics.png)
+![DollhouseMCP metrics tab](/assets/images/blog/dollhouse-console-metrics.png)
 
 Like the Logs tab, this view is still in the process of getting richer live data in our current build, so this screenshot is best read as a product surface preview rather than a finished telemetry dashboard. The important thing is that observability is part of the platform design, not an afterthought.
 
@@ -103,7 +103,7 @@ The public README and docs describe Gatekeeper as a server-side enforcement laye
 - a live decision feed
 - lightweight autonomy and decision counters
 
-![DollhouseMCP permissions tab](/Users/mick/Developer/Organizations/DollhouseMCP/active/website/assets/images/blog/dollhouse-console-permissions.png)
+![DollhouseMCP permissions tab](/assets/images/blog/dollhouse-console-permissions.png)
 
 That visibility matters. If your AI is being shaped by personas, skills, ensembles, and policy-driven workflows, you should be able to inspect the permission layer instead of trusting it blindly.
 

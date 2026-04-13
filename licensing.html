@@ -9,35 +9,41 @@ main_class: prose
 <h1>Licensing overview</h1>
 
 <p class="lead">
-  The DollhouseMCP software project is open source under AGPL-3.0-or-later, with commercial licensing available for
-  teams that need different terms.
+  The DollhouseMCP software project has a three-path licensing model: AGPL-3.0-or-later by default, a free commercial
+  path for organizations under $1M in annual revenue, and paid enterprise licensing for larger or white-label use.
 </p>
 
-<h2>Software license</h2>
+<h2>Licensing paths</h2>
 <p>
-  DollhouseMCP software is released under the GNU Affero General Public License v3.0 or later. That keeps the core
-  platform open while allowing users to study, modify, run, and share the software under AGPL terms.
+  This page is meant to match the choices people now see in the MCP server setup flow. The open-source core remains
+  available under AGPL terms, while commercial use now splits into a free self-certified path for smaller organizations
+  and a paid enterprise path for larger or negotiated deployments.
 </p>
 
 <div class="table-wrap">
   <table>
     <thead>
       <tr>
-        <th>Asset</th>
-        <th>Default terms</th>
-        <th>Notes</th>
+        <th>Path</th>
+        <th>Who it fits</th>
+        <th>Summary</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td>DollhouseMCP software</td>
         <td>AGPL-3.0-or-later</td>
-        <td>Applies to the core open-source product and source releases.</td>
+        <td>Open-source use and teams comfortable with AGPL obligations</td>
+        <td>Default license. No sign-up required. Share-alike terms apply.</td>
       </tr>
       <tr>
-        <td>Commercial licensing</td>
-        <td>Available by request</td>
-        <td>For organizations that need alternative terms for proprietary or hosted use cases.</td>
+        <td>Commercial</td>
+        <td>Organizations under $1M annual revenue</td>
+        <td>Free commercial path with attribution, telemetry acknowledgment, and revenue self-certification.</td>
+      </tr>
+      <tr>
+        <td>Enterprise</td>
+        <td>Organizations over $1M annual revenue, white-label, or negotiated terms</td>
+        <td>Paid commercial licensing with direct contact, procurement support, and room for custom terms.</td>
       </tr>
       <tr>
         <td>This website repository</td>
@@ -48,11 +54,58 @@ main_class: prose
   </table>
 </div>
 
+<h2>AGPL default</h2>
+<p>
+  DollhouseMCP software is released under the GNU Affero General Public License v3.0 or later. That keeps the core
+  platform open while allowing users to study, modify, run, and share the software under AGPL terms.
+</p>
+
+<ul>
+  <li>Use, modify, and distribute the software under AGPL terms.</li>
+  <li>Preserve copyright and license notices.</li>
+  <li>Provide corresponding source when AGPL obligations are triggered, including network use cases covered by the license.</li>
+  <li>No registration, telemetry opt-in, or commercial paperwork is required for the default AGPL path.</li>
+</ul>
+
+<h2>Free commercial path</h2>
+<p>
+  The current setup UI exposes a free commercial option for companies earning under $1,000,000 USD in annual revenue.
+  That path is meant to keep commercial adoption straightforward for smaller organizations that need different terms
+  from AGPL.
+</p>
+
+<ul>
+  <li>Available to organizations under $1M in annual revenue.</li>
+  <li>Requires revenue self-certification.</li>
+  <li>Requires attribution when DollhouseMCP is used in a commercial product.</li>
+  <li>Requires acknowledgment of anonymous usage telemetry as a condition of that license path.</li>
+</ul>
+
+<div class="callout">
+  <p>
+    In the product today, this is the <strong>Commercial</strong> option shown in the setup flow.
+  </p>
+</div>
+
+<h2>Enterprise path</h2>
+<p>
+  The setup UI also exposes an <strong>Enterprise</strong> path for companies over $1M in annual revenue, white-label
+  deployments, or teams that need procurement, support, or negotiated terms.
+</p>
+
+<ul>
+  <li>Designed for larger organizations or white-label use.</li>
+  <li>Supports direct contact and follow-up for commercial terms.</li>
+  <li>Priority support and SLA options may be available depending on the engagement.</li>
+</ul>
+
 <h2>When commercial licensing may help</h2>
 <ul>
   <li>You want to integrate DollhouseMCP into proprietary systems without AGPL obligations.</li>
   <li>You need custom terms for hosted offerings, support, or distribution.</li>
   <li>You want a direct licensing path for enterprise procurement or legal review.</li>
+  <li>You are building a commercial product and want the under-$1M self-certification route instead of AGPL.</li>
+  <li>You need white-label or larger-scale enterprise terms.</li>
 </ul>
 
 <h2>Questions and contact</h2>
@@ -63,7 +116,7 @@ main_class: prose
 
 <div class="callout">
   <p>
-    This page is a practical summary, not legal advice. For exact terms, review the relevant repository license files
-    and consult counsel for legal interpretation.
+    This page is a practical public summary that mirrors the current setup flow, not legal advice. For exact terms,
+    review the relevant repository license files and final commercial agreements.
   </p>
 </div>
