@@ -1200,6 +1200,22 @@ main {
   margin: 1.2rem 0;
 }
 
+.prose .theme-figure {
+  margin: 1.2rem 0;
+}
+
+.prose .theme-figure-image--dark {
+  display: none;
+}
+
+[data-theme="dark"] .prose .theme-figure-image--light {
+  display: none;
+}
+
+[data-theme="dark"] .prose .theme-figure-image--dark {
+  display: block;
+}
+
 .prose figcaption {
   font-size: var(--step--1);
   color: var(--ink-500);

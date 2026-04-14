@@ -29,6 +29,8 @@ That launches the local DollhouseMCP console and prints the local console URL in
 
 This post is a quick tour of those tabs and why they matter.
 
+All of the screenshots below were refreshed from the current `2.0.15` console so the UI matches what is live now.
+
 ## Setup: Guided Install From One Place
 
 The Setup tab is the first thing many people will want from the console. Instead of hunting through config files for each client, the setup wizard gives you one place to connect Claude Desktop, Claude Code, Cursor, VS Code, Codex, Gemini CLI, Windsurf, Cline, and LM Studio.
@@ -41,7 +43,10 @@ Based on the public quick-start docs, the setup flow supports:
 - copyable manual config blocks when you want to wire it up yourself
 - detection of existing installs so you can see what is already configured
 
-![DollhouseMCP setup tab](/assets/images/blog/dollhouse-console-setup.png)
+<figure class="theme-figure">
+  <img class="theme-figure-image theme-figure-image--light" src="/assets/images/blog/dollhouse-console-setup.png" alt="DollhouseMCP setup tab">
+  <img class="theme-figure-image theme-figure-image--dark" src="/assets/images/blog/dollhouse-console-setup-dark.png" alt="DollhouseMCP setup tab">
+</figure>
 
 This is also why the new homepage install flow is now centered on the web launcher. It is the easiest on-ramp we have.
 
@@ -51,7 +56,10 @@ DollhouseMCP elements live in your local portfolio at `~/.dollhouse/portfolio/`.
 
 The portfolio browser is especially useful when you already have a meaningful library of elements. You can browse by type, search by name or description, and move between your local portfolio and collection-aware surfaces without leaving the console.
 
-![DollhouseMCP portfolio tab](/assets/images/blog/dollhouse-console-portfolio.png)
+<figure class="theme-figure">
+  <img class="theme-figure-image theme-figure-image--light" src="/assets/images/blog/dollhouse-console-portfolio.png" alt="DollhouseMCP portfolio tab">
+  <img class="theme-figure-image theme-figure-image--dark" src="/assets/images/blog/dollhouse-console-portfolio-dark.png" alt="DollhouseMCP portfolio tab">
+</figure>
 
 For people new to DollhouseMCP, this tab makes the model of the system much easier to understand: elements are not abstract ideas floating around in a prompt. They are concrete, local building blocks you can browse and manage.
 
@@ -67,9 +75,12 @@ The logging surface is designed for actual debugging work, not just decoration. 
 - live updates over Server-Sent Events
 - backfill on connect so you are not only seeing brand-new events
 
-![DollhouseMCP logs tab](/assets/images/blog/dollhouse-console-logs.png)
+<figure class="theme-figure">
+  <img class="theme-figure-image theme-figure-image--light" src="/assets/images/blog/dollhouse-console-logs.png" alt="DollhouseMCP logs tab">
+  <img class="theme-figure-image theme-figure-image--dark" src="/assets/images/blog/dollhouse-console-logs-dark.png" alt="DollhouseMCP logs tab">
+</figure>
 
-This screenshot shows a couple of intentionally simple warning events, which is actually useful: the tab is not just a pretty shell, it is already a workable way to confirm that ingestion routes, filters, and severity handling are doing what you expect.
+This screenshot shows real startup and activation events from a live console session. That is useful in its own right: the tab is not just a pretty shell, it is already a workable way to confirm that ingestion routes, filters, and severity handling are doing what you expect.
 
 ## Metrics: What the Server Is Doing Internally
 
@@ -86,7 +97,10 @@ The public front-end and docs show metrics cards for things like:
 - locks and I/O
 - metrics system status
 
-![DollhouseMCP metrics tab](/assets/images/blog/dollhouse-console-metrics.png)
+<figure class="theme-figure">
+  <img class="theme-figure-image theme-figure-image--light" src="/assets/images/blog/dollhouse-console-metrics.png" alt="DollhouseMCP metrics tab">
+  <img class="theme-figure-image theme-figure-image--dark" src="/assets/images/blog/dollhouse-console-metrics-dark.png" alt="DollhouseMCP metrics tab">
+</figure>
 
 Metrics take a moment to warm up because the first snapshot is collected on an interval after the server starts. Once that first snapshot lands, the dashboard becomes a genuinely useful quick read on memory, CPU, cache activity, security counters, and metrics pipeline health.
 
@@ -103,7 +117,12 @@ The public README and docs describe Gatekeeper as a server-side enforcement laye
 - a live decision feed
 - lightweight autonomy and decision counters
 
-![DollhouseMCP permissions tab](/assets/images/blog/dollhouse-console-permissions.png)
+<figure class="theme-figure">
+  <img class="theme-figure-image theme-figure-image--light" src="/assets/images/blog/dollhouse-console-permissions.png" alt="DollhouseMCP permissions tab">
+  <img class="theme-figure-image theme-figure-image--dark" src="/assets/images/blog/dollhouse-console-permissions-dark.png" alt="DollhouseMCP permissions tab">
+</figure>
+
+In this capture, the permission sources come from active demo elements with explicit allow, deny, and confirm patterns, so you can see the policy layer and the resulting live decisions side by side.
 
 That visibility matters. If your AI is being shaped by personas, skills, ensembles, and policy-driven workflows, you should be able to inspect the permission layer instead of trusting it blindly.
 
