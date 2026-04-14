@@ -20,9 +20,11 @@ Disallow: /
 # Sitemap
 Sitemap: https://dollhousemcp.com/sitemap.xml
 
-# LLM and agent discovery
-llms.txt: https://dollhousemcp.com/llms.txt
-agent-manifest: https://dollhousemcp.com/.well-known/agent-manifest.txt
+# LLM and agent discovery (informational — not standard robots.txt directives,
+# but useful as human-readable pointers; crawlers that support these standards
+# fetch these paths directly from the root)
+# llms.txt: https://dollhousemcp.com/llms.txt
+# agent-manifest: https://dollhousemcp.com/.well-known/agent-manifest.txt
 
 # Security.txt location for security researchers
 # See https://securitytxt.org/
