@@ -1,10 +1,12 @@
+---
+---
 # Agent Manifest — DollhouseMCP
 # Format: agent-manifest.txt (formerly agents.txt)
 # Spec reference: https://dev.to/jaspervanveen/agentstxt-a-proposed-web-standard-for-ai-agents-20lb
 # Note: agent-manifest.txt is an emerging proposal, not yet a finalized standard.
 # This file should be reviewed and updated when a stable spec is published.
 # Site: https://dollhousemcp.com
-# Last updated: 2026-04-14
+# Last updated: {{ site.time | date: "%Y-%m-%d" }}
 
 ## Identity
 

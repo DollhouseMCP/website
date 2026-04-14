@@ -7,7 +7,6 @@
 User-agent: *
 Allow: /
 Disallow: /docs/
-Disallow: /style-guide.html
 
 # Block bad bots and scrapers
 User-agent: AhrefsBot
@@ -26,14 +25,12 @@ Sitemap: https://dollhousemcp.com/sitemap.xml
 # llms.txt: https://dollhousemcp.com/llms.txt
 # agent-manifest: https://dollhousemcp.com/.well-known/agent-manifest.txt
 
-# Security.txt location for security researchers
+# Security.txt location for security researchers (non-standard directive — informational only)
 # See https://securitytxt.org/
-Security.txt: https://dollhousemcp.com/.well-known/security.txt
+# Security.txt: https://dollhousemcp.com/.well-known/security.txt
 
 # Crawl-delay to be respectful of resources (in seconds)
 # Most modern bots ignore this, but it's good practice
 Crawl-delay: 1
 
-# Specify preference for HTTPS (though most bots use HTTPS by default now)
-# This is a non-standard directive but doesn't hurt
-Prefer-https: true
+# Prefer-https: true (non-standard, ignored by compliant parsers — omitted for RFC 9309 cleanliness)
