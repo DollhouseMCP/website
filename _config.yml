@@ -41,7 +41,7 @@ exclude:
   - CLAUDE.md
   - .git
   - .github
-  - docs/security
+  - docs
   - mockups
   - SECURITY.md
   - vendor

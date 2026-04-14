@@ -48,3 +48,10 @@ temp/
 
 # OS
 Thumbs.db
+
+# Internal docs — session notes, planning, and development docs
+# These should never be committed to the public website repo.
+# Files already in the repo: use `git rm --cached` to untrack without deleting.
+# Note: _config.yml also excludes docs/ from the Jekyll build as defense in depth.
+# If public-facing docs are ever added under docs/, update both files intentionally.
+docs/
