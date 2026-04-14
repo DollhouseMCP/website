@@ -22,6 +22,7 @@ as @dollhousemcp/mcp-server on npm.
 - [Dynamic Permissioning](https://dollhousemcp.com/dynamic-permissioning.html): Gatekeeper policies, allow/deny/confirm patterns, and per-operation approval flows
 - [MCP-AQL](https://dollhousemcp.com/mcp-aql.html): The structured query layer built on MCP — CRUDE routing, semantic endpoints, runtime discovery
 - [Portfolio Workflows](https://dollhousemcp.com/portfolio-workflows.html): Three-tier architecture — local portfolio, GitHub backup, community collection
+- [Platform Operations](https://dollhousemcp.com/platform-operations.html): Full platform surface — portfolio management, collection workflows, skill conversion, search, and execution lifecycle control
 - [Starter Elements](https://dollhousemcp.com/starter-elements.html): The 38 bundled elements included with installation
 - [Licensing](https://dollhousemcp.com/licensing.html): AGPL-3.0 default, free commercial tier (under $1M revenue), enterprise options
 - [About](https://dollhousemcp.com/about.html): Project background, mission, and founder information
@@ -45,4 +46,5 @@ as @dollhousemcp/mcp-server on npm.
 
 ## Optional
 
-- [Style Guide](https://dollhousemcp.com/style-guide.html): Internal design system reference
+- [Blog Index](https://dollhousemcp.com/blog/): Full list of all posts
+- [Releases](https://github.com/DollhouseMCP/mcp-server/releases): Changelog and version history
