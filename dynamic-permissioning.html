@@ -47,6 +47,17 @@ gatekeeper:
   </div>
 </div>
 
+<figure class="theme-figure">
+  <img class="theme-figure-image theme-figure-image--light" src="/assets/images/blog/dollhouse-console-permissions.png" alt="DollhouseMCP permissions tab showing active policy sources, allow and deny and confirm patterns, and a live decision feed.">
+  <img class="theme-figure-image theme-figure-image--dark" src="/assets/images/blog/dollhouse-console-permissions-dark.png" alt="DollhouseMCP permissions tab showing active policy sources, allow and deny and confirm patterns, and a live decision feed.">
+  <figcaption>
+    The Permissions tab shows the active policy stack in real time: which element contributed each rule, the allow,
+    deny, and confirm patterns currently in force, and the decisions the Gatekeeper is making as operations come in.
+    See the full console walkthrough in
+    <a href="{{ '/blog/dollhousemcp-console-tour/' | relative_url }}">A Tour of the DollhouseMCP Console</a>.
+  </figcaption>
+</figure>
+
 <p>
   This still applies even if the MCP client has "Always Allow" enabled. The Gatekeeper runs server-side after the client
   approves the tool call, so a deny from any active element cannot be overridden by the LLM or the client.
