@@ -48,3 +48,11 @@ temp/
 
 # OS
 Thumbs.db
+
+# Internal docs — session notes, planning, and development docs
+# These should never be committed to the public website repo.
+# Files already in the repo: use `git rm --cached` to untrack without deleting.
+docs/session-notes/
+docs/development/
+docs/WEBSITE_EVOLUTION_PLAN.md
+docs/security/

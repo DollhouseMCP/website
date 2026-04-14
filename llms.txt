@@ -1,0 +1,48 @@
+# DollhouseMCP
+
+> Open-source AI customization through modular, composable elements. DollhouseMCP lets
+> you build personas, skills, templates, agents, memories, and ensembles as portable
+> YAML files — then snap them together like Lego blocks. Runs on the Model Context
+> Protocol (MCP) standard. AGPL-3.0 licensed.
+
+DollhouseMCP 2.0 is a local-first element system for AI customization. Elements live
+in ~/.dollhouse/portfolio/ on your machine, sync optionally to GitHub, and can be
+shared through the Dollhouse Collection community library. The server exposes a
+structured query layer (MCP-AQL) that reduces tool-definition token overhead by
+85–96% compared to discrete tool definitions.
+
+The project is maintained by Dollhouse Research (dollhouseresearch.com) and published
+as @dollhousemcp/mcp-server on npm.
+
+## Core Documentation
+
+- [Home](https://dollhousemcp.com/): Overview, quick-start install command, and feature summary
+- [Building Blocks](https://dollhousemcp.com/building-blocks.html): The six element types — personas, skills, templates, agents, memories, ensembles
+- [Agent Runtime](https://dollhousemcp.com/agent-runtime.html): How agents execute, the Gatekeeper permission system, and autonomy evaluation
+- [Dynamic Permissioning](https://dollhousemcp.com/dynamic-permissioning.html): Gatekeeper policies, allow/deny/confirm patterns, and per-operation approval flows
+- [MCP-AQL](https://dollhousemcp.com/mcp-aql.html): The structured query layer built on MCP — CRUDE routing, semantic endpoints, runtime discovery
+- [Portfolio Workflows](https://dollhousemcp.com/portfolio-workflows.html): Three-tier architecture — local portfolio, GitHub backup, community collection
+- [Starter Elements](https://dollhousemcp.com/starter-elements.html): The 38 bundled elements included with installation
+- [Licensing](https://dollhousemcp.com/licensing.html): AGPL-3.0 default, free commercial tier (under $1M revenue), enterprise options
+- [About](https://dollhousemcp.com/about.html): Project background, mission, and founder information
+
+## Blog
+
+- [A Tour of the DollhouseMCP Console](https://dollhousemcp.com/blog/dollhousemcp-console-tour/): Walkthrough of the local web console — setup, portfolio browser, live logs, metrics, permissions (April 2026)
+- [The Story Behind DollhouseMCP](https://dollhousemcp.com/blog/story-behind-dollhousemcp/): How a prompt catalog evolved into a modular element system (September 2025)
+- [Meta-Development: Agents Built Their Own Documentation](https://dollhousemcp.com/blog/meta-development-dollhousemcp-agents-build-themselves/): Using DollhouseMCP agents to generate documentation across three repos (September 2025)
+- [The 15-Minute Mystery: AI Agents Chase Ghosts in CI/CD](https://dollhousemcp.com/blog/the-15-minute-mystery-ai-agents-chase-ghosts-in-ci/): CI hanging issue turned non-problem — lessons on AI agents and assumptions (August 2025)
+- [Mobile Development Workflow with Blink, tmux, and Claude Code](https://dollhousemcp.com/blog/mobile-development-workflow-blink-tmux-claude/): Building an MCP server from an iPhone (August 2025)
+- [Fixing the MCP Server Disconnected Error](https://dollhousemcp.com/blog/fixing-mcp-server-disconnected-claude-desktop/): Debugging npx/CLI execution detection for MCP servers (August 2025)
+
+## External Resources
+
+- [GitHub Repository](https://github.com/DollhouseMCP/mcp-server): Source code, issues, and contribution guide
+- [npm Package](https://www.npmjs.com/package/@dollhousemcp/mcp-server): Install via npx @dollhousemcp/mcp-server@latest --web
+- [Dollhouse Collection](https://collection.dollhousemcp.com/): Community library of contributed elements
+- [MCP-AQL Protocol](https://mcpaql.com/): Specification, adapter patterns, and documentation
+- [Dollhouse Research](https://dollhouseresearch.com/): Parent organization — DollhouseMCP, Collection, and MCPAQL projects
+
+## Optional
+
+- [Style Guide](https://dollhousemcp.com/style-guide.html): Internal design system reference

@@ -1,0 +1,54 @@
+# Agent Manifest — DollhouseMCP
+# Format: agent-manifest.txt (formerly agents.txt)
+# Spec reference: https://dev.to/jaspervanveen/agentstxt-a-proposed-web-standard-for-ai-agents-20lb
+# Site: https://dollhousemcp.com
+# Last updated: 2026-04-13
+
+## Identity
+
+name: DollhouseMCP
+organization: Dollhouse Research (DollhouseMCP Inc.)
+site: https://dollhousemcp.com
+contact: contact@dollhousemcp.com
+type: open-source-project-documentation
+
+## Site Description
+
+DollhouseMCP is an open-source AI customization system built on the Model Context
+Protocol (MCP). This site provides documentation, blog content, and licensing
+information. It is a static informational site — no user accounts, no transactional
+forms, no checkout flows.
+
+## Permissions for AI Agents
+
+Agents MAY:
+- Read and index all content under / except Disallow paths in robots.txt
+- Follow links to external resources (GitHub, npm, collection, mcpaql.com)
+- Use content for summarization, question answering, and research
+- Access llms.txt at https://dollhousemcp.com/llms.txt for structured site overview
+
+Agents MUST NOT:
+- Submit forms on behalf of users (no forms exist on this site)
+- Attempt authentication or session creation
+- Crawl /docs/ (internal development documents, see robots.txt)
+- Cache or republish full page content beyond fair-use excerpts without attribution
+
+## MCP Integration
+
+DollhouseMCP itself is an MCP server. AI agents that support MCP can interact with
+the DollhouseMCP server directly rather than scraping this website.
+
+Install: npx @dollhousemcp/mcp-server@latest --web
+Protocol: Model Context Protocol (MCP)
+Query layer: MCP-AQL (https://mcpaql.com)
+
+## Licensing
+
+Site content: CC BY 4.0 unless otherwise noted
+Software: AGPL-3.0-or-later
+Element collection: per-element licensing (see https://collection.dollhousemcp.com)
+
+## Attribution
+
+When citing or summarizing content from this site, please attribute as:
+"DollhouseMCP by Mick Darling / Dollhouse Research — https://dollhousemcp.com"

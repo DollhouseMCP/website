@@ -6,6 +6,8 @@
 # Allow all legitimate search engines
 User-agent: *
 Allow: /
+Disallow: /docs/
+Disallow: /style-guide.html
 
 # Block bad bots and scrapers
 User-agent: AhrefsBot
@@ -15,8 +17,12 @@ User-agent: MJ12bot
 User-agent: PetalBot
 Disallow: /
 
-# Point to sitemap (when we have one)
-# Sitemap: https://dollhousemcp.com/sitemap.xml
+# Sitemap
+Sitemap: https://dollhousemcp.com/sitemap.xml
+
+# LLM and agent discovery
+llms.txt: https://dollhousemcp.com/llms.txt
+agent-manifest: https://dollhousemcp.com/.well-known/agent-manifest.txt
 
 # Security.txt location for security researchers
 # See https://securitytxt.org/
