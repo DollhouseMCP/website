@@ -8,7 +8,6 @@
   const themeToggleLabel = document.getElementById("theme-toggle-label");
   const mediaDark = globalThis.matchMedia("(prefers-color-scheme: dark)");
   const interactiveSelector = "a, button, input, textarea, select";
-  const blogWidthStorageKey = "dollhousemcp-blog-width";
 
   const closeNavigation = () => {
     if (!menuToggle || !siteNav) {
@@ -215,51 +214,6 @@
     });
   };
 
-  const applyWidth = (shell, mode) => {
-    shell.classList.toggle("is-wide", mode === "wide");
-    const buttons = shell.querySelectorAll("[data-prose-width]");
-    buttons.forEach((button) => {
-      if (!(button instanceof HTMLButtonElement)) {
-        return;
-      }
-      button.classList.toggle("is-active", button.dataset.proseWidth === mode);
-    });
-  };
-
-  const handleProseWidthButtonClick = (button, proseShells) => {
-    const mode = button.dataset.proseWidth === "wide" ? "wide" : "standard";
-    setStoredValue(blogWidthStorageKey, mode);
-    proseShells.forEach((targetShell) => applyWidth(targetShell, mode));
-  };
-
-  const initProseWidthButtons = (shell, proseShells, initialMode) => {
-    applyWidth(shell, initialMode);
-
-    const buttons = shell.querySelectorAll("[data-prose-width]");
-    buttons.forEach((button) => {
-      if (!(button instanceof HTMLButtonElement)) {
-        return;
-      }
-      button.addEventListener("click", () => {
-        handleProseWidthButtonClick(button, proseShells);
-      });
-    });
-  };
-
-  const initProseWidthToggle = () => {
-    const proseShells = document.querySelectorAll("[data-prose-shell]");
-    if (proseShells.length === 0) {
-      return;
-    }
-
-    const savedWidth = localStorage.getItem(blogWidthStorageKey);
-    const initialMode = savedWidth === "wide" ? "wide" : "standard";
-
-    proseShells.forEach((shell) => {
-      initProseWidthButtons(shell, proseShells, initialMode);
-    });
-  };
-
   const bindClick = (element, handler) => {
     if (!element) {
       return;
@@ -435,7 +389,6 @@
   initThemeToggle();
   initClickableCards();
   initCopyButtons();
-  initProseWidthToggle();
   initScreenshotViewers();
   initRevealAnimations();
 })();

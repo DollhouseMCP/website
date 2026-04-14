@@ -1311,41 +1311,6 @@ main {
   margin-top: 1rem;
 }
 
-.prose-width-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.28rem;
-  margin-left: 0;
-  border: 1px solid color-mix(in srgb, var(--line) 88%, var(--paper-strong));
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--surface-2) 84%, var(--paper-strong));
-  margin-top: 1.05rem;
-}
-
-.prose-width-button {
-  appearance: none;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--ink-700);
-  font: inherit;
-  font-size: var(--step--1);
-  font-weight: 700;
-  padding: 0.38rem 0.8rem;
-  cursor: pointer;
-}
-
-.prose-width-button.is-active {
-  background: color-mix(in srgb, var(--paper-strong) 92%, var(--surface-1));
-  color: var(--ink-950);
-  box-shadow: var(--shadow-soft);
-}
-
-.prose-post.is-wide {
-  width: min(var(--max-width), calc(100% - 2 * var(--gutter)));
-}
-
 .timeline {
   margin: 1.15rem 0 0;
   padding: 0;
