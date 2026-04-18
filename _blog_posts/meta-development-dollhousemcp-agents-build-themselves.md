@@ -333,8 +333,6 @@ Mick Darling is the creator of DollhouseMCP and a product executive exploring th
 
 - [DollhouseMCP GitHub Repository](https://github.com/DollhouseMCP/mcp-server)
 - [Technical Roadmap (PR #879)](https://github.com/DollhouseMCP/mcp-server/pull/879)
-- [Plugin Development Guide](https://github.com/DollhouseMCP/mcp-server/blob/develop/docs/contributing/PLUGIN_DEVELOPMENT_GUIDE.md)
-- [Session Notes](https://github.com/DollhouseMCP/business/blob/main/documents/session-notes/SESSION_2025_09_02_META_DEVELOPMENT_STRATEGY.md)
 
 ## Join the Conversation
 

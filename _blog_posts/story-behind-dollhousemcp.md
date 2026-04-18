@@ -112,7 +112,7 @@ What would it be for you?
 
 ## Try It
 
-The entire system is open source and available on [GitHub](https://github.com/DollhouseMCP/dollhousemcp-mcp-server). It takes about 5 minutes to set up if you're already using Claude Code.
+The entire system is open source and available on [GitHub](https://github.com/DollhouseMCP/mcp-server). It takes about 5 minutes to set up if you're already using Claude Code.
 
 Or just browse the [community collection](https://github.com/DollhouseMCP/collection) to see what personas and skills others have built. Everything from harsh code reviewers to empathetic user researchers to technical documentation specialists.
 

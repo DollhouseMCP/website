@@ -46,6 +46,7 @@
     "pulsemcp",
     "pytest",
     "rebrands",
+    "scrollback",
     "skywork",
     "smithery",
     "sonarcloud",
