@@ -94,11 +94,11 @@ Full voice/visual/component rules: open `style-guide.html` in a browser after `j
 - **claude-review** — automated PR review
 - **SonarCloud** — code analysis
 
-Future quality additions on the roadmap: HTML validation, accessibility (pa11y / Lighthouse), SEO meta-tag and schema validation, image-CLS prevention, secret scanning (gitleaks), SVG optimization. See open issues in this repo for current scope and priority.
+Additional quality checks (a11y, HTML validation, SEO, image-CLS, secret scanning, SVG optimization) are tracked in this repo's open issues — search the issue tracker for the current scope rather than relying on this list.
 
 ### Cache-busting
 
-Asset refs in layouts use query params (`?v=YYYYMMDDx`) to force browsers to pick up updated files. Bump the param when you modify an asset — see `_layouts/default.html` and `_includes/header.html` for the pattern. The research site does the same (`?v=20260418a`).
+Asset refs in layouts use query params (`?v=YYYYMMDDx`) to force browsers to pick up updated files. Bump the param when you modify an asset — see `_layouts/default.html` and `_includes/header.html` for the pattern. The sibling research site uses the same convention.
 
 ## Gotchas
 

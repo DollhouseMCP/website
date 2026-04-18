@@ -25,6 +25,10 @@ blog/posts-preview.html
 .env.local
 .env.*.local
 
+# Agent personal overrides — repo-local but per-developer
+CLAUDE.local.md
+AGENTS.local.md
+
 # IDE
 .vscode/
 .idea/
