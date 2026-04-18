@@ -2,13 +2,8 @@
   "version": "0.2",
   "language": "en",
   "ignorePaths": [
-    "_site/**",
     "vendor/**",
     "node_modules/**",
-    "assets/images/**",
-    "assets/fonts/**",
-    "icons/**",
-    "mockups/**",
     "Gemfile.lock"
   ],
   "ignoreRegExpList": [
