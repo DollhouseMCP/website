@@ -16,6 +16,7 @@ keywords: "Blink Shell, tmux, Claude Code, iPhone development, mobile coding, SS
 **Challenge**: Building complex AI infrastructure (DollhouseMCP) requires powerful development environments, but we wanted to work from anywhere - including iPhones.
 
 **Solution**: A sophisticated mobile development workflow combining:
+
 - **Mac Studio** as the always-on development server
 - **Claude Code** (Anthropic's official CLI) for AI-assisted development
 - **tmux** for persistent, resumable sessions
@@ -32,6 +33,7 @@ keywords: "Blink Shell, tmux, Claude Code, iPhone development, mobile coding, SS
 When we started building DollhouseMCP - our Model Context Protocol server that brings enterprise-grade memory and ensemble capabilities to Claude Desktop - we had an unusual constraint: our lead developer travels extensively and wanted to maintain full development capability from just an iPhone.
 
 This isn't about writing a quick script or fixing a typo. We're talking about:
+
 - Managing a 50+ element MCP server with complex TypeScript architecture
 - Running comprehensive test suites with 96%+ coverage requirements
 - Implementing patent-pending memory management systems
@@ -44,7 +46,7 @@ All from a device that fits in your pocket.
 
 ### The Stack
 
-```
+```text
 iPhone (Blink Shell)
     ↓ SSH
 Mac Studio (Always On)
@@ -97,6 +99,7 @@ tmux attach -t dollhouse-dev
 ```
 
 Claude Code maintains context across disconnections. Your tmux session preserves:
+
 - All terminal output
 - Claude's conversation history
 - Running processes (tests, builds, servers)
@@ -256,7 +259,8 @@ tmux attach
 
 **Problem**: Reviewing large diffs on iPhone screen.
 
-**Solution**: 
+**Solution**:
+
 ```bash
 # Use Claude to summarize changes
 "Summarize the key changes in this PR"
@@ -278,6 +282,7 @@ Using this mobile workflow, we've successfully:
 ## Performance Metrics
 
 Our mobile development sessions typically achieve:
+
 - **Response time**: < 100ms for most operations (on good connections)
 - **Uptime**: 99.9% (Mac Studio reliability)
 - **Context retention**: 100% (tmux never loses state)
@@ -298,12 +303,14 @@ Building an MCP server requires deep focus and continuous context. Traditional m
 Want to replicate our workflow? Here's the quickstart:
 
 ### Prerequisites
+
 - Mac Studio/Mini/iMac (any always-on Mac)
 - Blink Shell ($20 - worth every penny)
 - Claude Code CLI (free from Anthropic)
 - tmux (already on macOS)
 
 ### Setup Commands
+
 ```bash
 # On your Mac
 brew install tmux
@@ -334,7 +341,7 @@ As we continue building DollhouseMCP, this mobile workflow evolves:
 
 ## Conclusion: Redefining "Mobile Development"
 
-When people hear "mobile development," they think of building apps for phones. We've redefined it as building enterprise-grade software FROM phones. 
+When people hear "mobile development," they think of building apps for phones. We've redefined it as building enterprise-grade software FROM phones.
 
 DollhouseMCP exists because we refused to accept that serious development requires sitting at a desk. Every feature, every test, every deployment can happen from anywhere with cellular signal.
 

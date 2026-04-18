@@ -1,0 +1,14 @@
+config:
+  default: true
+  MD013: false  # line-length — prose wrapping is author choice
+  MD025: false  # single-h1 — Jekyll front-matter title + H1 in content is intentional
+  MD033: false  # inline-html — needed for figure/img markup in posts
+  MD036: false  # emphasis-as-heading — blog-post subtitles (italics under H1) are editorial
+  MD041: false  # first-line-h1 — posts start with front-matter, not H1
+  MD060: false  # table-column-style — cosmetic pipe-spacing choice
+globs:
+  - "**/*.md"
+ignores:
+  - "_site/**"
+  - "vendor/**"
+  - "node_modules/**"

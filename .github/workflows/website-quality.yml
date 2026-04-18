@@ -1,0 +1,81 @@
+name: Website Quality
+
+on:
+  pull_request:
+    paths:
+      - "**/*.md"
+      - "**/*.html"
+      - "_layouts/**"
+      - "_includes/**"
+      - "_config.yml"
+      - "_blog_posts/**"
+      - "_posts/**"
+      - "assets/**"
+      - "styles/**"
+      - "content/**"
+      - "Gemfile"
+      - "Gemfile.lock"
+      - ".github/workflows/website-quality.yml"
+      - ".cspell.json"
+      - ".lychee.toml"
+      - ".markdownlint-cli2.yaml"
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  markdown-lint:
+    name: Markdown Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lint Markdown
+        uses: DavidAnson/markdownlint-cli2-action@v20
+        with:
+          globs: |
+            **/*.md
+
+  spellcheck:
+    name: Spelling
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run CSpell
+        uses: streetsidesoftware/cspell-action@v7
+        with:
+          config: .cspell.json
+          files: |
+            **/*.md
+          strict: true
+
+  links:
+    name: Link Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.1.4"
+          bundler-cache: true
+
+      - name: Build site
+        run: bundle exec jekyll build --trace
+
+      - name: Check Links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --config .lychee.toml --no-progress --root-dir _site "_site/**/*.html"
+          fail: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
