@@ -18,13 +18,23 @@ if [[ -z "$BASEURL" ]]; then
 fi
 
 if [[ -f "$SRC_DIR/Gemfile" ]]; then
+  # Pre-create tmpfs mountpoints on the host while SRC_DIR is still writable.
+  # Docker on Linux (overlay2) can't create directories inside the :ro bind
+  # mount to host a tmpfs overlay, so the mountpoints must exist in the source
+  # before docker runs. Both paths are gitignored, so this doesn't taint the
+  # checkout.
+  mkdir -p "$SRC_DIR/.jekyll-cache" "$SRC_DIR/.bundle"
+
   if ! docker run --rm \
     -e BASEURL="$BASEURL" \
     -e JEKYLL_ENV=production \
+    -e BUNDLE_APP_CONFIG=/tmp/.bundle-app \
     -e HOST_UID="$(id -u)" \
     -e HOST_GID="$(id -g)" \
     -v "$SRC_DIR":/app:ro \
     -v "$DEST_DIR":/out \
+    --tmpfs /app/.jekyll-cache:rw,mode=0700 \
+    --tmpfs /app/.bundle:rw,mode=0700 \
     -w /app \
     "$RUBY_IMAGE" \
     bash -lc 'bundle install && bundle exec jekyll build --source /app --destination /out --baseurl "$BASEURL" --trace && (chown -R "$HOST_UID:$HOST_GID" /out || true)'; then
