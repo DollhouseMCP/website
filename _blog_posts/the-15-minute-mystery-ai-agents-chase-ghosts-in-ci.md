@@ -13,6 +13,7 @@ excerpt: "How a 'critical' CI hanging issue that affected 500+ commits turned ou
 It was late on a Saturday evening in August when I discovered what appeared to be a critical issue in our experimental server. The CI tests were hanging, timing out after 15 minutes on Windows and Ubuntu. The investigation that followed would reveal not just a technical issue, but a fascinating case study in how AI agents can create problems while trying to solve them.
 
 Our story involves two repositories:
+
 - The **main repository**: Our production MCP server with months of stable CI runs
 - The **experimental repository**: A clone for testing new features, particularly a new prompt element type
 
@@ -27,8 +28,9 @@ execSync('where bash', { encoding: 'utf8' });
 According to their analysis, this had been causing CI failures since July 8th - over 500 commits ago! The agents traced it back to PR #138 and declared it a critical issue that had been "silently failing" in production for over a month.
 
 Their session notes were dramatic:
+
 - "Windows/Ubuntu CI timing out after 15 minutes"
-- "macOS passing in 36 seconds" 
+- "macOS passing in 36 seconds"
 - "Critical hanging issue from ancient PR"
 - "Affects production releases"
 
@@ -57,6 +59,7 @@ Then came the ninth agent - the Final Critical Review Specialist, configured to 
 - The Cross-Platform Compatibility Specialist **didn't modify any platform-specific code**
 
 In total, the review agent found that the specialist agents had:
+
 - Made only 1 real code change (which didn't fix the problem)
 - Fabricated extensive documentation
 - Created 14 new bugs
@@ -80,6 +83,7 @@ testTimeout: 10000,  // 10 seconds
 **Jest has a 10-second timeout!**
 
 When the test runs in CI:
+
 1. The test checks if bash exists on Windows
 2. `execSync('where bash')` might try to hang
 3. Jest kills it after 10 seconds
@@ -100,21 +104,27 @@ if (process.platform === 'win32') {
 ## The Lessons Learned
 
 ### 1. Context is Everything
+
 The agents had all the code but lacked the context. They didn't understand:
+
 - Jest's timeout mechanism
 - The difference between test code and production code
 - That the main repository had been working fine
 
 ### 2. Verification Before Action
+
 The specialist agents jumped straight to fixing without verifying the problem actually existed. A simple check of recent CI runs would have shown everything was working.
 
 ### 3. The Danger of Cascading Assumptions
+
 One agent's assumption that there was a problem led to eight more agents "fixing" it, each building on the previous agent's flawed premise.
 
 ### 4. The Value of Adversarial Review
+
 The only agent that found the truth was the one explicitly configured to be skeptical and adversarial. It actually checked the code instead of trusting the reports.
 
 ### 5. Simple Solutions Often Win
+
 The entire "crisis" was prevented by a simple `testTimeout: 10000` configuration. No elaborate Promise.race() patterns or cross-platform compatibility layers needed.
 
 ## The Meta-Lesson: AI Agents and Human Oversight
@@ -131,6 +141,7 @@ The agents weren't malicious - they were doing exactly what they were asked to d
 ## The Happy Ending
 
 In the end:
+
 - The main repository never had a problem
 - The experimental server issues were from the agents' "fixes," not the original code
 - The prompt element feature can proceed without the dramatic fixes

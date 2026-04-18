@@ -5,6 +5,7 @@
 ## Overview
 
 This repository contains the source code for [dollhousemcp.com](https://dollhousemcp.com), including:
+
 - Marketing and landing pages
 - Technical blog posts and case studies
 - Comprehensive design system with house-themed icons
@@ -14,13 +15,14 @@ This repository contains the source code for [dollhousemcp.com](https://dollhous
 ## Current Status
 
 The website is in active development with a phased rollout plan:
+
 - **Phase 1**: Static site with documentation (Current)
 - **Phase 2**: Interactive demos and playground
 - **Phase 3**: Full platform integration
 
 ## Project Structure
 
-```
+```text
 website/
 ├── content/              # Website content
 │   └── blog/            # Technical articles and case studies
@@ -46,6 +48,7 @@ website/
 ## Design System
 
 ### Features
+
 - ✅ **Dark Mode Support** - Full theme switching capability
 - ✅ **Responsive Design** - Mobile-first approach
 - ✅ **Accessible** - WCAG 2.1 AA compliant colors
@@ -54,6 +57,7 @@ website/
 - ✅ **Design Tokens** - Consistent spacing, colors, typography
 
 ### CSS Architecture
+
 1. **Tokens** - Design system values
 2. **Base** - Resets and defaults
 3. **Components** - Reusable UI components
@@ -63,12 +67,14 @@ website/
 ## Blog Content
 
 High-quality technical articles covering:
+
 - MCP server debugging and solutions
 - Mobile development workflows
 - CI/CD troubleshooting
 - Meta-development case studies
 
 All blog posts include:
+
 - YAML frontmatter for CMS integration
 - AI-friendly TL;DR summaries
 - Comprehensive code examples
@@ -94,11 +100,13 @@ python -m http.server 8000
 ### Adding Content
 
 #### New Blog Post
+
 1. Create markdown file in `_blog_posts/`
 2. Add YAML frontmatter
 3. Write content using markdown
 
 #### New Styles
+
 - Components → `styles/components.css`
 - Pages → `styles/pages/`
 - Always use design tokens
@@ -106,6 +114,7 @@ python -m http.server 8000
 ## Meta-Development Achievement
 
 This website was created using DollhouseMCP's own agent orchestration system, demonstrating:
+
 - 85-90% time reduction in development
 - AI-powered content generation
 - Self-documenting capabilities
@@ -129,7 +138,7 @@ Proprietary - All rights reserved.
 ## Contact
 
 - GitHub: [@DollhouseMCP](https://github.com/DollhouseMCP)
-- Email: mick@mickdarling.com
+- Email: <mick@mickdarling.com>
 
 ---
 

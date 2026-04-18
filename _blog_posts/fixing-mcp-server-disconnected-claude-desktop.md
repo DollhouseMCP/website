@@ -18,6 +18,7 @@ keywords: "MCP, Model Context Protocol, Claude Desktop, Server disconnected, npx
 **Root Cause**: The server's startup detection logic (`import.meta.url === file://${process.argv[1]}`) fails for npx/CLI execution paths.
 
 **Solution**: Detect multiple execution methods and add progressive retry delays:
+
 ```javascript
 const isDirectExecution = import.meta.url === `file://${process.argv[1]}`;
 const isNpxExecution = process.env.npm_execpath?.includes('npx');
@@ -167,6 +168,7 @@ If you're experiencing "Server disconnected" errors with your MCP server:
 ### 1. Check Your Startup Logic
 
 Look for patterns like:
+
 ```javascript
 // PROBLEMATIC PATTERNS:
 if (import.meta.url === `file://${process.argv[1]}`) { }
@@ -177,6 +179,7 @@ if (process.argv[1].endsWith('index.js')) { } // Too specific
 ### 2. Add Diagnostic Logging
 
 Add this temporarily to understand execution:
+
 ```javascript
 console.error('Execution context:', {
   directMatch: import.meta.url === `file://${process.argv[1]}`,
@@ -189,6 +192,7 @@ console.error('Execution context:', {
 ### 3. Test All Execution Methods
 
 Create a test script:
+
 ```bash
 #!/bin/bash
 # Test all execution methods
@@ -208,6 +212,7 @@ echo "Testing CLI execution..."
 ### 1. Support Multiple Execution Methods
 
 Always detect and support:
+
 - Direct node execution
 - NPX execution
 - CLI/bin execution
@@ -216,6 +221,7 @@ Always detect and support:
 ### 2. Use Progressive Delays for Module Initialization
 
 ESM modules may need time to initialize:
+
 ```javascript
 const STARTUP_DELAYS = [10, 50, 100, 200]; // Accommodates fast and slow machines
 ```
@@ -223,6 +229,7 @@ const STARTUP_DELAYS = [10, 50, 100, 200]; // Accommodates fast and slow machine
 ### 3. Minimal Error Messages in Production
 
 For security, avoid detailed error logs:
+
 ```javascript
 // Bad: Exposes internal paths and structure
 console.error("Failed to start:", { path: process.argv[1], cwd: process.cwd() });
@@ -234,6 +241,7 @@ console.error("[ServerName] Server startup failed");
 ### 4. Test with Real npm Installation
 
 Always test with actual npm installation:
+
 ```bash
 # Build and pack
 npm run build && npm pack
@@ -249,6 +257,7 @@ npm install -g ./package-name-1.0.0.tgz
 For AI assistants debugging similar issues:
 
 ### Structured Problem Definition
+
 ```yaml
 problem_type: "MCP server startup failure"
 symptoms:
@@ -264,6 +273,7 @@ affected_components:
 ```
 
 ### Solution Pattern
+
 ```yaml
 solution_components:
   - execution_detection:
@@ -280,6 +290,7 @@ solution_components:
 ```
 
 ### Testing Checklist
+
 - [ ] Direct execution: `node dist/index.js`
 - [ ] NPX execution: `npx @package/name`
 - [ ] CLI execution: `package-cli`
