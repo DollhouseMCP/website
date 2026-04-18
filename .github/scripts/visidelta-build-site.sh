@@ -21,11 +21,13 @@ if [[ -f "$SRC_DIR/Gemfile" ]]; then
   if ! docker run --rm \
     -e BASEURL="$BASEURL" \
     -e JEKYLL_ENV=production \
+    -e BUNDLE_APP_CONFIG=/tmp/.bundle-app \
     -e HOST_UID="$(id -u)" \
     -e HOST_GID="$(id -g)" \
     -v "$SRC_DIR":/app:ro \
     -v "$DEST_DIR":/out \
-    --tmpfs /app/.jekyll-cache:rw,mode=1777 \
+    --tmpfs /app/.jekyll-cache:rw,mode=0700 \
+    --tmpfs /app/.bundle:rw,mode=0700 \
     -w /app \
     "$RUBY_IMAGE" \
     bash -lc 'bundle install && bundle exec jekyll build --source /app --destination /out --baseurl "$BASEURL" --trace && (chown -R "$HOST_UID:$HOST_GID" /out || true)'; then
