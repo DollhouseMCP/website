@@ -21,6 +21,7 @@ if [[ -f "$SRC_DIR/Gemfile" ]]; then
   if ! docker run --rm \
     -e BASEURL="$BASEURL" \
     -e JEKYLL_ENV=production \
+    -e JEKYLL_CACHE_DIR=/tmp/.jekyll-cache \
     -e HOST_UID="$(id -u)" \
     -e HOST_GID="$(id -g)" \
     -v "$SRC_DIR":/app:ro \
