@@ -44,7 +44,7 @@ Homebrew Ruby (`/opt/homebrew/opt/ruby`) works but runs 3.4.x and breaks old Jek
 ├── _layouts/                # default.html, post.html
 ├── _includes/               # header.html and partials
 ├── _blog_posts/             # Collection: blog content (/blog/:name/)
-├── _posts/                  # Legacy Jekyll posts — use _blog_posts/ for new content
+├── _posts/                  # Legacy Jekyll posts — existing posts stay; new content goes in _blog_posts/
 ├── index.html               # Landing page
 ├── about.html, licensing.html, etc.   # Top-level marketing pages
 ├── style-guide.html         # Live Atelier component showcase — source of truth
@@ -92,7 +92,7 @@ Full voice/visual/component rules: open `style-guide.html` in a browser after `j
 - **claude-review** — automated PR review
 - **SonarCloud** — code analysis
 
-Planned expansions tracked in #26 (markdown lint, lychee link check, cspell, HTML validation, a11y).
+Future quality additions on the roadmap: HTML validation, accessibility (pa11y / Lighthouse), SEO meta-tag and schema validation, image-CLS prevention, secret scanning (gitleaks), SVG optimization. See open issues in this repo for current scope and priority.
 
 ### Cache-busting
 
@@ -102,8 +102,8 @@ Asset refs in layouts use query params (`?v=YYYYMMDDx`) to force browsers to pic
 
 - **Ruby 3.4 breaks old Jekyll** — `String#tainted?` was removed in 3.2 and the GitHub-Pages-pinned `liquid 4.0.3` still uses it. Pin local Ruby at 3.1.x.
 - **Gemfile.lock platform drift** — running `bundle install` on macOS can add `arm64-darwin` entries. Don't commit those; they break Linux CI. If the lock file drifts, `git restore Gemfile.lock` before committing.
-- **Visidelta source mount is `:ro`** — `.github/scripts/visidelta-build-site.sh` mounts the repo read-only. Jekyll needs a writable cache path; the workflow uses a tmpfs overlay at `/app/.jekyll-cache` (see commit history / #25 for fix context).
-- **`develop` was historically stale** — fully re-synced to `main` on 2026-04-18. All new work should branch off `develop`.
+- **Visidelta source mount is `:ro`** — `.github/scripts/visidelta-build-site.sh` mounts the repo read-only. Jekyll needs a writable cache path; the workflow uses tmpfs overlays at `/app/.jekyll-cache` and `/app/.bundle`. The mountpoints must be pre-created on the host (Linux overlay2 can't `mkdir` inside a `:ro` mount); the script handles that.
+- **`develop` is the integration branch** — all new work branches off `develop`, then PR into `develop`. Don't push directly to `main`. (`develop` was historically stale and force-resynced to `main`; check `git log` if you need that context.)
 - **No unit tests** — this is a static site, Jekyll build is the contract. Visual regressions are caught by Visidelta screenshots.
 
 ## Code style
