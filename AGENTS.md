@@ -44,7 +44,7 @@ Homebrew Ruby (`/opt/homebrew/opt/ruby`) works but runs 3.4.x and breaks old Jek
 ├── _layouts/                # default.html, post.html
 ├── _includes/               # header.html and partials
 ├── _blog_posts/             # Collection: blog content (/blog/:name/)
-├── _posts/                  # Legacy Jekyll posts
+├── _posts/                  # Legacy Jekyll posts — use _blog_posts/ for new content
 ├── index.html               # Landing page
 ├── about.html, licensing.html, etc.   # Top-level marketing pages
 ├── style-guide.html         # Live Atelier component showcase — source of truth
@@ -88,7 +88,7 @@ Full voice/visual/component rules: open `style-guide.html` in a browser after `j
 ### CI (current)
 
 - **Jekyll Build** — smoke-builds the site on every PR
-- **Visidelta Preview** — Docker-wrapped build that produces before/after screenshots for visual diffs (see tracker #24 for current Jekyll-cache quirk)
+- **Visidelta Preview** — Docker-wrapped build that produces before/after screenshots for visual diffs. The wrapper mounts the source `:ro` and uses tmpfs overlays at `/app/.jekyll-cache` and `/app/.bundle` so Jekyll can write its caches without compromising the read-only source mount; see `.github/scripts/visidelta-build-site.sh` for the exact docker invocation.
 - **claude-review** — automated PR review
 - **SonarCloud** — code analysis
 
@@ -115,7 +115,7 @@ Asset refs in layouts use query params (`?v=YYYYMMDDx`) to force browsers to pic
 
 ## Privacy boundary
 
-This repo is public. The `DollhouseMCP` org also has **private repos** (experimental, business, catalog, tools-internal). Don't reference private-repo implementation details in marketing copy, commit messages, or docs here. If unsure whether something is public, check the org-level [CLAUDE.md](https://github.com/DollhouseMCP/) or ask.
+This repo is public. The `DollhouseMCP` org also has **private repos** (experimental, business, catalog, tools-internal). Don't reference private-repo implementation details in marketing copy, commit messages, or docs here. If unsure whether something is public, check the org-level `CLAUDE.md` in the `DollhouseMCP` organization root, or ask.
 
 ## See also
 
