@@ -9,6 +9,7 @@ This is the Jekyll source for **[dollhousemcp.com](https://dollhousemcp.com)** �
 The repo is **public**. Everything here ships to the open internet.
 
 Sibling sites with shared conventions:
+
 - `DollhouseMCP/dollhouseresearch-website` — parent research org (`dollhouseresearch.com`)
 - `DollhouseMCP/collection` — community catalog (`collection.dollhousemcp.com`, static `public/` tree)
 
@@ -17,6 +18,7 @@ All three share the **Atelier** design system (`atelier.css`) — this repo is t
 ## Setup
 
 Required:
+
 - Ruby 3.1.x (not 3.4+ — see Gotchas)
 - Bundler 2.3.x
 - Docker (only for the Visidelta preview workflow)
@@ -36,7 +38,7 @@ Homebrew Ruby (`/opt/homebrew/opt/ruby`) works but runs 3.4.x and breaks old Jek
 
 ## Repository layout
 
-```
+```text
 .
 ├── _config.yml              # Jekyll config — baseurl, plugins, collections
 ├── _layouts/                # default.html, post.html
@@ -77,12 +79,14 @@ Full voice/visual/component rules: open `style-guide.html` in a browser after `j
 ## Workflow
 
 ### Branching
+
 - `main` is the deployed branch (GitHub Pages).
 - `develop` is the integration branch — PRs target here.
 - Feature branches: `feature/*`, `fix/*`, `design/*`, `docs/*`, `chore/*`.
 - Merge order: feature → develop → main via PR (no direct pushes to main).
 
 ### CI (current)
+
 - **Jekyll Build** — smoke-builds the site on every PR
 - **Visidelta Preview** — Docker-wrapped build that produces before/after screenshots for visual diffs (see tracker #24 for current Jekyll-cache quirk)
 - **claude-review** — automated PR review
@@ -91,6 +95,7 @@ Full voice/visual/component rules: open `style-guide.html` in a browser after `j
 Planned expansions tracked in #26 (markdown lint, lychee link check, cspell, HTML validation, a11y).
 
 ### Cache-busting
+
 Asset refs in layouts use query params (`?v=YYYYMMDDx`) to force browsers to pick up updated files. Bump the param when you modify an asset — see `_layouts/default.html` and `_includes/header.html` for the pattern. The research site does the same (`?v=20260418a`).
 
 ## Gotchas
@@ -114,7 +119,7 @@ This repo is public. The `DollhouseMCP` org also has **private repos** (experime
 
 ## See also
 
-- **Site:** https://dollhousemcp.com
+- **Site:** <https://dollhousemcp.com>
 - **Design system:** `style-guide.html`, `assets/css/atelier.css`
 - **Org-level guidance:** `DollhouseMCP/CLAUDE.md` at the org root
 - **Sibling sites:** `DollhouseMCP/dollhouseresearch-website`, `DollhouseMCP/collection`
