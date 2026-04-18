@@ -19,9 +19,9 @@ All three share the **Atelier** design system (`atelier.css`) — this repo is t
 
 Required:
 
-- Ruby 3.1.x (not 3.4+ — see Gotchas)
-- Bundler 2.3.x
-- Docker (only for the Visidelta preview workflow)
+- Ruby 3.1.x (not 3.2+ — see Gotchas). A `.ruby-version` file pins `3.1.4` so rbenv / chruby / asdf will auto-switch when you `cd` into the repo.
+- Bundler 2.3 or newer (`Gemfile.lock` ships with 2.3.27).
+- Docker (only for the Visidelta preview workflow).
 
 ```bash
 # First-time setup
@@ -31,10 +31,12 @@ bundle install
 bundle exec jekyll serve
 
 # One-shot production build
-bundle exec jekyll build --trace
+bundle exec jekyll build
+
+# Add --trace to either command above for full backtraces on build errors
 ```
 
-Homebrew Ruby (`/opt/homebrew/opt/ruby`) works but runs 3.4.x and breaks old Jekyll plugins. Use rbenv/chruby/rvm to pin 3.1.x locally.
+Homebrew Ruby (`/opt/homebrew/opt/ruby`) works but runs 3.4.x and breaks old Jekyll plugins (see Gotchas). Use rbenv/chruby/asdf to pin 3.1.x locally — the `.ruby-version` file does that for you with any of the three.
 
 ## Repository layout
 
@@ -100,7 +102,7 @@ Asset refs in layouts use query params (`?v=YYYYMMDDx`) to force browsers to pic
 
 ## Gotchas
 
-- **Ruby 3.4 breaks old Jekyll** — `String#tainted?` was removed in 3.2 and the GitHub-Pages-pinned `liquid 4.0.3` still uses it. Pin local Ruby at 3.1.x.
+- **Ruby 3.2+ breaks old Jekyll** — `String#tainted?` was removed in Ruby 3.2 and the GitHub-Pages-pinned `liquid 4.0.3` still calls it. Pin local Ruby at 3.1.x (the `.ruby-version` file at the repo root does this for rbenv / chruby / asdf users automatically).
 - **Gemfile.lock platform drift** — running `bundle install` on macOS can add `arm64-darwin` entries. Don't commit those; they break Linux CI. If the lock file drifts, `git restore Gemfile.lock` before committing.
 - **Visidelta source mount is `:ro`** — `.github/scripts/visidelta-build-site.sh` mounts the repo read-only. Jekyll needs a writable cache path; the workflow uses tmpfs overlays at `/app/.jekyll-cache` and `/app/.bundle`. The mountpoints must be pre-created on the host (Linux overlay2 can't `mkdir` inside a `:ro` mount); the script handles that.
 - **`develop` is the integration branch** — all new work branches off `develop`, then PR into `develop`. Don't push directly to `main`. (`develop` was historically stale and force-resynced to `main`; check `git log` if you need that context.)
