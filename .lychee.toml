@@ -8,6 +8,14 @@ exclude = [
   "https://lobehub.com/.*",
   "https://www.npmjs.com/package/@dollhousemcp/mcp-server.*",
   "https://mcpaql.com/.*",
+  # Site's own production origin. jekyll-seo-tag emits an absolute
+  # canonical (and og:url) <link> to https://dollhousemcp.com/<page> on
+  # every page; for any page not yet deployed (i.e. every new page in a
+  # PR) lychee resolves that against production and gets a 404 — a
+  # guaranteed false positive that clears the moment the PR is deployed.
+  # Internal correctness is still fully checked: lychee resolves
+  # root-relative links against the local _site build (--root-dir _site).
+  "^https?://(www\\.)?dollhousemcp\\.com(/.*)?$",
   # RFC 2606 / 6761 reserved names used in documentation and examples —
   # these should never be resolved by lychee even if a tutorial references them.
   "^https?://localhost(:\\d+)?(/.*)?$",
