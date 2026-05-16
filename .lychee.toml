@@ -1,6 +1,10 @@
-max_retries = 2
-retry_wait_time = 2
-timeout = 20
+# Retry generously: the security pages cite ~34 github.com/.../blob/main
+# source links, and GitHub intermittently returns 429/502 under that
+# volume. More retries with a longer backoff rides out transient 5xx/429
+# without masking real failures — a genuine 404 still fails after retries.
+max_retries = 5
+retry_wait_time = 4
+timeout = 30
 no_progress = true
 exclude = [
   "https://www.linkedin.com/.*",
