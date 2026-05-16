@@ -52,7 +52,11 @@ mermaid: true
   K -- approved --> H
   K -- denied --> XR[Operation rejected]
   H --> L[Operation executes]
-  L --> M[Autonomy evaluator and danger zone gate the next step]</pre>
+  L --> M[Autonomy evaluator and danger zone gate the next step]
+  classDef deny fill:#b91c1c,stroke:#7f1d1d,color:#fff;
+  classDef allow fill:#15803d,stroke:#14532d,color:#fff;
+  class XN,XD,XR deny;
+  class H,L allow;{% endraw %}</pre>
 
 <p>
   The diagram is the contract; the rest of this page is the code that implements each box.
@@ -299,7 +303,11 @@ export function findConfirmDenyingElement(
   GK -- "needs confirmation" --> HC[Out-of-band human challenge]
   EX --> AE[Autonomy evaluator gates the next agent step]
   AE -- "danger threshold crossed" --> DZ[Danger zone enforcer: process-level block]
-  AE -- "continue" --> GK{% endraw %}</pre>
+  AE -- "continue" --> GK
+  classDef deny fill:#b91c1c,stroke:#7f1d1d,color:#fff;
+  classDef allow fill:#15803d,stroke:#14532d,color:#fff;
+  class DZ deny;
+  class EX allow;{% endraw %}</pre>
 
 <h2>Related</h2>
 <ul class="timeline">

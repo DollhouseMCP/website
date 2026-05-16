@@ -43,7 +43,9 @@ mermaid: true
   IR -- yes --> FLAG[irreversible = true, score +10]
   F --> EVAL[Risk + irreversible handed to approval policy]
   FLAG --> EVAL
-  EVAL --> GK[Gatekeeper / autonomy evaluator decision]{% endraw %}</pre>
+  EVAL --> GK[Gatekeeper / autonomy evaluator decision]
+  classDef deny fill:#b91c1c,stroke:#7f1d1d,color:#fff;
+  class X,DENY deny;{% endraw %}</pre>
 
 <h2>Tiers, and the patterns that are never approvable</h2>
 <p>

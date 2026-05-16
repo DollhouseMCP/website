@@ -49,7 +49,11 @@ mermaid: true
   AE -- "continue" --> OP
   AE -- "pause" --> HUMAN[Return to human]
   AE -- "danger zone" --> DZ[Danger zone enforcer: persistent block]
-  EX -.-> MON[Security monitor records every decision]{% endraw %}</pre>
+  EX -.-> MON[Security monitor records every decision]
+  classDef deny fill:#b91c1c,stroke:#7f1d1d,color:#fff;
+  classDef allow fill:#15803d,stroke:#14532d,color:#fff;
+  class STOP,REJ,DZ deny;
+  class EX,DONE allow;{% endraw %}</pre>
 
 <h2>Start here</h2>
 <p>

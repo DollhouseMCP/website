@@ -35,10 +35,47 @@
   });
 
   function mermaidThemeForSite() {
-    // Merview parity: dark mode -> 'dark', otherwise 'default'.
-    return document.documentElement.dataset.theme === "dark"
-      ? "dark"
-      : "default";
+    return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+  }
+
+  /*
+   * Mermaid 'base' theme tuned to the Atelier design tokens (assets/css/
+   * atelier.css) so diagrams read as part of the site, not a bolted-on
+   * widget. Values mirror the light/dark token sets verbatim.
+   */
+  function atelierThemeVariables() {
+    var dark = mermaidThemeForSite() === "dark";
+    return dark
+      ? {
+          background: "#0f1522",
+          primaryColor: "#161b24",
+          primaryTextColor: "#f6f9fd",
+          primaryBorderColor: "#7aa7f5",
+          lineColor: "#7b93a7",
+          secondaryColor: "#37271d",
+          tertiaryColor: "#161b24",
+          mainBkg: "#161b24",
+          nodeBorder: "#7aa7f5",
+          clusterBkg: "#0f1522",
+          titleColor: "#f6f9fd",
+          edgeLabelBackground: "#0f1522",
+          fontFamily: "Manrope, system-ui, sans-serif"
+        }
+      : {
+          background: "#ffffff",
+          primaryColor: "#eef4ff",
+          primaryTextColor: "#0a1020",
+          primaryBorderColor: "#1e40af",
+          lineColor: "#677893",
+          secondaryColor: "#fff2e8",
+          tertiaryColor: "#ffffff",
+          mainBkg: "#eef4ff",
+          nodeBorder: "#1e40af",
+          clusterBkg: "#ffffff",
+          titleColor: "#0a1020",
+          edgeLabelBackground: "#ffffff",
+          fontFamily: "Manrope, system-ui, sans-serif"
+        };
   }
 
   function render() {
@@ -54,10 +91,11 @@
       // right default to demonstrate on a security page (Merview parity).
       // 'strict' disables htmlLabels, so labels render as safe SVG text.
       securityLevel: "strict",
-      theme: mermaidThemeForSite(),
-      flowchart: { useMaxWidth: true },
+      theme: "base",
+      themeVariables: atelierThemeVariables(),
+      flowchart: { useMaxWidth: true, curve: "basis", padding: 14 },
       sequence: { useMaxWidth: true },
-      fontFamily: 'Manrope, system-ui, sans-serif'
+      fontFamily: "Manrope, system-ui, sans-serif"
     });
 
     try {
