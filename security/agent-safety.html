@@ -1,0 +1,223 @@
+---
+layout: default
+title: "Security — Agent safety"
+description: "How DollhouseMCP bounds autonomous agents: the five-stage autonomy evaluator, the file-backed danger zone enforcer, and the out-of-band challenge that a compromised model cannot read its way past."
+main_class: prose
+mermaid: true
+---
+
+<p class="eyebrow">Security · Layer 2 and 3</p>
+<h1>Agent safety: bounding autonomy.</h1>
+
+<p class="lead">
+  The Gatekeeper decides whether one operation runs. Agent safety decides whether the agent continues. The autonomy
+  evaluator and the danger zone enforcer are documented below with verbatim source from the public
+  <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository.
+</p>
+
+<p><a href="{{ '/security/' | relative_url }}">← Back to the security overview</a></p>
+
+<h2>The threat</h2>
+<p>
+  An autonomous agent runs many steps with no human between them. A single bad step is recoverable; a loop of them is
+  not. The risk is not one dangerous call but unbounded continuation, where each step is individually reasonable and
+  the aggregate is harmful. Agent safety requires the agent to be re-authorized before every step.
+</p>
+
+<h2>Per-step evaluation</h2>
+<p>
+  Before the agent continues, the autonomy evaluator runs an ordered set of checks. The first failing check ends the
+  loop. The outcome is always one of three values.
+</p>
+
+<pre class="mermaid">{% raw %}flowchart TD
+  S[Agent finishes a step] --> C1{Step budget remaining?}
+  C1 -- no --> P[PAUSE: return to human]
+  C1 -- yes --> C2{Previous step failed?}
+  C2 -- yes --> P
+  C2 -- no --> C3{Next action matches require-approval?}
+  C3 -- yes --> P
+  C3 -- no --> C4[Determine safety tier]
+  C4 -- danger_zone --> DZ[STOP: danger zone block]
+  C4 -- "confirm and not aggressive" --> P
+  C4 -- advisory --> C5{Risk score within tolerance?}
+  C5 -- no --> P
+  C5 -- yes --> G[CONTINUE: take next step]
+  G --> S
+  classDef deny fill:#b91c1c,stroke:#7f1d1d,color:#fff;
+  classDef allow fill:#15803d,stroke:#14532d,color:#fff;
+  class DZ deny;
+  class G allow;{% endraw %}</pre>
+
+<h2>The evaluator in code</h2>
+<p>
+  Every stage returns the same shape. A hard stop (<code>stopped: true</code>) is a distinct signal from a
+  recoverable pause, so a danger-zone hit cannot be downgraded.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/elements/agents/autonomyEvaluator.ts"><code>src/elements/agents/autonomyEvaluator.ts</code></a>
+</p>
+<pre><code>{% raw %}export function evaluateAutonomy(context: AutonomyContext): AutonomyDirective {
+  const config = mergeWithDefaults(context.autonomyConfig);
+  const factors: string[] = [];
+
+  // Early validation: sanitize risk score before any checks consume it
+  if (context.riskScore !== undefined) {
+    context.riskScore = sanitizeRiskScore(context.riskScore, context.agentName);
+  }
+
+  // Check 1: Step count limit
+  const stepLimitResult = checkStepLimit(context.stepCount, config.maxAutonomousSteps);
+  if (stepLimitResult) {
+    factors.push(stepLimitResult.factor);
+    if (!stepLimitResult.continue) {
+      autonomyMetrics.recordPause(stepLimitResult.reason || 'step_limit', context.stepCount);
+      return buildDirective(false, stepLimitResult.reason, factors, { stepsRemaining: 0 });
+    }
+  }
+
+  // Check 2: Current step outcome
+  if (context.currentStepOutcome === 'failure') {
+    factors.push('Previous step failed');
+    return buildDirective(false, 'Previous step failed - human review recommended', factors);
+  }
+
+  // Check 3: Pattern matching for next action
+  if (context.nextActionHint) {
+    const patternResult = checkActionPatterns(
+      context.nextActionHint, config.requiresApproval, config.autoApprove
+    );
+    if (!patternResult.continue) {
+      return buildDirective(false, patternResult.reason, factors);
+    }
+  }
+
+  // Check 5: Risk score vs tolerance threshold
+  if (context.riskScore !== undefined) {
+    const thresholdResult = checkRiskThreshold(context.riskScore, config.riskTolerance);
+    if (!thresholdResult.continue) {
+      return buildDirective(false, thresholdResult.reason, factors);
+    }
+  }
+
+  return buildDirective(true, undefined, factors);
+}{% endraw %}</code></pre>
+
+<p>
+  Security-critical logic that throws is treated as a stop, not a pass. If the safety-tier evaluation itself errors,
+  the agent pauses for human review rather than proceeding:
+</p>
+<pre><code>{% raw %}try {
+  tierResult = determineSafetyTier(riskScore, [], action, DEFAULT_SAFETY_CONFIG);
+} catch (error) {
+  factors.push(`Safety tier evaluation failed: ${errorMsg}`);
+  return {
+    continue: false,
+    reason: 'Safety evaluation failed — pausing for human review',
+    factors,
+  };
+}{% endraw %}</code></pre>
+
+<p>
+  The agent's autonomy envelope is declared per agent, in the element itself:
+</p>
+<pre><code>{% raw %}autonomy:
+  riskTolerance: conservative   # conservative | moderate | aggressive
+  maxAutonomousSteps: 10
+  requiresApproval: ["*delete*", "*production*"]
+  autoApprove: ["read*", "list*"]{% endraw %}</code></pre>
+
+<h2>The danger zone</h2>
+<p>
+  Some thresholds are past the point where a confirmation dialog is appropriate. The danger zone enforcer records a
+  block to disk so it survives a crash or restart, and clearing it requires an out-of-band verification ID the model
+  never sees. A mismatch is logged <code>HIGH</code>, not silently allowed.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/DangerZoneEnforcer.ts"><code>src/security/DangerZoneEnforcer.ts</code></a>
+</p>
+<pre><code>{% raw %}unblock(agentName: string, verificationId?: string): boolean {
+  validateAgentName(agentName, 'unblock');
+  const context = this.blockedContexts.get(agentName.trim());
+  if (!context) {
+    return true; // Not blocked, so "successfully" unblocked
+  }
+
+  // If verification was required, check that it matches
+  if (context.verificationId && verificationId !== context.verificationId) {
+    SecurityMonitor.logSecurityEvent({
+      type: 'VERIFICATION_FAILED',
+      severity: 'HIGH',
+      source: 'DangerZoneEnforcer.unblock',
+      details: `Unblock denied for agent '${agentName}': verification ID mismatch`,
+    });
+    return false;
+  }
+
+  this.blockedContexts.delete(agentName.trim());
+  return true;
+}{% endraw %}</code></pre>
+
+<p>
+  The split is the security boundary: the agent is given the <code>challengeId</code> (a UUID), but the matching code
+  is shown only through an OS-native dialog and a server-side store. It never enters the model's context.
+</p>
+<pre><code>{% raw %}function storeAndDisplayChallenge(challenge, context) {
+  if (!challenge.displayCode) return;
+
+  // Store server-side for later verification
+  if (context.verificationStore) {
+    context.verificationStore.set(challenge.challengeId, {
+      code: challenge.displayCode,
+      expiresAt: new Date(challenge.expiresAt).getTime(),
+      reason: challenge.reason,
+    });
+  }
+
+  // Show to human via OS-native dialog (never returned to the model)
+  showVerificationDialog(
+    challenge.displayCode, challenge.reason,
+    { title: 'DollhouseMCP - Verification Required', icon: 'warning' }
+  );
+}{% endraw %}</code></pre>
+
+<div class="callout">
+  <p>
+    A pause queries a human. A danger-zone block does not query: it stops, persists the stop, and requires an answer
+    the model is structurally unable to supply on its own.
+  </p>
+</div>
+
+<h2>Position in the security stack</h2>
+<p>
+  Content validation sanitizes the input before a request exists. The Gatekeeper decides whether a single operation
+  runs. Agent safety decides whether the loop continues, and feeds the danger zone enforcer when a threshold is
+  crossed.
+</p>
+<pre class="mermaid">{% raw %}flowchart LR
+  GK[Gatekeeper allows an operation] --> EX[Agent executes the step]
+  EX --> AE[Autonomy evaluator]
+  AE -- "continue" --> NEXT[Next operation: back to Gatekeeper]
+  AE -- "pause" --> HUMAN[Return to human]
+  AE -- "danger zone" --> DZ[Danger zone enforcer writes a persistent block]
+  DZ --> VC[Out-of-band challenge required to clear]
+  classDef deny fill:#b91c1c,stroke:#7f1d1d,color:#fff;
+  class DZ deny;{% endraw %}</pre>
+
+<h2>Related</h2>
+<ul class="timeline">
+  <li>
+    <strong><a href="{{ '/security/' | relative_url }}">Security overview</a></strong>
+    <p>The full eight-layer model and how agent safety fits into it.</p>
+  </li>
+  <li>
+    <strong><a href="{{ '/security/gatekeeper.html' | relative_url }}">The Gatekeeper</a></strong>
+    <p>The permission engine that gates each operation before the autonomy evaluator gates the next step.</p>
+  </li>
+  <li>
+    <strong><a href="{{ '/security/cli-classification.html' | relative_url }}">CLI tool classification</a></strong>
+    <p>The risk score and irreversibility flag the autonomy evaluator weighs when deciding to continue.</p>
+  </li>
+</ul>

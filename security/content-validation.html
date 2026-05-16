@@ -1,0 +1,227 @@
+---
+layout: default
+title: "Security — Content validation"
+description: "How DollhouseMCP treats every persona, skill, and template as untrusted input: deterministic prompt-injection detection, Unicode normalization, hardened YAML parsing, and ReDoS protection, with verbatim source."
+main_class: prose
+mermaid: true
+---
+
+<p class="eyebrow">Security · Layer 4</p>
+<h1>Content validation: untrusted input by default.</h1>
+
+<p class="lead">
+  Element content is data, and data is treated as hostile until validated. Every persona, skill, and template runs a
+  sequence of checks before any character can influence the model. The source below is quoted verbatim from the
+  public <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository.
+</p>
+
+<p><a href="{{ '/security/' | relative_url }}">← Back to the security overview</a></p>
+
+<h2>The threat</h2>
+<p>
+  A persona file can carry a hidden instruction override. A community skill can conceal a payload behind look-alike
+  Unicode. Crafted YAML front matter can expand into gigabytes, and a crafted regex target can hang the process.
+  None of these require a network; they arrive in content the user requested to load.
+</p>
+
+<h2>Validation order</h2>
+<p>
+  Content is checked in a fixed order, and the order is load-bearing: normalization runs before length and pattern
+  checks, so an attacker cannot pad past a limit with zero-width characters or disguise a pattern with homoglyphs.
+</p>
+
+<pre class="mermaid">{% raw %}flowchart TD
+  IN[Element content loaded] --> SZ1{Raw size sane?}
+  SZ1 -- no --> REJ[Reject: SecurityError]
+  SZ1 -- yes --> UNI[Unicode validation and NFC normalization]
+  UNI --> SZ2{Normalized size within limit?}
+  SZ2 -- no --> REJ
+  SZ2 -- yes --> BUN{Verified bundled hash?}
+  BUN -- yes --> PASS[Trusted: skip injection scan]
+  BUN -- no --> INJ[Deterministic injection-pattern scan]
+  INJ -- match --> REJ
+  INJ -- clean --> YAML[Hardened YAML parse, safe schema only]
+  YAML -- bomb or bad schema --> REJ
+  YAML -- ok --> PASS
+  PASS --> MODEL[Content may reach the model]
+  classDef deny fill:#b91c1c,stroke:#7f1d1d,color:#fff;
+  classDef allow fill:#15803d,stroke:#14532d,color:#fff;
+  class REJ deny;
+  class PASS,MODEL allow;{% endraw %}</pre>
+
+<h2>Prompt-injection detection is deterministic by design</h2>
+<p>
+  The detector is a fixed pattern table, not an AI classifier. An AI classifier can be diverted from its task; a
+  regex cannot be social-engineered. Each entry carries a severity.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/contentValidator.ts"><code>src/security/contentValidator.ts</code></a>
+</p>
+<pre><code>{% raw %}private static readonly INJECTION_PATTERNS: Array&lt;{ pattern: RegExp; severity: 'high' | 'critical'; description: string }&gt; = [
+  // System prompt override attempts
+  { pattern: /\[SYSTEM:\s*.*?\]/gi, severity: 'critical', description: 'System prompt override' },
+  { pattern: /\[ADMIN:\s*.*?\]/gi, severity: 'critical', description: 'Admin prompt override' },
+
+  // Instruction manipulation
+  { pattern: /ignore\s+(all\s+)?previous\s+instructions/gi, severity: 'critical', description: 'Instruction override' },
+  { pattern: /forget\s+your\s+training/gi, severity: 'critical', description: 'Instruction override' },
+  { pattern: /you\s+are\s+now\s+(in\s+)?(admin|root|system|sudo|developer|debug|test|DAN)\s*(mode)?/gi, severity: 'critical', description: 'Role elevation attempt' },
+  { pattern: /\b(jailbreak|do\s+anything\s+now|DAN\s+mode)\b/gi, severity: 'critical', description: 'Jailbreak attempt' },
+
+  // Data exfiltration attempts
+  { pattern: /send\s+all\s+(files|data|personas|tokens|credentials|api\s+keys)\s+to/gi, severity: 'critical', description: 'Data exfiltration' },
+
+  // SECURITY: Backtick command detection with ReDoS mitigation
+  // FIX (PR #1313): replaced .* with [^`]* and added explicit bounds {0,200}
+  { pattern: /`[^`]{0,200}(?:rm\s+-rf?\s+[/~]|sudo\s+rm|chmod\s+777|chown\s+root)[^`]{0,200}`/gi, severity: 'critical', description: 'Dangerous shell command in backticks' },
+];{% endraw %}</code></pre>
+
+<p>
+  Content shipped inside the npm package is registered by SHA-256 hash, so trusted bundled elements are not re-scanned
+  against patterns they would falsely trip. A bundled file modified after install no longer matches its hash, which
+  revokes the trust:
+</p>
+<pre><code>{% raw %}/** True if the given content hash belongs to a verified bundled element. */
+static isBundledContent(content: string): boolean {
+  if (this.bundledContentHashes.size === 0) return false;
+  const hash = createHash('sha256').update(content).digest('hex');
+  return this.bundledContentHashes.has(hash);
+}{% endraw %}</code></pre>
+
+<h2>Unicode is normalized before it is trusted</h2>
+<p>
+  Homoglyph spoofing (a Cyrillic <code>а</code> standing in for a Latin <code>a</code>), bidi overrides, and
+  zero-width injection are collapsed at the validation boundary, and a direction-override is logged
+  <code>HIGH</code>.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/validators/unicodeValidator.ts"><code>src/security/validators/unicodeValidator.ts</code></a>
+</p>
+<pre><code>{% raw %}private static readonly DIRECTION_OVERRIDE_CHARS = /[\u202A-\u202E\u2066-\u2069]/g;
+private static readonly ZERO_WIDTH_CHARS = /[\u200B-\u200F\u2028-\u202F\uFEFF]/g;
+
+private static readonly CONFUSABLE_MAPPINGS: Map&lt;string, string&gt; = new Map([
+  // Cyrillic to Latin
+  ['а', 'a'], ['е', 'e'], ['о', 'o'], ['р', 'p'], ['с', 'c'], ['х', 'x'], ['у', 'y'],
+  ['А', 'A'], ['В', 'B'], ['Е', 'E'], ['К', 'K'], ['М', 'M'], ['Н', 'H'], ['О', 'O'],
+  // Greek uppercase to Latin — visually identical to Latin capitals (#1782)
+  ['Α', 'A'], ['Β', 'B'], ['Ε', 'E'], ['Η', 'H'], ['Ι', 'I'],
+]);
+
+static normalize(content: string): UnicodeValidationResult {
+  let normalized = content;
+  // ... detect suspicious patterns, then:
+  if (this.DIRECTION_OVERRIDE_CHARS.test(normalized)) {
+    normalized = normalized.replace(this.DIRECTION_OVERRIDE_CHARS, '');
+    SecurityMonitor.logSecurityEvent({
+      type: 'UNICODE_DIRECTION_OVERRIDE', severity: 'HIGH',
+      source: 'UnicodeValidator', details: 'Direction override characters removed from content'
+    });
+  }
+  // Apply Unicode normalization (NFC)
+  normalized = normalized.normalize('NFC');
+  // ...
+}{% endraw %}</code></pre>
+
+<h2>YAML is parsed with a safe schema and a bomb check</h2>
+<p>
+  Front matter is parsed with the CORE schema only — no custom tags, no object deserialization — behind size limits
+  and an anchor-to-alias amplification check that runs before the parser does.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/secureYamlParser.ts"><code>src/security/secureYamlParser.ts</code></a>
+</p>
+<pre><code>{% raw %}// Allowed YAML types - CORE_SCHEMA (safe subset, no custom/object types)
+private static readonly SAFE_SCHEMA = yaml.CORE_SCHEMA;
+
+// 4. Pre-parse security validation (YAML-bomb / amplification)
+if (opts.validateContent &amp;&amp; !ContentValidator.validateYamlContent(yamlContent)) {
+  SecurityMonitor.logSecurityEvent({
+    type: 'YAML_INJECTION_ATTEMPT', severity: 'CRITICAL',
+    source: 'SecureYamlParser', details: 'Malicious YAML pattern detected during parsing'
+  });
+  throw new SecurityError('Malicious YAML content detected', 'critical');
+}
+
+// 5. Parse with safe schema
+data = yaml.load(yamlContent, {
+  schema: this.SAFE_SCHEMA,
+  json: false,  // Don't allow JSON-specific types
+});{% endraw %}</code></pre>
+
+<h2>Regex execution is bounded so input cannot hang the server</h2>
+<p>
+  Every pattern runs through a length cap and timing guard, and patterns are statically classified by complexity so
+  catastrophic-backtracking constructs get the tightest input limit.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/dosProtection.ts"><code>src/security/dosProtection.ts</code></a>
+</p>
+<pre><code>{% raw %}static test(pattern: string | RegExp, input: string, options: RegexExecutionOptions = {}): boolean {
+  const { timeout = REGEX_TIMEOUT_MS, maxLength = MAX_INPUT_LENGTH, context = 'unknown' } = options;
+
+  if (!input || typeof input !== 'string') return false;
+
+  // Length check to prevent DOS
+  if (input.length &gt; maxLength) {
+    console.warn(`[SafeRegex] Input too long (${input.length} &gt; ${maxLength}) in ${context}`);
+    return false;
+  }
+
+  const regex = typeof pattern === 'string' ? this.compilePattern(pattern) : pattern;
+  if (!regex) return false;
+
+  const startTime = Date.now();
+  try {
+    const result = regex.test(input);
+    if (Date.now() - startTime &gt; timeout) {
+      console.warn(`[SafeRegex] Slow regex execution in ${context}`);
+    }
+    return result;
+  } finally {
+    if (regex.global) regex.lastIndex = 0;
+  }
+}{% endraw %}</code></pre>
+
+<div class="callout">
+  <p>
+    The order is the defense: normalize, then measure, then match. An attacker who controlled the order could pad
+    past a limit or disguise a pattern; the order is fixed and not attacker-controlled.
+  </p>
+</div>
+
+<h2>Position in the security stack</h2>
+<p>
+  This layer runs first. By the time the Gatekeeper sees an operation, the content that shaped it has already been
+  normalized and scanned, so every later layer operates on sanitized input.
+</p>
+<pre class="mermaid">{% raw %}flowchart LR
+  LOAD[Element load or install] --> CV[Content validation gauntlet]
+  CV -- "rejected" --> STOP[Never reaches the model]
+  CV -- "clean" --> ACT[Element activates]
+  ACT --> GK[Gatekeeper sees operations from clean content]
+  ACT --> COL[Collection install runs the same pipeline]
+  classDef deny fill:#b91c1c,stroke:#7f1d1d,color:#fff;
+  classDef allow fill:#15803d,stroke:#14532d,color:#fff;
+  class STOP deny;
+  class ACT allow;{% endraw %}</pre>
+
+<h2>Related</h2>
+<ul class="timeline">
+  <li>
+    <strong><a href="{{ '/security/' | relative_url }}">Security overview</a></strong>
+    <p>The full eight-layer model and how content validation fits into it.</p>
+  </li>
+  <li>
+    <strong><a href="{{ '/security/gatekeeper.html' | relative_url }}">The Gatekeeper</a></strong>
+    <p>What gates the operations that validated content produces.</p>
+  </li>
+  <li>
+    <strong><a href="{{ '/security/filesystem.html' | relative_url }}">Filesystem and process</a></strong>
+    <p>Where validated content is written, with path-traversal and atomic-write protection.</p>
+  </li>
+</ul>

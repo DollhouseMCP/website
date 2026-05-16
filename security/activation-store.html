@@ -1,0 +1,155 @@
+---
+layout: default
+title: "Security — Activation store isolation"
+description: "How DollhouseMCP keeps active-element state from leaking across sessions: validated session identifiers, per-session versioned files, a type allowlist, identifier normalization, and a fail-safe loader, with verbatim source."
+main_class: prose
+mermaid: true
+---
+
+<p class="eyebrow">Security · Layer 7</p>
+<h1>Activation store isolation.</h1>
+
+<p class="lead">
+  The set of active elements determines what the Gatekeeper allows, so that state is isolated per session and
+  validated on load. The source below is quoted verbatim from the public
+  <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository.
+</p>
+
+<p><a href="{{ '/security/' | relative_url }}">← Back to the security overview</a></p>
+
+<h2>The threat</h2>
+<p>
+  Active elements are the inputs the Gatekeeper resolves policy from. If one session's activation state could leak
+  into another, a permissive element activated in a throwaway session would reshape the permission surface of a
+  different one. The state is stored in a file on disk, so a corrupt or crafted activation file must never be trusted
+  blindly or allowed to crash the load.
+</p>
+
+<h2>Activation state lifecycle</h2>
+<p>
+  A session is named, the name is validated, and that name alone determines which file is read. Everything loaded
+  from that file is re-normalized and type-checked before it becomes live state.
+</p>
+
+<pre class="mermaid">{% raw %}flowchart TD
+  ENV[DOLLHOUSE_SESSION_ID resolved] --> VAL{Matches SESSION_ID_PATTERN?}
+  VAL -- no --> DEF[Fall back to a safe default identity]
+  VAL -- yes --> PATH[Derive per-session path: activations-SESSIONID.json]
+  DEF --> PATH
+  PATH --> LOAD{File present?}
+  LOAD -- "no (ENOENT)" --> FRESH[Start fresh, no event]
+  LOAD -- yes --> PARSE{Parse and shape valid?}
+  PARSE -- "no (corruption)" --> SAFE[Start fresh + log MEDIUM security event]
+  PARSE -- yes --> NORM[Normalize identifiers, apply type allowlist, dedupe]
+  NORM --> STATE[In-memory per-session state]
+  FRESH --> STATE
+  SAFE --> STATE
+  STATE --> GK[Gatekeeper resolves policy from active elements]
+  classDef deny fill:#b91c1c,stroke:#7f1d1d,color:#fff;
+  classDef allow fill:#15803d,stroke:#14532d,color:#fff;
+  class SAFE deny;
+  class STATE allow;{% endraw %}</pre>
+
+<h2>The session identifier is a strict allowlist pattern</h2>
+<p>
+  The session name comes from the environment and is constrained to a tight character class with a bounded length.
+  It cannot contain a path separator or traversal sequence, so it cannot redirect the activation file outside the
+  state directory.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/services/sessionIdentity.ts"><code>src/services/sessionIdentity.ts</code></a>
+</p>
+<pre><code>{% raw %}export const SESSION_ID_PATTERN = /^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/;{% endraw %}</code></pre>
+
+<p>
+  The validated identity is the sole determinant of which file is read; the path is derived from it, never from
+  caller-supplied input:
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/services/ActivationStore.ts"><code>src/services/ActivationStore.ts</code></a>
+</p>
+<pre><code>{% raw %}const identity = resolveSessionIdentity();
+this.sessionId = identity.sessionId;
+this.runtimeSessionId = identity.runtimeSessionId;
+this.enabled = isPersistenceEnabled();
+this.stateDir = stateDir ?? path.join(os.homedir(), '.dollhouse', 'state');
+this.persistPath = path.join(this.stateDir, `activations-${this.sessionId}.json`);{% endraw %}</code></pre>
+
+<h2>Everything loaded is re-normalized and type-checked</h2>
+<p>
+  The on-disk file is untrusted input. Element identifiers are re-run through the same Unicode normalization the rest
+  of the platform uses, and element types are collapsed to a known canonical set, so a tampered file cannot smuggle
+  a look-alike identifier or an unknown element type into live state.
+</p>
+<pre><code>{% raw %}function normalizeType(elementType: string): string {
+  const lower = elementType.toLowerCase();
+  return PLURAL_TO_SINGULAR[lower] ?? lower;
+}
+
+function normalizeActivationIdentifier(value: string): string {
+  return UnicodeValidator.normalize(value).normalizedContent.trim();
+}{% endraw %}</code></pre>
+
+<h2>The loader fails safe and records why</h2>
+<p>
+  A missing file is normal: a fresh session starts empty. A file that exists but will not parse is treated as
+  possible tampering or corruption. The session starts fresh rather than crashing or trusting invalid data, and the
+  condition is recorded as a security event rather than swallowed silently.
+</p>
+<pre><code>{% raw %}} catch (error) {
+  if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+    logger.debug(`[ActivationStore] No activation file found for session '${this.sessionId}', starting fresh`);
+  } else {
+    logger.warn(`[ActivationStore] Failed to load activation file for session '${this.sessionId}', starting fresh`, { error });
+
+    SecurityMonitor.logSecurityEvent({
+      type: 'ELEMENT_ACTIVATED',
+      severity: 'MEDIUM',
+      source: 'ActivationStore.initialize',
+      details: `Failed to load activation file for session '${this.sessionId}' — starting fresh (possible data corruption)`,
+      additionalData: { error: String(error), sessionId: this.sessionId },
+    });
+  }
+}{% endraw %}</code></pre>
+
+<p>
+  Persistence is opt-out: a session can run fully ephemeral, with no activation file written or read.
+</p>
+
+<div class="callout">
+  <p>
+    The session name is the only key, and it is validated before it can name anything. Fail-safe is the default: on
+    any uncertainty, the store starts empty and logs the reason rather than trusting a file it cannot verify.
+  </p>
+</div>
+
+<h2>Position in the security stack</h2>
+<p>
+  This layer feeds the Gatekeeper. The permission decision on every operation depends on which elements are active,
+  and that set is what the activation store isolates per session and re-validates on load. Content validation
+  sanitized those elements on the way in; the activation store ensures that exactly the correct elements are live for
+  this session.
+</p>
+<pre class="mermaid">{% raw %}flowchart LR
+  CV[Content validation: clean element on activation] --> AS[Activation store: per-session, validated state]
+  AS --> GK[Gatekeeper: resolves policy from active elements]
+  AS -. "isolated per DOLLHOUSE_SESSION_ID" .-> AS2[Other sessions: separate files, no cross-talk]
+  GK --> DEC[Allow / confirm / deny decision]{% endraw %}</pre>
+
+<h2>Related</h2>
+<ul class="timeline">
+  <li>
+    <strong><a href="{{ '/security/' | relative_url }}">Security overview</a></strong>
+    <p>The full eight-layer model and how activation store isolation fits into it.</p>
+  </li>
+  <li>
+    <strong><a href="{{ '/security/gatekeeper.html' | relative_url }}">The Gatekeeper</a></strong>
+    <p>The permission engine that resolves policy from exactly the active-element set this layer isolates.</p>
+  </li>
+  <li>
+    <strong><a href="{{ '/security/content-validation.html' | relative_url }}">Content validation</a></strong>
+    <p>The normalization this layer reuses when it re-validates identifiers loaded from disk.</p>
+  </li>
+</ul>
