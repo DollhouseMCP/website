@@ -363,12 +363,12 @@ mermaid: true
 </p>
 <ul class="timeline">
   <li>
-    <strong>Encrypted token storage</strong>
-    <p>GitHub tokens are validated by format, encrypted at rest with AES-256-GCM under a PBKDF2-derived key, and redacted from every log line and error message.</p>
+    <strong>GitHub token encrypted at rest</strong>
+    <p>The GitHub token is validated by format, encrypted at rest with AES-256-GCM under a PBKDF2-derived key, and redacted from every log line and error message.</p>
   </li>
   <li>
-    <strong>Constant-time console authentication</strong>
-    <p>The local web console uses a crypto-random bearer token, stored owner-only and compared in constant time. The presented token is Unicode-normalized and checked against a strict hex format before the comparison, which closes a normalization-bypass class.</p>
+    <strong>Console authentication (feature-gated, default-off)</strong>
+    <p>Console auth is enforced only when <code>DOLLHOUSE_WEB_AUTH_ENABLED</code> is set; during the current Phase 1 rollout it is off by default and the middleware is a deliberate no-op. When enabled, the console uses a crypto-random bearer token — stored in an owner-only file rather than encrypted — compared in constant time, Unicode-normalized and strict-hex-checked before the comparison to close a normalization-bypass class.</p>
   </li>
   <li>
     <strong>Optional TOTP multi-factor</strong>
