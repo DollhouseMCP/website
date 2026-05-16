@@ -1,0 +1,193 @@
+---
+layout: default
+title: "Security — Filesystem and process"
+description: "How DollhouseMCP keeps file and shell access inside the sandbox: symlink-aware path-traversal prevention, atomic locked writes, and a strict command allowlist, with verbatim source."
+main_class: prose
+mermaid: true
+---
+
+<p class="eyebrow">Security · Layer 5</p>
+<h1>Filesystem and process isolation.</h1>
+
+<p class="lead">
+  The portfolio resides on local disk and the server can run a small set of commands; both are tightly constrained.
+  The source below is quoted verbatim from the public
+  <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository.
+</p>
+
+<p><a href="{{ '/security/' | relative_url }}">← Back to the security overview</a></p>
+
+<h2>The threat</h2>
+<p>
+  A path like <code>../../.ssh/id_rsa</code> reads outside the sandbox, and a symlink pointing out of the portfolio
+  achieves the same result while appearing benign. A crash mid-write corrupts a file; an unsanitized argument turns a
+  helper command into shell injection. Each failure mode is one line of carelessness away.
+</p>
+
+<h2>Path validation sequence</h2>
+<p>
+  A path is not trusted on appearance. It is null-stripped and normalized, rejected outright if it contains
+  <code>..</code>, then checked against the allowed directory. If it is a symlink, its real target is resolved and
+  re-checked first. Only then are the extension and filename validated.
+</p>
+
+<pre class="mermaid">{% raw %}flowchart TD
+  P[Path submitted] --> N[Strip null bytes, normalize]
+  N --> DD{Contains '..'?}
+  DD -- yes --> REJ[Reject: path traversal detected]
+  DD -- no --> IN{Inside allowed directory?}
+  IN -- no --> REJ
+  IN -- yes --> SL{Is it a symlink?}
+  SL -- yes --> RT{Real target inside allowed dir?}
+  RT -- no --> REJ
+  RT -- yes --> EXT
+  SL -- no --> EXT[Validate extension and filename format]
+  EXT -- not allowed --> REJ
+  EXT -- ok --> OK[Path accepted]
+  classDef deny fill:#b91c1c,stroke:#7f1d1d,color:#fff;
+  classDef allow fill:#15803d,stroke:#14532d,color:#fff;
+  class REJ deny;
+  class OK allow;{% endraw %}</pre>
+
+<h2>Path traversal, including via symlink</h2>
+<p>
+  <code>lstat</code> detects a symlink without following it; <code>realpath</code> then resolves the target and the
+  containment check runs again. A non-existent file is allowed through, since it may be a file being created, but a
+  symlink pointing out of the sandbox is not.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/pathValidator.ts"><code>src/security/pathValidator.ts</code></a>
+</p>
+<pre><code>{% raw %}// Check for path traversal attempts in the normalized path
+const normalizedPath = path.normalize(cleanPath);
+if (normalizedPath.includes('..') || cleanPath.includes('..')) {
+  logger.warn('Path traversal attempt detected', { userPath: absolutePath });
+  throw new Error('Path traversal detected');
+}
+
+// SECURITY FIX: if the path is a symlink, ensure it points within allowed dir
+try {
+  const stats = await fs.lstat(normalizedPath); // lstat doesn't follow symlinks
+  if (stats.isSymbolicLink()) {
+    const realPath = await fs.realpath(normalizedPath);
+    const realPathWithSep = realPath + path.sep;
+    if (!realPathWithSep.startsWith(allowedDirWithSep) &amp;&amp; realPath !== normalizedAllowedDir) {
+      logger.error('Symlink target outside allowed directory', { path: absolutePath, realPath });
+      throw new Error('Path access denied');
+    }
+  }
+} catch (err) {
+  // If file doesn't exist, that's okay (might be creating a new file)
+  if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+    throw err;
+  }
+}{% endraw %}</code></pre>
+
+<p>
+  Extension and filename format are an allowlist, not a denylist:
+</p>
+<pre><code>{% raw %}private static ALLOWED_EXTENSIONS: string[] = ['.md', '.markdown', '.txt', '.yml', '.yaml'];
+
+private static validateFilename(realPath: string): void {
+  const ext = path.extname(path.basename(realPath)).toLowerCase();
+  if (!this.ALLOWED_EXTENSIONS.includes(ext)) {
+    throw new Error(`File extension not allowed: ${ext}. Allowed: ${this.ALLOWED_EXTENSIONS.join(', ')}`);
+  }
+  if (!RegexValidator.validate(path.basename(realPath), /^[a-zA-Z0-9_.-]+$/, { maxLength: SECURITY_LIMITS.MAX_FILENAME_LENGTH })) {
+    throw new Error(`Invalid filename format: ${path.basename(realPath)}`);
+  }
+}{% endraw %}</code></pre>
+
+<h2>Writes are atomic and locked</h2>
+<p>
+  Concurrent writes to the same file are serialized, and the write goes to a temp file that is atomically renamed
+  over the target, so a crash cannot leave a half-written portfolio file.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/fileLockManager.ts"><code>src/security/fileLockManager.ts</code></a>
+</p>
+<pre><code>{% raw %}async atomicWriteFile(filePath: string, content: string, options?: { encoding?: BufferEncoding }): Promise&lt;void&gt; {
+  const tempPath = await this.getTempFilePath(filePath);
+  try {
+    await fs.mkdir(path.dirname(tempPath), { recursive: true });
+    await fs.writeFile(tempPath, content, options);
+    await fs.rename(tempPath, filePath);   // atomic on same filesystem
+  } catch (error) {
+    try { await fs.unlink(tempPath); } catch (e) { /* best-effort cleanup */ }
+    throw error;
+  }
+}{% endraw %}</code></pre>
+
+<h2>Shell execution is an allowlist with a stripped environment</h2>
+<p>
+  Only a fixed set of commands and subcommands is permitted, every argument is validated, and the child process is
+  spawned directly, never through a shell, with an explicit minimal <code>PATH</code> instead of the inherited
+  environment. This defeats both command injection and PATH hijacking.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/commandValidator.ts"><code>src/security/commandValidator.ts</code></a>
+</p>
+<pre><code>{% raw %}const ALLOWED_COMMANDS: Record&lt;string, string[]&gt; = {
+  git: ['pull', 'status', 'log', 'rev-parse', 'branch', 'checkout', 'fetch', 'clone', '--abbrev-ref', 'HEAD', '--porcelain'],
+  npm: ['install', 'run', 'audit', 'ci', '--version', 'build'],
+  node: ['--version'],
+  npx: ['--version']
+};
+
+static sanitizeCommand(cmd: string, args: string[]): void {
+  if (!ALLOWED_COMMANDS[cmd]) {
+    throw new Error(`Command not allowed: ${cmd}`);
+  }
+  for (const arg of args) {
+    if (!ALLOWED_COMMANDS[cmd].includes(arg) &amp;&amp; !this.isSafeArgument(arg)) {
+      throw new Error(`Argument not allowed: ${arg}`);
+    }
+  }
+}
+
+// ... spawned with:
+env: {
+  // SEC-03: Explicit allowlist instead of spreading full process.env
+  PATH: '/usr/bin:/bin:/usr/local/bin',
+  HOME: process.env.HOME,
+  USER: process.env.USER,
+}{% endraw %}</code></pre>
+
+<div class="callout">
+  <p>
+    The allowlist pattern applies twice: which directories and extensions are reachable, and which commands and
+    arguments may run. Anything not explicitly named is denied, so a novel attack does not require a new rule to be
+    blocked.
+  </p>
+</div>
+
+<h2>Position in the security stack</h2>
+<p>
+  Content validation decides whether content is safe to retain. This layer decides where it may be written and what
+  may run, and the CLI tool classifier scores a command's risk before the Gatekeeper approves it.
+</p>
+<pre class="mermaid">{% raw %}flowchart LR
+  CV[Validated element content] --> PV[Path validator: where it can be written]
+  PV --> FL[File lock manager: atomic, serialized write]
+  CMD[Helper command requested] --> CMV[Command allowlist + stripped env]
+  CMV --> CLI[CLI tool classification scores the risk]
+  CLI --> GK[Gatekeeper decides approval]{% endraw %}</pre>
+
+<h2>Related</h2>
+<ul class="timeline">
+  <li>
+    <strong><a href="{{ '/security/' | relative_url }}">Security overview</a></strong>
+    <p>The full eight-layer model and how filesystem and process isolation fit into it.</p>
+  </li>
+  <li>
+    <strong><a href="{{ '/security/content-validation.html' | relative_url }}">Content validation</a></strong>
+    <p>What runs before content is ever written to the portfolio.</p>
+  </li>
+  <li>
+    <strong><a href="{{ '/security/cli-classification.html' | relative_url }}">CLI tool classification</a></strong>
+    <p>How a command's risk and irreversibility are scored before it is allowed to run.</p>
+  </li>
+</ul>

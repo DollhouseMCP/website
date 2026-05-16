@@ -33,7 +33,7 @@ Here's what I mean:
 
 **Traditional AI interaction**: Every session starts fresh. You explain your context, your preferences, your standards. The AI responds. Next session? Start over.
 
-**Vibe tooling**: You build tools using natural language that persist and evolve. You don't write code to create these tools - you just describe what you want. "Be a security-focused code reviewer who's harsh but constructive." Done. That tool now exists. 
+**Vibe tooling**: You build tools using natural language that persist and evolve. You don't write code to create these tools - you just describe what you want. "Be a security-focused code reviewer who's harsh but constructive." Done. That tool now exists.
 
 Need to adjust it? "Be less harsh but maintain the security focus." Version 1.2 of your tool, created with one sentence.
 
@@ -42,18 +42,23 @@ Need to adjust it? "Be less harsh but maintain the security focus." Version 1.2 
 Over the next two months, this evolved into something much more comprehensive:
 
 ### Personas with Personality
+
 Not just saved prompts, but actual personas with consistent behavior, preferences, and capabilities. They remember who they are across sessions, across platforms.
 
 ### Skills that Extend Capabilities
+
 A persona can have skills - analyze LinkedIn profiles, generate audio summaries, validate security patterns, write in specific styles. I built an audio summary skill in 5 minutes that actually works. I'm still surprised every time it talks back to me.
 
 ### Templates for Structure
+
 Reusable document structures, code patterns, analysis frameworks. Build once, use forever, modify with natural language.
 
 ### Agents with Autonomy
+
 They work independently toward goals. When they need a new capability, they can find or create DollhouseMCP elements to solve problems. It's remarkably self-improving.
 
 ### Memory that Persists
+
 The context and improvements accumulate. Solve a problem once, and the solution is available forever. Each refinement makes the system more capable.
 
 ## Why I Could Build This
@@ -64,19 +69,22 @@ I'm not a 100x developer. I'm not even sure I'm a 10x developer. But I've been p
 
 ## The Surprise
 
-What surprised me most wasn't that it worked - it was how naturally it evolved from a personal tool into something genuinely useful for teams. 
+What surprised me most wasn't that it worked - it was how naturally it evolved from a personal tool into something genuinely useful for teams.
 
 When you solve your own problem thoroughly enough, without cutting corners, without compromising on the experience, you sometimes create something others need too.
 
 ## Real Examples That Made Me Realize This Was Different
 
 ### The Code Review Persona
+
 I created "Marcus" - a senior architect persona who reviews code. Not revolutionary, right? Except Marcus remembers our entire codebase structure, our specific error handling patterns, our API conventions. When I tweaked him to be "less pedantic about naming but more strict about error handling," that preference stuck. Forever.
 
 ### The Audio Feedback Loop
+
 I was deep in a debugging session when I realized I'd been reading walls of text for hours. On a whim, I created a skill that summarizes progress in audio. Five minutes later, Claude was literally talking to me, summarizing what we'd found and what to try next. It sounds like a small thing, but it changed how I work.
 
 ### The Documentation Evolution
+
 Started with a simple template for API documentation. Asked it to "make it more like Stripe's docs." It adapted. Then "add examples in Python and JavaScript." It evolved. Now it generates documentation that looks like we hired Stripe's documentation team. Each refinement built on the last.
 
 ## What's Next
@@ -86,6 +94,7 @@ DollhouseMCP is open source. It's on GitHub. It works today with Claude and any 
 I built this for myself, but I'm sharing it because I think others might find it useful. The documentation is real. The code is clean. The community is already contributing improvements.
 
 If you're tired of:
+
 - Explaining your codebase to AI every morning
 - Losing track of prompts that worked perfectly
 - Inconsistent AI responses across your team
@@ -103,7 +112,7 @@ What would it be for you?
 
 ## Try It
 
-The entire system is open source and available on [GitHub](https://github.com/DollhouseMCP/dollhousemcp-mcp-server). It takes about 5 minutes to set up if you're already using Claude Code.
+The entire system is open source and available on [GitHub](https://github.com/DollhouseMCP/mcp-server). It takes about 5 minutes to set up if you're already using Claude Code.
 
 Or just browse the [community collection](https://github.com/DollhouseMCP/collection) to see what personas and skills others have built. Everything from harsh code reviewers to empathetic user researchers to technical documentation specialists.
 

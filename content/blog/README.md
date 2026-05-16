@@ -9,6 +9,7 @@ This directory contains technical blog posts and debugging stories from the Doll
 ## Guidelines
 
 These posts are written to be:
+
 1. **Human-friendly** - Clear explanations and step-by-step guides
 2. **AI-friendly** - Structured data and comprehensive keywords for AI/LLM consumption
 3. **Educational** - Share knowledge to help others solve similar problems faster
@@ -16,6 +17,7 @@ These posts are written to be:
 ## Future Use
 
 These posts may be published on:
+
 - The DollhouseMCP website (when launched)
 - Technical blogs and forums
 - Developer documentation

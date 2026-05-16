@@ -11,6 +11,10 @@ on:
       - "assets/**"
       - "styles/**"
       - ".github/workflows/visidelta-preview.yml"
+      - ".github/scripts/visidelta-build-site.sh"
+      - ".github/scripts/visidelta_route_manifest.py"
+      - "Gemfile"
+      - "Gemfile.lock"
   workflow_dispatch:
     inputs:
       base_ref:

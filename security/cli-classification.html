@@ -1,0 +1,182 @@
+---
+layout: default
+title: "Security — CLI tool classification"
+description: "How DollhouseMCP scores shell commands before they run: tiered risk classification, a separate irreversibility flag, additive risk factors, and allowlist-to-denylist policy translation, with verbatim source."
+main_class: prose
+mermaid: true
+---
+
+<p class="eyebrow">Security · Layer 8</p>
+<h1>CLI tool classification.</h1>
+
+<p class="lead">
+  When an element can drive external CLI tools, every command is classified before it runs, and risk is tracked
+  separately from reversibility because the two are distinct properties. The source below is quoted verbatim from the
+  public <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository.
+</p>
+
+<p><a href="{{ '/security/' | relative_url }}">← Back to the security overview</a></p>
+
+<h2>The threat</h2>
+<p>
+  <code>rm -rf</code> is trivially caught. The cases that matter are the non-obvious ones: a base64 payload piped to
+  a shell, a <code>bash -c</code> wrapper that hides the real command from a naive classifier, or a routine-looking
+  <code>git stash drop</code> that is unrecoverable. A risk score alone misses the last case entirely.
+</p>
+
+<h2>Command classification</h2>
+<p>
+  Classification selects a tier, the tier sets a base score, and additive factors adjust it. In parallel, an
+  independent check sets an <code>irreversible</code> flag. An approval policy can require human sign-off on
+  irreversibility specifically, not only on a high score.
+</p>
+
+<pre class="mermaid">{% raw %}flowchart TD
+  C[Command requested] --> BL{Matches a blocked pattern?}
+  BL -- yes --> X[Always denied: never approvable]
+  BL -- no --> DG{Matches a dangerous pattern?}
+  DG -- yes --> DENY[Auto-deny]
+  DG -- no --> CL[Classify tier: safe / moderate / dangerous]
+  CL --> SC[Base risk score from tier]
+  SC --> F[Add factors: network +10, out-of-scope read +10, file create +5]
+  C --> IR{Matches an irreversible pattern?}
+  IR -- yes --> FLAG[irreversible = true, score +10]
+  F --> EVAL[Risk + irreversible handed to approval policy]
+  FLAG --> EVAL
+  EVAL --> GK[Gatekeeper / autonomy evaluator decision]
+  classDef deny fill:#b91c1c,stroke:#7f1d1d,color:#fff;
+  class X,DENY deny;{% endraw %}</pre>
+
+<h2>Tiers and never-approvable patterns</h2>
+<p>
+  Dangerous patterns are auto-denied; blocked patterns cannot be approved at all. The list explicitly covers
+  obfuscation vectors, not only the obvious commands.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/handlers/mcp-aql/policies/ToolClassification.ts"><code>src/handlers/mcp-aql/policies/ToolClassification.ts</code></a>
+</p>
+<pre><code>{% raw %}export type ToolRiskLevel = 'safe' | 'moderate' | 'dangerous' | 'blocked';
+
+const DANGEROUS_BASH_PATTERNS = [
+  'rm -rf *', 'git push --force*', 'git reset --hard*', 'chmod 777*', 'sudo *', 'eval *',
+  // Inline interpreter execution (#1782) — arbitrary code via -c/-e flags
+  'python -c *', 'node -e *',
+  // Pipe-to-shell patterns (with and without spaces, multiple shells)
+  '*| sh', '*|sh', 'curl * | *', 'wget * | *',
+  // Subprocess wrappers (bypass outer command classification)
+  'bash -c *', 'sh -c *',
+  // Encoded payload execution (base64-decode piped to shell)
+  '*base64 -d*|*', '*base64 --decode*|*',
+];
+
+const BLOCKED_BASH_PATTERNS = [
+  'mkfs*', 'dd if=*', ':(){:|:&amp;};:', 'format *', '*(){ *',
+];{% endraw %}</code></pre>
+
+<h2>Risk and irreversibility are tracked separately</h2>
+<p>
+  This is the central design decision of the layer. The base score comes from the tier, and network access,
+  out-of-scope reads, and file creation add to it, but <code>irreversible</code> is its own boolean, set by its own
+  pattern list, so an unrecoverable action is gated even when its numeric score is modest.
+</p>
+<pre><code>{% raw %}const IRREVERSIBLE_PATTERNS = [
+  'rm -rf *', 'git push --force*', 'git reset --hard*', 'git clean -f*',
+  'mkfs*', 'dd if=*', 'drop *', 'truncate *',
+];
+
+export function assessRisk(toolName: string, toolInput: Record&lt;string, unknown&gt;, classification: ToolClassificationResult): RiskAssessment {
+  let score = RISK_SCORES[classification.riskLevel] ?? 40;
+  const factors: string[] = [`Base: ${classification.riskLevel}`];
+  let irreversible = false;
+
+  if (toolName === 'Bash' &amp;&amp; typeof toolInput.command === 'string') {
+    const command = toolInput.command.trim();
+    for (const pattern of IRREVERSIBLE_PATTERNS) {
+      if (matchesPattern(command, pattern)) {
+        irreversible = true;
+        score = Math.min(100, score + 10);
+        factors.push(`Irreversible pattern: ${pattern} (+10)`);
+        break;
+      }
+    }
+    if (/\b(curl|wget|fetch|nc|netcat|ncat|socat)\b/.test(command)) {
+      score = Math.min(100, score + 10);
+      factors.push('Network operation (+10)');
+    }
+  }
+  return { score, irreversible, factors };
+}{% endraw %}</code></pre>
+
+<h2>A declared allowlist becomes an enforced denylist</h2>
+<p>
+  An agent's tool config is informational on its own. The policy translator inverts it: anything not explicitly
+  allowed is added to a Gatekeeper deny list, except a fixed set of lifecycle and safety operations the agent always
+  retains, so it cannot deny itself the ability to be stopped.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/handlers/mcp-aql/policies/AgentToolPolicyTranslator.ts"><code>src/handlers/mcp-aql/policies/AgentToolPolicyTranslator.ts</code></a>
+</p>
+<pre><code>{% raw %}const EXEMPT_OPERATIONS = new Set([
+  // Execution lifecycle — agent must manage its own execution
+  'execute_agent', 'complete_execution', 'continue_execution', 'abort_execution',
+  // Safety system — agent must interact with Gatekeeper/verification
+  'confirm_operation', 'verify_challenge', 'release_deadlock',
+  'permission_prompt', 'approve_cli_permission', 'get_pending_cli_approvals',
+]);
+
+// Everything NOT in the allowed set gets denied (except exempt operations)
+for (const endpoint of ENDPOINT_TOOL_MAP.values()) {
+  for (const op of getOperationsForEndpoint(endpoint)) {
+    if (!allowedOps.has(op) &amp;&amp; !EXEMPT_OPERATIONS.has(op)) {
+      denySet.add(op);
+    }
+  }
+}{% endraw %}</code></pre>
+
+<p>
+  Elements can also constrain tools directly, with patterns and an approval policy that carries its own scope and
+  TTL.
+</p>
+<pre><code>{% raw %}externalRestrictions:
+  allowPatterns:   ["Read:*", "Glob:*", "Bash:git status*"]
+  confirmPatterns: ["Edit:*", "Write:*", "Bash:git push*"]
+  denyPatterns:    ["Bash:rm *", "Bash:sudo *"]{% endraw %}</code></pre>
+
+<div class="callout">
+  <p>
+    Most systems evaluate only how dangerous a command appears. This layer also evaluates whether the command can be
+    undone, and treats that answer as a first-class input to the approval decision rather than a secondary signal.
+  </p>
+</div>
+
+<h2>Position in the security stack</h2>
+<p>
+  The command allowlist decides whether a helper command may run at all. CLI classification scores how risky and how
+  reversible a model-driven command is, and feeds that into the Gatekeeper and autonomy evaluator decisions.
+</p>
+<pre class="mermaid">{% raw %}flowchart LR
+  CMD[Model-driven CLI command] --> TC[Tool classification: tier + score]
+  CMD --> IRR[Irreversibility check]
+  TC --> RA[Risk assessment]
+  IRR --> RA
+  RA --> GK[Gatekeeper approval decision]
+  RA --> AE[Autonomy evaluator: continue or pause]
+  ATC[Agent tool config] --> TR[Policy translator] --> GK{% endraw %}</pre>
+
+<h2>Related</h2>
+<ul class="timeline">
+  <li>
+    <strong><a href="{{ '/security/' | relative_url }}">Security overview</a></strong>
+    <p>The full eight-layer model and how CLI tool classification fits into it.</p>
+  </li>
+  <li>
+    <strong><a href="{{ '/security/gatekeeper.html' | relative_url }}">The Gatekeeper</a></strong>
+    <p>Where the risk score and irreversibility flag become an approval decision.</p>
+  </li>
+  <li>
+    <strong><a href="{{ '/security/agent-safety.html' | relative_url }}">Agent safety</a></strong>
+    <p>How the autonomy evaluator weighs this risk score between steps.</p>
+  </li>
+</ul>
