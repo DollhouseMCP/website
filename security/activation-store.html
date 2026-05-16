@@ -10,8 +10,8 @@ mermaid: true
 <h1>Activation store isolation.</h1>
 
 <p class="lead">
-  Which elements are active decides what the Gatekeeper allows, so that state has to be isolated per session and
-  safe to load. Verbatim source from the public
+  The set of active elements determines what the Gatekeeper allows, so that state is isolated per session and
+  validated on load. The source below is quoted verbatim from the public
   <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository.
 </p>
 
@@ -19,16 +19,16 @@ mermaid: true
 
 <h2>The threat</h2>
 <p>
-  Active elements are not cosmetic — they are the inputs the Gatekeeper resolves policy from. If one session's
-  activation state could bleed into another, a permissive element activated in a throwaway session would quietly
-  reshape the permission surface of a different one. And the state lives in a file on disk, so a corrupt or crafted
-  activation file must never be trusted blindly or allowed to crash the load.
+  Active elements are the inputs the Gatekeeper resolves policy from. If one session's activation state could leak
+  into another, a permissive element activated in a throwaway session would reshape the permission surface of a
+  different one. The state is stored in a file on disk, so a corrupt or crafted activation file must never be trusted
+  blindly or allowed to crash the load.
 </p>
 
-<h2>The lifecycle of activation state</h2>
+<h2>Activation state lifecycle</h2>
 <p>
-  A session is named, the name is validated, and that name alone decides which file is read. Everything loaded from
-  that file is re-normalized and type-checked before it becomes live state.
+  A session is named, the name is validated, and that name alone determines which file is read. Everything loaded
+  from that file is re-normalized and type-checked before it becomes live state.
 </p>
 
 <pre class="mermaid">{% raw %}flowchart TD
@@ -52,9 +52,9 @@ mermaid: true
 
 <h2>The session identifier is a strict allowlist pattern</h2>
 <p>
-  The session name comes from the environment, and it is constrained to a tight character class with a bounded
-  length. It cannot contain a path separator or traversal sequence, so it can never redirect the activation file
-  outside the state directory.
+  The session name comes from the environment and is constrained to a tight character class with a bounded length.
+  It cannot contain a path separator or traversal sequence, so it cannot redirect the activation file outside the
+  state directory.
 </p>
 <p class="code-source">
   From
@@ -63,8 +63,8 @@ mermaid: true
 <pre><code>{% raw %}export const SESSION_ID_PATTERN = /^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/;{% endraw %}</code></pre>
 
 <p>
-  The validated identity is the only thing that decides which file is read — the path is derived from it, never
-  from caller-supplied input:
+  The validated identity is the sole determinant of which file is read; the path is derived from it, never from
+  caller-supplied input:
 </p>
 <p class="code-source">
   From
@@ -79,9 +79,9 @@ this.persistPath = path.join(this.stateDir, `activations-${this.sessionId}.json`
 
 <h2>Everything loaded is re-normalized and type-checked</h2>
 <p>
-  The on-disk file is untrusted input. Element identifiers are run back through the same Unicode normalization the
-  rest of the platform uses, and element types are collapsed to a known canonical set — so a tampered file cannot
-  smuggle a look-alike identifier or an unknown element type into live state.
+  The on-disk file is untrusted input. Element identifiers are re-run through the same Unicode normalization the rest
+  of the platform uses, and element types are collapsed to a known canonical set, so a tampered file cannot smuggle
+  a look-alike identifier or an unknown element type into live state.
 </p>
 <pre><code>{% raw %}function normalizeType(elementType: string): string {
   const lower = elementType.toLowerCase();
@@ -92,11 +92,11 @@ function normalizeActivationIdentifier(value: string): string {
   return UnicodeValidator.normalize(value).normalizedContent.trim();
 }{% endraw %}</code></pre>
 
-<h2>The loader fails safe, and says so</h2>
+<h2>The loader fails safe and records why</h2>
 <p>
-  A missing file is normal — a fresh session simply starts empty. A file that exists but will not parse is treated
-  as possible tampering or corruption: the session still starts fresh rather than crashing or trusting garbage, but
-  it is recorded as a security event rather than swallowed silently.
+  A missing file is normal: a fresh session starts empty. A file that exists but will not parse is treated as
+  possible tampering or corruption. The session starts fresh rather than crashing or trusting invalid data, and the
+  condition is recorded as a security event rather than swallowed silently.
 </p>
 <pre><code>{% raw %}} catch (error) {
   if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
@@ -115,22 +115,22 @@ function normalizeActivationIdentifier(value: string): string {
 }{% endraw %}</code></pre>
 
 <p>
-  Persistence is also opt-out: a session can run fully ephemeral, with no activation file written or read at all.
+  Persistence is opt-out: a session can run fully ephemeral, with no activation file written or read.
 </p>
 
 <div class="callout">
   <p>
-    The session name is the only key, and it is validated before it can name anything. Fail-safe is the default:
-    when in doubt, the store starts empty and logs why, rather than trusting a file it cannot verify.
+    The session name is the only key, and it is validated before it can name anything. Fail-safe is the default: on
+    any uncertainty, the store starts empty and logs the reason rather than trusting a file it cannot verify.
   </p>
 </div>
 
-<h2>Where activation store isolation sits in the stack</h2>
+<h2>Position in the security stack</h2>
 <p>
   This layer feeds the Gatekeeper. The permission decision on every operation depends on which elements are active,
-  and that set is exactly what the activation store isolates per session and re-validates on load. Content
-  validation cleaned those elements on the way in; the activation store makes sure the right ones, and only the
-  right ones, are live for this session.
+  and that set is what the activation store isolates per session and re-validates on load. Content validation
+  sanitized those elements on the way in; the activation store ensures that exactly the correct elements are live for
+  this session.
 </p>
 <pre class="mermaid">{% raw %}flowchart LR
   CV[Content validation: clean element on activation] --> AS[Activation store: per-session, validated state]

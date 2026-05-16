@@ -10,25 +10,25 @@ mermaid: true
 <h1>CLI tool classification.</h1>
 
 <p class="lead">
-  When an element can drive external CLI tools, every command is classified before it runs — and risk is tracked
-  separately from reversibility, because they are not the same thing. Verbatim source from the public
-  <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository.
+  When an element can drive external CLI tools, every command is classified before it runs, and risk is tracked
+  separately from reversibility because the two are distinct properties. The source below is quoted verbatim from the
+  public <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository.
 </p>
 
 <p><a href="{{ '/security/' | relative_url }}">← Back to the security overview</a></p>
 
 <h2>The threat</h2>
 <p>
-  Everyone catches <code>rm -rf</code>. The cases that matter are the non-obvious ones: a base64 payload piped to a
-  shell, a <code>bash -c</code> wrapper that hides the real command from a naive classifier, or a routine-sounding
-  <code>git stash drop</code> that happens to be unrecoverable. A risk score alone misses that last one entirely.
+  <code>rm -rf</code> is trivially caught. The cases that matter are the non-obvious ones: a base64 payload piped to
+  a shell, a <code>bash -c</code> wrapper that hides the real command from a naive classifier, or a routine-looking
+  <code>git stash drop</code> that is unrecoverable. A risk score alone misses the last case entirely.
 </p>
 
-<h2>How a command is judged</h2>
+<h2>Command classification</h2>
 <p>
-  Classification picks a tier, the tier sets a base score, and additive factors adjust it. In parallel, an
-  independent check sets an <code>irreversible</code> flag. An approval policy can then require human sign-off on
-  irreversibility specifically, not just on a high number.
+  Classification selects a tier, the tier sets a base score, and additive factors adjust it. In parallel, an
+  independent check sets an <code>irreversible</code> flag. An approval policy can require human sign-off on
+  irreversibility specifically, not only on a high score.
 </p>
 
 <pre class="mermaid">{% raw %}flowchart TD
@@ -47,10 +47,10 @@ mermaid: true
   classDef deny fill:#b91c1c,stroke:#7f1d1d,color:#fff;
   class X,DENY deny;{% endraw %}</pre>
 
-<h2>Tiers, and the patterns that are never approvable</h2>
+<h2>Tiers and never-approvable patterns</h2>
 <p>
-  Dangerous patterns are auto-denied; blocked patterns cannot be approved at all. The list explicitly covers the
-  obfuscation vectors, not just the obvious commands.
+  Dangerous patterns are auto-denied; blocked patterns cannot be approved at all. The list explicitly covers
+  obfuscation vectors, not only the obvious commands.
 </p>
 <p class="code-source">
   From
@@ -76,9 +76,9 @@ const BLOCKED_BASH_PATTERNS = [
 
 <h2>Risk and irreversibility are tracked separately</h2>
 <p>
-  This is the design decision the rest of the layer turns on. The base score comes from the tier, and network
-  access, out-of-scope reads, and file creation add to it — but <code>irreversible</code> is its own boolean, set by
-  its own pattern list, so an unrecoverable action is gated even when its numeric score looks modest.
+  This is the central design decision of the layer. The base score comes from the tier, and network access,
+  out-of-scope reads, and file creation add to it, but <code>irreversible</code> is its own boolean, set by its own
+  pattern list, so an unrecoverable action is gated even when its numeric score is modest.
 </p>
 <pre><code>{% raw %}const IRREVERSIBLE_PATTERNS = [
   'rm -rf *', 'git push --force*', 'git reset --hard*', 'git clean -f*',
@@ -111,8 +111,8 @@ export function assessRisk(toolName: string, toolInput: Record&lt;string, unknow
 <h2>A declared allowlist becomes an enforced denylist</h2>
 <p>
   An agent's tool config is informational on its own. The policy translator inverts it: anything not explicitly
-  allowed is added to a Gatekeeper deny list — except a fixed set of lifecycle and safety operations the agent must
-  always keep, so it can never deny itself the ability to be stopped.
+  allowed is added to a Gatekeeper deny list, except a fixed set of lifecycle and safety operations the agent always
+  retains, so it cannot deny itself the ability to be stopped.
 </p>
 <p class="code-source">
   From
@@ -137,7 +137,7 @@ for (const endpoint of ENDPOINT_TOOL_MAP.values()) {
 
 <p>
   Elements can also constrain tools directly, with patterns and an approval policy that carries its own scope and
-  TTL:
+  TTL.
 </p>
 <pre><code>{% raw %}externalRestrictions:
   allowPatterns:   ["Read:*", "Glob:*", "Bash:git status*"]
@@ -146,14 +146,14 @@ for (const endpoint of ENDPOINT_TOOL_MAP.values()) {
 
 <div class="callout">
   <p>
-    Most systems ask "how dangerous does this look?" This one also asks "can this be undone?" — and treats the answer
-    as a first-class input to the approval decision, not a footnote.
+    Most systems evaluate only how dangerous a command appears. This layer also evaluates whether the command can be
+    undone, and treats that answer as a first-class input to the approval decision rather than a secondary signal.
   </p>
 </div>
 
-<h2>Where CLI classification sits in the stack</h2>
+<h2>Position in the security stack</h2>
 <p>
-  The command allowlist decides whether a helper command may run at all. CLI classification decides how risky and how
+  The command allowlist decides whether a helper command may run at all. CLI classification scores how risky and how
   reversible a model-driven command is, and feeds that into the Gatekeeper and autonomy evaluator decisions.
 </p>
 <pre class="mermaid">{% raw %}flowchart LR

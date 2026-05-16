@@ -10,8 +10,9 @@ mermaid: true
 <h1>Filesystem and process isolation.</h1>
 
 <p class="lead">
-  The portfolio lives on your disk and the server can run a few commands, and both are tightly fenced. Verbatim
-  source from the public <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository.
+  The portfolio resides on local disk and the server can run a small set of commands; both are tightly constrained.
+  The source below is quoted verbatim from the public
+  <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository.
 </p>
 
 <p><a href="{{ '/security/' | relative_url }}">← Back to the security overview</a></p>
@@ -19,15 +20,15 @@ mermaid: true
 <h2>The threat</h2>
 <p>
   A path like <code>../../.ssh/id_rsa</code> reads outside the sandbox, and a symlink pointing out of the portfolio
-  does the same thing while looking innocent. A crash mid-write corrupts a file; an unsanitized argument turns a
-  helper command into shell injection. Each of these is one line of carelessness away.
+  achieves the same result while appearing benign. A crash mid-write corrupts a file; an unsanitized argument turns a
+  helper command into shell injection. Each failure mode is one line of carelessness away.
 </p>
 
-<h2>How a path is cleared</h2>
+<h2>Path validation sequence</h2>
 <p>
-  A path is not trusted because it looks fine. It is null-stripped and normalized, rejected outright if it contains
-  <code>..</code>, then checked against the allowed directory — and if it is a symlink, its real target is resolved
-  and re-checked before anything else. Only then are the extension and filename validated.
+  A path is not trusted on appearance. It is null-stripped and normalized, rejected outright if it contains
+  <code>..</code>, then checked against the allowed directory. If it is a symlink, its real target is resolved and
+  re-checked first. Only then are the extension and filename validated.
 </p>
 
 <pre class="mermaid">{% raw %}flowchart TD
@@ -51,8 +52,8 @@ mermaid: true
 <h2>Path traversal, including via symlink</h2>
 <p>
   <code>lstat</code> detects a symlink without following it; <code>realpath</code> then resolves the target and the
-  containment check runs again. A non-existent file is allowed through (you may be creating it), but a symlink
-  pointing out of the sandbox is not.
+  containment check runs again. A non-existent file is allowed through, since it may be a file being created, but a
+  symlink pointing out of the sandbox is not.
 </p>
 <p class="code-source">
   From
@@ -100,8 +101,8 @@ private static validateFilename(realPath: string): void {
 
 <h2>Writes are atomic and locked</h2>
 <p>
-  Concurrent writes to the same file are serialized, and the write itself goes to a temp file that is atomically
-  renamed over the target, so a crash can never leave a half-written portfolio file.
+  Concurrent writes to the same file are serialized, and the write goes to a temp file that is atomically renamed
+  over the target, so a crash cannot leave a half-written portfolio file.
 </p>
 <p class="code-source">
   From
@@ -121,9 +122,9 @@ private static validateFilename(realPath: string): void {
 
 <h2>Shell execution is an allowlist with a stripped environment</h2>
 <p>
-  Only a handful of commands and subcommands are permitted, every argument is validated, and the child process is
-  spawned (never a shell) with an explicit minimal <code>PATH</code> rather than the inherited environment, which
-  defeats both command injection and PATH hijacking.
+  Only a fixed set of commands and subcommands is permitted, every argument is validated, and the child process is
+  spawned directly, never through a shell, with an explicit minimal <code>PATH</code> instead of the inherited
+  environment. This defeats both command injection and PATH hijacking.
 </p>
 <p class="code-source">
   From
@@ -157,16 +158,16 @@ env: {
 
 <div class="callout">
   <p>
-    The allowlist is the pattern, twice over: which directories and extensions are reachable, and which commands and
-    arguments may run. Anything not explicitly named is denied, so a new attack does not need a new rule to be
+    The allowlist pattern applies twice: which directories and extensions are reachable, and which commands and
+    arguments may run. Anything not explicitly named is denied, so a novel attack does not require a new rule to be
     blocked.
   </p>
 </div>
 
-<h2>Where filesystem and process sit in the stack</h2>
+<h2>Position in the security stack</h2>
 <p>
-  Content validation decides whether content is safe to keep. This layer decides where it may be written and what
-  may run, and the CLI tool classifier decides how risky a given command is before the Gatekeeper approves it.
+  Content validation decides whether content is safe to retain. This layer decides where it may be written and what
+  may run, and the CLI tool classifier scores a command's risk before the Gatekeeper approves it.
 </p>
 <pre class="mermaid">{% raw %}flowchart LR
   CV[Validated element content] --> PV[Path validator: where it can be written]

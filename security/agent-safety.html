@@ -10,8 +10,8 @@ mermaid: true
 <h1>Agent safety: bounding autonomy.</h1>
 
 <p class="lead">
-  The Gatekeeper decides whether one operation runs. Agent safety decides whether the agent keeps going. This page
-  walks the autonomy evaluator and the danger zone enforcer with verbatim source from the public
+  The Gatekeeper decides whether one operation runs. Agent safety decides whether the agent continues. The autonomy
+  evaluator and the danger zone enforcer are documented below with verbatim source from the public
   <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository.
 </p>
 
@@ -19,16 +19,15 @@ mermaid: true
 
 <h2>The threat</h2>
 <p>
-  An autonomous agent runs many steps with no human between them. A single bad step is recoverable; a loop of them
-  is not — the risk is never one dangerous call but unbounded continuation, where each step looks individually
-  reasonable and the aggregate is harm. Agent safety exists so the agent has to earn the right to take its next step,
-  every step.
+  An autonomous agent runs many steps with no human between them. A single bad step is recoverable; a loop of them is
+  not. The risk is not one dangerous call but unbounded continuation, where each step is individually reasonable and
+  the aggregate is harmful. Agent safety requires the agent to be re-authorized before every step.
 </p>
 
-<h2>What happens between every step</h2>
+<h2>Per-step evaluation</h2>
 <p>
-  Before the agent is allowed to continue, the autonomy evaluator runs an ordered set of checks. The first one that
-  fails ends the loop. The outcome is always one of three things.
+  Before the agent continues, the autonomy evaluator runs an ordered set of checks. The first failing check ends the
+  loop. The outcome is always one of three values.
 </p>
 
 <pre class="mermaid">{% raw %}flowchart TD
@@ -50,10 +49,10 @@ mermaid: true
   class DZ deny;
   class G allow;{% endraw %}</pre>
 
-<h2>The evaluator, in code</h2>
+<h2>The evaluator in code</h2>
 <p>
-  Every stage returns the same shape, and a hard stop (<code>stopped: true</code>) is a distinct signal from a
-  recoverable pause, so a danger-zone hit can never be downgraded.
+  Every stage returns the same shape. A hard stop (<code>stopped: true</code>) is a distinct signal from a
+  recoverable pause, so a danger-zone hit cannot be downgraded.
 </p>
 <p class="code-source">
   From
@@ -129,7 +128,7 @@ mermaid: true
   requiresApproval: ["*delete*", "*production*"]
   autoApprove: ["read*", "list*"]{% endraw %}</code></pre>
 
-<h2>The danger zone: past the point of a prompt</h2>
+<h2>The danger zone</h2>
 <p>
   Some thresholds are past the point where a confirmation dialog is appropriate. The danger zone enforcer records a
   block to disk so it survives a crash or restart, and clearing it requires an out-of-band verification ID the model
@@ -162,7 +161,7 @@ mermaid: true
 }{% endraw %}</code></pre>
 
 <p>
-  The split is the security story: the agent is given the <code>challengeId</code> (a UUID), but the matching code
+  The split is the security boundary: the agent is given the <code>challengeId</code> (a UUID), but the matching code
   is shown only through an OS-native dialog and a server-side store. It never enters the model's context.
 </p>
 <pre><code>{% raw %}function storeAndDisplayChallenge(challenge, context) {
@@ -186,14 +185,14 @@ mermaid: true
 
 <div class="callout">
   <p>
-    A pause asks a human. A danger-zone block does not ask — it stops, persists the stop, and demands an answer the
-    model is structurally unable to supply on its own.
+    A pause queries a human. A danger-zone block does not query: it stops, persists the stop, and requires an answer
+    the model is structurally unable to supply on its own.
   </p>
 </div>
 
-<h2>Where agent safety sits in the stack</h2>
+<h2>Position in the security stack</h2>
 <p>
-  Content validation cleans the input before a request exists. The Gatekeeper decides whether a single operation
+  Content validation sanitizes the input before a request exists. The Gatekeeper decides whether a single operation
   runs. Agent safety decides whether the loop continues, and feeds the danger zone enforcer when a threshold is
   crossed.
 </p>

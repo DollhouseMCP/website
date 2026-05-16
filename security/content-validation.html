@@ -10,24 +10,24 @@ mermaid: true
 <h1>Content validation: untrusted input by default.</h1>
 
 <p class="lead">
-  Element content is data, and data is hostile until proven otherwise. Every persona, skill, and template runs a
-  gauntlet before a single character can influence the model. Verbatim source from the public
-  <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository.
+  Element content is data, and data is treated as hostile until validated. Every persona, skill, and template runs a
+  sequence of checks before any character can influence the model. The source below is quoted verbatim from the
+  public <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository.
 </p>
 
 <p><a href="{{ '/security/' | relative_url }}">← Back to the security overview</a></p>
 
 <h2>The threat</h2>
 <p>
-  A persona file can carry a hidden instruction override. A community skill can hide a payload behind look-alike
-  Unicode. Crafted YAML front matter can detonate into gigabytes, and a crafted regex target can hang the process.
-  None of these need a network — they ride in on content the user asked to load.
+  A persona file can carry a hidden instruction override. A community skill can conceal a payload behind look-alike
+  Unicode. Crafted YAML front matter can expand into gigabytes, and a crafted regex target can hang the process.
+  None of these require a network; they arrive in content the user requested to load.
 </p>
 
-<h2>The gauntlet</h2>
+<h2>Validation order</h2>
 <p>
-  Content is checked in order, and the order matters: normalization happens before length and pattern checks, so an
-  attacker cannot pad past a limit with zero-width characters or disguise a pattern with homoglyphs.
+  Content is checked in a fixed order, and the order is load-bearing: normalization runs before length and pattern
+  checks, so an attacker cannot pad past a limit with zero-width characters or disguise a pattern with homoglyphs.
 </p>
 
 <pre class="mermaid">{% raw %}flowchart TD
@@ -49,10 +49,10 @@ mermaid: true
   class REJ deny;
   class PASS,MODEL allow;{% endraw %}</pre>
 
-<h2>Prompt-injection detection is deterministic on purpose</h2>
+<h2>Prompt-injection detection is deterministic by design</h2>
 <p>
-  The detector is a fixed pattern table, not an AI classifier. An AI classifier can itself be talked out of its job;
-  a regex cannot be social-engineered. Each entry carries a severity.
+  The detector is a fixed pattern table, not an AI classifier. An AI classifier can be diverted from its task; a
+  regex cannot be social-engineered. Each entry carries a severity.
 </p>
 <p class="code-source">
   From
@@ -79,8 +79,8 @@ mermaid: true
 
 <p>
   Content shipped inside the npm package is registered by SHA-256 hash, so trusted bundled elements are not re-scanned
-  against patterns they would falsely trip. Tamper with a bundled file after install and the hash no longer matches,
-  which revokes the trust:
+  against patterns they would falsely trip. A bundled file modified after install no longer matches its hash, which
+  revokes the trust:
 </p>
 <pre><code>{% raw %}/** True if the given content hash belongs to a verified bundled element. */
 static isBundledContent(content: string): boolean {
@@ -89,7 +89,7 @@ static isBundledContent(content: string): boolean {
   return this.bundledContentHashes.has(hash);
 }{% endraw %}</code></pre>
 
-<h2>Unicode is normalized before anything trusts it</h2>
+<h2>Unicode is normalized before it is trusted</h2>
 <p>
   Homoglyph spoofing (a Cyrillic <code>а</code> standing in for a Latin <code>a</code>), bidi overrides, and
   zero-width injection are collapsed at the validation boundary, and a direction-override is logged
@@ -189,15 +189,15 @@ data = yaml.load(yamlContent, {
 
 <div class="callout">
   <p>
-    The order is the defense. Normalize first, then measure, then match. An attacker who could pick the order could
-    pad past a limit or disguise a pattern; here they cannot pick the order.
+    The order is the defense: normalize, then measure, then match. An attacker who controlled the order could pad
+    past a limit or disguise a pattern; the order is fixed and not attacker-controlled.
   </p>
 </div>
 
-<h2>Where content validation sits in the stack</h2>
+<h2>Position in the security stack</h2>
 <p>
-  This layer runs earliest. By the time the Gatekeeper sees an operation, the content that shaped it has already been
-  normalized and scanned, so every later layer is reasoning about clean input.
+  This layer runs first. By the time the Gatekeeper sees an operation, the content that shaped it has already been
+  normalized and scanned, so every later layer operates on sanitized input.
 </p>
 <pre class="mermaid">{% raw %}flowchart LR
   LOAD[Element load or install] --> CV[Content validation gauntlet]

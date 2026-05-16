@@ -10,23 +10,22 @@ mermaid: true
 <h1>Defense in depth for agentic AI.</h1>
 
 <p class="lead">
-  DollhouseMCP makes AI behavior programmable, and programmable behavior is an attack surface. This is the hub for
-  how the platform defends that surface: the architecture, each layer, and a direct line into the source code that
-  enforces it.
+  DollhouseMCP makes AI behavior programmable, and programmable behavior is an attack surface. This document describes
+  how the platform defends that surface: the architecture, each layer, and the source code that enforces it.
 </p>
 
 <p>
-  The whole model rests on one decision: an LLM's instructions are only suggestions, while the server's policies are
-  the actual enforcement. Every privileged operation is checked server-side after the MCP client approves the tool
-  call, so a permissive client setting cannot wave it through and the model cannot reason its way past it. The
-  boundary is the policy itself, and that policy runs in code the model cannot edit.
+  The model rests on one decision: an LLM's instructions are suggestions; the server's policies are the enforcement.
+  Every privileged operation is checked server-side after the MCP client approves the tool call. A permissive client
+  setting cannot bypass the check, and the model cannot reason past it. The boundary is the policy itself, and that
+  policy runs in code the model cannot edit.
 </p>
 
-<h2>What happens when an operation runs</h2>
+<h2>Operation flow</h2>
 <p>
-  The layers are not a list, they are a path. Content is sanitized before a request can form, the Gatekeeper decides
-  whether the operation runs, shell-touching commands are risk-scored on the way through, and if the caller is an
-  autonomous agent the loop is gated before the next step. This is the causal flow end to end.
+  The layers form a path, not a list. Content is sanitized before a request can form, the Gatekeeper decides whether
+  the operation runs, shell-touching commands are risk-scored in transit, and when the caller is an autonomous agent
+  the loop is gated before the next step. The diagram below traces the causal flow end to end.
 </p>
 
 <pre class="mermaid">{% raw %}flowchart TD
@@ -55,11 +54,11 @@ mermaid: true
   class STOP,REJ,DZ deny;
   class EX,DONE allow;{% endraw %}</pre>
 
-<h2>Start here</h2>
+<h2>Layer reference</h2>
 <p>
-  Every layer has a dedicated page that walks the actual enforcement code, with the causal diagrams above broken
-  down per layer. Or jump straight to the source file in the public
-  <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository from the table further down.
+  Each layer has a dedicated page covering its enforcement code, with the causal diagram above broken down per layer.
+  The table further down links directly to the source files in the public
+  <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository.
 </p>
 
 <div class="card-grid">
@@ -120,10 +119,9 @@ mermaid: true
   </article>
 </div>
 
-<h2>Read the source</h2>
+<h2>Source</h2>
 <p>
-  None of this is pseudocode — these are the actual files that do the enforcement, on the default branch of the
-  public repository.
+  These are the enforcing files on the default branch of the public repository, not pseudocode.
 </p>
 
 <div class="table-wrap">
@@ -191,19 +189,18 @@ mermaid: true
   </table>
 </div>
 
-<h2>The threats this answers</h2>
+<h2>Threat model</h2>
 <p>
-  A server that can read files, run commands, call agents, and install community content is genuinely useful and
-  genuinely dangerous. The threats are concrete. A persona file can carry a hidden prompt injection, a community
-  element can attempt path traversal, a Unicode homograph can disguise a payload as ordinary text, and a model
-  talked out of its instructions can reach for a destructive command. DollhouseMCP assumes every one of these will
-  happen, and is built so that the model being wrong, compromised, or manipulated is never enough on its own to
-  cause harm.
+  A server that can read files, run commands, call agents, and install community content is both useful and
+  dangerous. The threats are concrete: a persona file can carry a hidden prompt injection, a community element can
+  attempt path traversal, a Unicode homograph can disguise a payload as ordinary text, and a model diverted from its
+  instructions can issue a destructive command. DollhouseMCP assumes every one of these occurs, and is built so that
+  a model that is wrong, compromised, or manipulated is never sufficient on its own to cause harm.
 </p>
 
 <h2>The eight layers</h2>
 <p>
-  Security here is not one check. It is a stack of independent layers, each defending a different class of threat and
+  Security is not a single check. It is a stack of independent layers, each defending a different class of threat and
   each able to stop an operation on its own.
 </p>
 
@@ -253,17 +250,17 @@ mermaid: true
 
 <p>
   Reads are auto-approved, creation needs a once-per-session confirmation, and update, delete, and execute need a
-  confirmation every time. The most destructive operations are marked non-elevatable, which means no element policy
-  can ever auto-approve them. And if an element's deny list includes the confirmation operation itself, the session
-  drops to read-only — once you deny the mechanism that grants exceptions, there is no path left to grant one.
-  The full walkthrough is on the <a href="{{ '/security/gatekeeper.html' | relative_url }}">Gatekeeper page</a>.
+  confirmation every time. The most destructive operations are marked non-elevatable, so no element policy can
+  auto-approve them. If an element's deny list includes the confirmation operation itself, the session drops to
+  read-only: denying the mechanism that grants exceptions leaves no path to grant one. Full detail is on the
+  <a href="{{ '/security/gatekeeper.html' | relative_url }}">Gatekeeper page</a>.
 </p>
 
 <figure class="theme-figure">
   <img class="theme-figure-image theme-figure-image--light" src="/assets/images/blog/dollhouse-console-permissions.png" alt="DollhouseMCP permissions tab showing active policy sources, allow and deny and confirm patterns, and a live decision feed.">
   <img class="theme-figure-image theme-figure-image--dark" src="/assets/images/blog/dollhouse-console-permissions-dark.png" alt="DollhouseMCP permissions tab showing active policy sources, allow and deny and confirm patterns, and a live decision feed.">
   <figcaption>
-    The Permissions tab makes the Gatekeeper legible: which active element contributed each rule, the patterns in
+    The Permissions tab exposes the Gatekeeper state: which active element contributed each rule, the patterns in
     force, and the live decision feed. See
     <a href="{{ '/dynamic-permissioning.html' | relative_url }}">Dynamic permissioning</a> for how active elements
     reshape the permission surface.
@@ -272,20 +269,20 @@ mermaid: true
 
 <h2>2. Danger zone enforcement</h2>
 <p>
-  Some situations are past the point where a confirmation prompt is enough, so the danger zone enforcer is a
-  programmatic block instead: an agent that crosses a danger threshold is recorded to disk and stopped, and that
-  block survives a crash or restart. Clearing it takes an out-of-band challenge — a one-time code shown through an
-  OS-native dialog and never returned in the model's response — so a compromised model cannot read its own way out.
-  Source: <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/DangerZoneEnforcer.ts"><code>DangerZoneEnforcer.ts</code></a>.
+  Some conditions are past the point where a confirmation prompt is sufficient, so the danger zone enforcer applies a
+  programmatic block instead. An agent that crosses a danger threshold is recorded to disk and stopped, and the block
+  survives a crash or restart. Clearing it requires an out-of-band challenge: a one-time code shown through an
+  OS-native dialog and never returned in the model's response, so a compromised model cannot retrieve it. Source:
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/DangerZoneEnforcer.ts"><code>DangerZoneEnforcer.ts</code></a>.
 </p>
 
 <h2>3. The autonomy evaluator</h2>
 <p>
-  Higher agency has to stay bounded and observable. Before every autonomous step, the autonomy evaluator runs an
-  ordered set of checks — step-count limits, the outcome of the previous step, action-pattern matching against
-  per-agent approve and require-approval lists, a safety-tier escalation ladder, and a numeric risk score against a
-  configurable tolerance — and any one of them can stop the agent. The result is always continue, pause for a human,
-  or escalate. Source:
+  Higher agency stays bounded and observable. Before every autonomous step, the autonomy evaluator runs an ordered
+  set of checks: step-count limits, the outcome of the previous step, action-pattern matching against per-agent
+  approve and require-approval lists, a safety-tier escalation ladder, and a numeric risk score against a
+  configurable tolerance. Any one of them can stop the agent. The result is always continue, pause for a human, or
+  escalate. Source:
   <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/elements/agents/autonomyEvaluator.ts"><code>autonomyEvaluator.ts</code></a>.
 </p>
 
@@ -297,7 +294,7 @@ mermaid: true
 
 <h2>4. Content validation</h2>
 <p>
-  Element content is untrusted input, and it runs a gauntlet before any of it can influence the model. Source:
+  Element content is untrusted input. It runs a sequence of checks before any of it can influence the model. Source:
   <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/contentValidator.ts"><code>contentValidator.ts</code></a>,
   <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/validators/unicodeValidator.ts"><code>unicodeValidator.ts</code></a>,
   <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/secureYamlParser.ts"><code>secureYamlParser.ts</code></a>,
@@ -385,20 +382,20 @@ mermaid: true
   Active-element state is persisted per session. Session identifiers are regex-validated to prevent path injection,
   each session writes a separate versioned activation file, only known element types are accepted, identifiers are
   normalized, and a corrupt or missing file starts fresh with a logged security event rather than failing open. An
-  ephemeral mode turns persistence off entirely. Source:
+  ephemeral mode disables persistence entirely. Source:
   <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/services/ActivationStore.ts"><code>ActivationStore.ts</code></a>.
 </p>
 
 <h2>8. CLI tool classification</h2>
 <p>
-  When elements can drive external CLI tools, every command is classified before it runs. A static map and a large
+  When elements drive external CLI tools, every command is classified before it runs. A static map and a large
   pattern set sort commands into safe, moderate, dangerous, and always-blocked tiers, and assign a 0–100 risk score
   weighted by irreversibility, network access, out-of-scope paths, and sensitive locations.
 </p>
 <p>
-  Risk and reversibility are tracked separately on purpose. <code>git checkout -b feature</code> sounds risky but is
-  trivially undone, while <code>git stash drop</code> sounds routine but cannot be taken back, so a dedicated
-  irreversibility flag gates unrecoverable operations even when their raw score looks modest. Elements can constrain
+  Risk and reversibility are tracked separately by design. <code>git checkout -b feature</code> scores as risky but
+  is trivially undone, while <code>git stash drop</code> appears routine but is irrecoverable, so a dedicated
+  irreversibility flag gates unrecoverable operations even when their raw score is modest. Elements can constrain
   tools further with explicit allow, confirm, and deny patterns and an approval policy that carries its own scope and
   TTL. Source:
   <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/handlers/mcp-aql/policies/ToolClassification.ts"><code>ToolClassification.ts</code></a>,
@@ -418,9 +415,9 @@ mermaid: true
   Collection is a shared library, not an implicitly trusted one.
 </p>
 
-<h2>Verified continuously, not once</h2>
+<h2>Continuous verification</h2>
 <p>
-  The defenses are checked on an ongoing basis, not just at the moment they ship.
+  The defenses are verified on an ongoing basis, not only at release.
 </p>
 <ul class="timeline">
   <li>
@@ -455,8 +452,8 @@ mermaid: true
 
 <div class="callout">
   <p>
-    DollhouseMCP makes AI behavior programmable, and it treats that power as something earned at every step. The model
-    can be wrong, the content can be hostile, and the client can be too permissive — and none of that is enough on its
-    own, because the enforcement never lives in the prompt. It lives in the server.
+    DollhouseMCP makes AI behavior programmable and gates that power at every step. The model can be wrong, the
+    content can be hostile, and the client can be too permissive; none of these is sufficient on its own, because the
+    enforcement does not live in the prompt. It lives in the server.
   </p>
 </div>

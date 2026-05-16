@@ -10,10 +10,10 @@ mermaid: true
 <h1>The Gatekeeper permission engine.</h1>
 
 <p class="lead">
-  Every MCP-AQL operation resolves to exactly one of four permission levels before it runs. This page walks the
-  actual enforcement code — verbatim from the public
-  <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository — so you can evaluate the
-  implementation, not a description of it.
+  Every MCP-AQL operation resolves to exactly one of four permission levels before it runs. The enforcement code
+  below is quoted verbatim from the public
+  <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository, so the implementation is presented
+  directly rather than described.
 </p>
 
 <p>
@@ -22,16 +22,15 @@ mermaid: true
 
 <h2>The threat</h2>
 <p>
-  An LLM decides what tool call it wants to make. If the only thing standing between that decision and your
-  filesystem is the model's own judgement — or the MCP client's "always allow" toggle — then a prompt-injected,
-  socially-engineered, or simply mistaken model is one tool call away from damage. The Gatekeeper exists so that the
-  model's intent is never the last word.
+  An LLM decides which tool call to make. If the only control between that decision and the filesystem is the model's
+  own judgement or the MCP client's "always allow" toggle, a prompt-injected, socially-engineered, or mistaken model
+  is one tool call away from damage. The Gatekeeper ensures the model's intent is never the final authority.
 </p>
 
-<h2>The path every operation takes</h2>
+<h2>Operation pipeline</h2>
 <p>
-  Before any of the type model or precedence rules matter, it helps to see the order things happen in. Every
-  MCP-AQL call walks this pipeline, and any stage can end it.
+  Every MCP-AQL call traverses this pipeline before the type model or precedence rules apply, and any stage can
+  terminate it.
 </p>
 
 <pre class="mermaid">{% raw %}flowchart TD
@@ -59,10 +58,10 @@ mermaid: true
   class H,L allow;{% endraw %}</pre>
 
 <p>
-  The diagram is the contract; the rest of this page is the code that implements each box.
+  The diagram defines the contract; the code below implements each stage.
 </p>
 
-<h2>A four-value permission model, not a boolean</h2>
+<h2>A four-value permission model</h2>
 <p>
   Access control is not <code>allowed: true/false</code>. Every operation resolves to one of four discrete levels,
   and the policy type carries an explicit <code>canBeElevated</code> flag so a destructive operation can be marked
@@ -100,8 +99,9 @@ export interface OperationPolicy {
   canBeElevated?: boolean;
 }{% endraw %}</code></pre>
 <p>
-  Forcing every operation onto one of four levels makes "fail open" structurally hard: there is no truthy default to
-  slip through. <code>canBeElevated</code> is how the most destructive operations opt out of ever being promoted.
+  Constraining every operation to one of four levels makes failing open structurally hard: there is no truthy default
+  to slip through. <code>canBeElevated</code> is the mechanism by which the most destructive operations opt out of
+  promotion.
 </p>
 
 <h2>Precedence: deny &gt; confirm &gt; allow &gt; route default</h2>
@@ -164,9 +164,9 @@ for (const element of activeElements) {
   }
 }{% endraw %}</code></pre>
 <p>
-  This is the defense against privilege escalation by a malicious or careless active element: activating a permissive
-  persona cannot silently unlock an operation that another active element wanted gated, and it cannot touch a
-  non-elevatable operation at all.
+  This defends against privilege escalation by a malicious or careless active element: activating a permissive
+  persona cannot silently unlock an operation another active element gated, and cannot affect a non-elevatable
+  operation at all.
 </p>
 
 <h2>Safe defaults and pinned destructive operations</h2>
@@ -208,8 +208,8 @@ clear_github_auth: {
   canBeElevated: false,
 },{% endraw %}</code></pre>
 <p>
-  And the resolver itself fails safe — an unrecognised operation gets <code>CONFIRM_SINGLE_USE</code>, never
-  auto-approval:
+  The resolver itself fails safe: an unrecognised operation receives <code>CONFIRM_SINGLE_USE</code>, never
+  auto-approval.
 </p>
 <pre><code>{% raw %}export function getDefaultPermissionLevel(operation: string): PermissionLevel {
   // 1. Check for explicit override
@@ -275,25 +275,25 @@ export function findConfirmDenyingElement(
   return undefined;
 }{% endraw %}</code></pre>
 <p>
-  This is the defense against a compromised agent confirming its own destructive operations: the escape hatch is
-  built to be removable, while the recovery path is built so that it never can be.
+  This defends against a compromised agent confirming its own destructive operations: the escape hatch is removable,
+  while the recovery path is not.
 </p>
 
 <div class="callout">
   <p>
     The Gatekeeper is server-side and runs after the MCP client approves a tool call, so an "always allow" toggle in
-    your client never reaches it. The model can ask for anything it likes, but what it actually gets is decided here —
-    in code, by policy it cannot edit.
+    the client never reaches it. The model can request any operation, but what it receives is decided here, in code,
+    by policy it cannot edit.
   </p>
 </div>
 
-<h2>Where the Gatekeeper sits in the stack</h2>
+<h2>Position in the security stack</h2>
 <p>
-  The Gatekeeper is one layer, and it depends on the others. Content validation runs <em>before</em> a request is
-  even formed, so the prompt that produced the operation has already been sanitized. The Gatekeeper then decides
-  whether the operation runs. If it does, and the caller is an autonomous agent, the autonomy evaluator and danger
-  zone enforcer gate the <em>next</em> step. CLI tool classification feeds a risk score back into the confirmation
-  decision for shell-touching operations.
+  The Gatekeeper is one layer and depends on the others. Content validation runs <em>before</em> a request is formed,
+  so the prompt that produced the operation is already sanitized. The Gatekeeper then decides whether the operation
+  runs. If it does, and the caller is an autonomous agent, the autonomy evaluator and danger zone enforcer gate the
+  <em>next</em> step. CLI tool classification feeds a risk score into the confirmation decision for shell-touching
+  operations.
 </p>
 
 <pre class="mermaid">{% raw %}flowchart LR
