@@ -81,8 +81,12 @@
   function render() {
     nodes.forEach(function (el) {
       el.removeAttribute("data-processed");
+      // Restore the original diagram source as text. Mermaid reads the
+      // node's textContent, so this is the correct and complete restore;
+      // assigning innerHTML as well was redundant (and misleading, since
+      // it would re-parse rather than sanitize). securityLevel:'strict'
+      // is what handles XSS on Mermaid's side.
       el.textContent = el.getAttribute("data-src");
-      el.innerHTML = el.getAttribute("data-src");
     });
 
     window.mermaid.initialize({
