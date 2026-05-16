@@ -1,0 +1,450 @@
+---
+layout: default
+title: Security
+description: "The defense-in-depth security architecture built into DollhouseMCP: server-side enforcement, content validation, autonomy gating, and supply-chain protection for agentic AI, with links to the actual source."
+main_class: prose
+mermaid: true
+---
+
+<p class="eyebrow">Security</p>
+<h1>Defense in depth for agentic AI.</h1>
+
+<p class="lead">
+  DollhouseMCP makes AI behavior programmable, and programmable behavior is an attack surface. This is the hub for
+  how the platform defends that surface: the architecture, each layer, and a direct line into the source code that
+  enforces it.
+</p>
+
+<p>
+  The whole model rests on one decision: an LLM's instructions are only suggestions, while the server's policies are
+  the actual enforcement. Every privileged operation is checked server-side after the MCP client approves the tool
+  call, so a permissive client setting cannot wave it through and the model cannot reason its way past it. The
+  boundary is the policy itself, and that policy runs in code the model cannot edit.
+</p>
+
+<h2>What happens when an operation runs</h2>
+<p>
+  The layers are not a list, they are a path. Content is sanitized before a request can form, the Gatekeeper decides
+  whether the operation runs, shell-touching commands are risk-scored on the way through, and if the caller is an
+  autonomous agent the loop is gated before the next step. This is the causal flow end to end.
+</p>
+
+<pre class="mermaid">{% raw %}flowchart TD
+  LOAD[Element loaded or installed] --> CV[Content validation: injection, Unicode, YAML, ReDoS]
+  CV -- "rejected" --> STOP[Never reaches the model]
+  CV -- "clean" --> OP[Model requests an MCP-AQL operation]
+  OP --> CLI{Shell-touching command?}
+  CLI -- yes --> TC[CLI tool classification: risk score + irreversible flag]
+  CLI -- no --> GK
+  TC --> GK["Gatekeeper: deny then confirm then allow then default"]
+  GK -- "deny" --> REJ[Operation rejected]
+  GK -- "confirm" --> HC[Out-of-band human challenge]
+  HC -- "denied" --> REJ
+  HC -- "approved" --> EX
+  GK -- "allow" --> EX[Operation executes]
+  EX --> FS[Filesystem: path + symlink + atomic write]
+  EX --> AGENT{Autonomous agent?}
+  AGENT -- no --> DONE[Done]
+  AGENT -- yes --> AE[Autonomy evaluator: continue / pause / escalate]
+  AE -- "continue" --> OP
+  AE -- "pause" --> HUMAN[Return to human]
+  AE -- "danger zone" --> DZ[Danger zone enforcer: persistent block]
+  EX -.-> MON[Security monitor records every decision]{% endraw %}</pre>
+
+<h2>Start here</h2>
+<p>
+  Every layer has a dedicated page that walks the actual enforcement code, with the causal diagrams above broken
+  down per layer. Or jump straight to the source file in the public
+  <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository from the table further down.
+</p>
+
+<div class="card-grid">
+  <article class="card card-protocol reveal" data-card-link="{{ '/security/gatekeeper.html' | relative_url }}">
+    <span class="pill">Layer 1</span>
+    <div class="card-family card-family-protocol" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <h3>The Gatekeeper permission engine</h3>
+    <p>The four-value permission model, the deny-confirm-allow-default precedence resolver, non-elevatable operations, and the nuclear-sandbox lockout.</p>
+    <div class="link-row"><a href="{{ '/security/gatekeeper.html' | relative_url }}">Read the walkthrough</a></div>
+  </article>
+
+  <article class="card card-protocol reveal" data-card-link="{{ '/security/agent-safety.html' | relative_url }}">
+    <span class="pill">Layers 2 &amp; 3</span>
+    <div class="card-family card-family-protocol" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <h3>Agent safety</h3>
+    <p>The five-stage autonomy evaluator, the file-backed danger zone enforcer, and the out-of-band challenge a compromised model cannot read.</p>
+    <div class="link-row"><a href="{{ '/security/agent-safety.html' | relative_url }}">Read the walkthrough</a></div>
+  </article>
+
+  <article class="card card-protocol reveal" data-card-link="{{ '/security/content-validation.html' | relative_url }}">
+    <span class="pill">Layer 4</span>
+    <div class="card-family card-family-protocol" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <h3>Content validation</h3>
+    <p>Deterministic prompt-injection detection, Unicode normalization, hardened YAML parsing, and ReDoS protection on every element.</p>
+    <div class="link-row"><a href="{{ '/security/content-validation.html' | relative_url }}">Read the walkthrough</a></div>
+  </article>
+
+  <article class="card card-protocol reveal" data-card-link="{{ '/security/filesystem.html' | relative_url }}">
+    <span class="pill">Layer 5</span>
+    <div class="card-family card-family-protocol" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <h3>Filesystem and process</h3>
+    <p>Symlink-aware path-traversal prevention, atomic locked writes, and a strict command allowlist with a stripped environment.</p>
+    <div class="link-row"><a href="{{ '/security/filesystem.html' | relative_url }}">Read the walkthrough</a></div>
+  </article>
+
+  <article class="card card-protocol reveal" data-card-link="{{ '/security/credentials.html' | relative_url }}">
+    <span class="pill">Layer 6</span>
+    <div class="card-family card-family-protocol" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <h3>Credentials and API</h3>
+    <p>AES-256-GCM token encryption with PBKDF2, constant-time comparison, Unicode-safe strict format checks, and rate limiting.</p>
+    <div class="link-row"><a href="{{ '/security/credentials.html' | relative_url }}">Read the walkthrough</a></div>
+  </article>
+
+  <article class="card card-protocol reveal" data-card-link="{{ '/security/cli-classification.html' | relative_url }}">
+    <span class="pill">Layer 8</span>
+    <div class="card-family card-family-protocol" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <h3>CLI tool classification</h3>
+    <p>Tiered command risk scoring, a separate irreversibility flag, additive risk factors, and allowlist-to-denylist policy translation.</p>
+    <div class="link-row"><a href="{{ '/security/cli-classification.html' | relative_url }}">Read the walkthrough</a></div>
+  </article>
+</div>
+
+<h2>Read the source</h2>
+<p>
+  None of this is pseudocode — these are the actual files that do the enforcement, on the default branch of the
+  public repository.
+</p>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Layer</th>
+        <th>Enforcing source</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Gatekeeper permission engine</td>
+        <td>
+          <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/handlers/mcp-aql/GatekeeperTypes.ts"><code>GatekeeperTypes.ts</code></a>,
+          <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/handlers/mcp-aql/policies/ElementPolicies.ts"><code>ElementPolicies.ts</code></a>,
+          <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/handlers/mcp-aql/policies/OperationPolicies.ts"><code>OperationPolicies.ts</code></a>
+        </td>
+      </tr>
+      <tr>
+        <td>Danger zone enforcement</td>
+        <td><a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/DangerZoneEnforcer.ts"><code>DangerZoneEnforcer.ts</code></a></td>
+      </tr>
+      <tr>
+        <td>Autonomy evaluator</td>
+        <td><a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/elements/agents/autonomyEvaluator.ts"><code>autonomyEvaluator.ts</code></a></td>
+      </tr>
+      <tr>
+        <td>Content validation</td>
+        <td>
+          <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/contentValidator.ts"><code>contentValidator.ts</code></a>,
+          <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/validators/unicodeValidator.ts"><code>unicodeValidator.ts</code></a>,
+          <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/secureYamlParser.ts"><code>secureYamlParser.ts</code></a>,
+          <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/dosProtection.ts"><code>dosProtection.ts</code></a>
+        </td>
+      </tr>
+      <tr>
+        <td>Filesystem and process</td>
+        <td>
+          <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/pathValidator.ts"><code>pathValidator.ts</code></a>,
+          <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/fileLockManager.ts"><code>fileLockManager.ts</code></a>,
+          <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/commandValidator.ts"><code>commandValidator.ts</code></a>
+        </td>
+      </tr>
+      <tr>
+        <td>Credentials and API</td>
+        <td>
+          <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/tokenManager.ts"><code>tokenManager.ts</code></a>,
+          <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/web/console/consoleToken.ts"><code>consoleToken.ts</code></a>,
+          <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/web/middleware/authMiddleware.ts"><code>authMiddleware.ts</code></a>
+        </td>
+      </tr>
+      <tr>
+        <td>Activation store isolation</td>
+        <td><a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/services/ActivationStore.ts"><code>ActivationStore.ts</code></a></td>
+      </tr>
+      <tr>
+        <td>CLI tool classification</td>
+        <td>
+          <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/handlers/mcp-aql/policies/ToolClassification.ts"><code>ToolClassification.ts</code></a>,
+          <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/handlers/mcp-aql/policies/AgentToolPolicyTranslator.ts"><code>AgentToolPolicyTranslator.ts</code></a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>The threats this answers</h2>
+<p>
+  A server that can read files, run commands, call agents, and install community content is genuinely useful and
+  genuinely dangerous. The threats are concrete. A persona file can carry a hidden prompt injection, a community
+  element can attempt path traversal, a Unicode homograph can disguise a payload as ordinary text, and a model
+  talked out of its instructions can reach for a destructive command. DollhouseMCP assumes every one of these will
+  happen, and is built so that the model being wrong, compromised, or manipulated is never enough on its own to
+  cause harm.
+</p>
+
+<h2>The eight layers</h2>
+<p>
+  Security here is not one check. It is a stack of independent layers, each defending a different class of threat and
+  each able to stop an operation on its own.
+</p>
+
+<div class="focus-grid">
+  <div class="focus-panel">
+    <h3>1. The Gatekeeper</h3>
+    <p>A server-side permission engine that every MCP-AQL operation passes through. Active elements contribute allow, confirm, and deny policies, and the most restrictive rule wins.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>2. Danger zone enforcement</h3>
+    <p>Programmatic blocking that survives restarts. An agent that crosses a danger threshold is blocked at the process level until it is verified out of band.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>3. Autonomy evaluator</h3>
+    <p>A multi-stage check that gates every autonomous step, returning continue, pause for approval, or escalate, based on risk and reversibility.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>4. Content validation</h3>
+    <p>Prompt-injection detection, Unicode normalization, safe YAML parsing, and regex-DoS protection, applied to every piece of element content.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>5. Filesystem and process</h3>
+    <p>Path-traversal prevention with symlink resolution, an extension allowlist, atomic locked writes, and a strict command allowlist for shell execution.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>6. Credentials and API</h3>
+    <p>Encrypted token storage, constant-time token comparison, optional TOTP multi-factor, and token-bucket rate limiting on external calls.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>7. Activation store isolation</h3>
+    <p>Per-session state with validated session identifiers, a type allowlist, and integrity checks, so one session cannot leak into or tamper with another.</p>
+  </div>
+  <div class="focus-panel">
+    <h3>8. CLI tool classification</h3>
+    <p>Static and pattern-based risk scoring for shell commands, with a separate irreversibility flag, so dangerous and unrecoverable operations are handled differently.</p>
+  </div>
+</div>
+
+<h2>1. The Gatekeeper</h2>
+<p>
+  Every MCP-AQL operation passes through the Gatekeeper before it runs. It resolves a permission level from a strict
+  hierarchy — an explicit deny wins over a required confirmation, which wins over an allow, which wins over the
+  endpoint's route default.
+</p>
+
+<pre><code>deny  &gt;  confirm  &gt;  allow  &gt;  route default</code></pre>
+
+<p>
+  Reads are auto-approved, creation needs a once-per-session confirmation, and update, delete, and execute need a
+  confirmation every time. The most destructive operations are marked non-elevatable, which means no element policy
+  can ever auto-approve them. And if an element's deny list includes the confirmation operation itself, the session
+  drops to read-only — once you deny the mechanism that grants exceptions, there is no path left to grant one.
+  The full walkthrough is on the <a href="{{ '/security/gatekeeper.html' | relative_url }}">Gatekeeper page</a>.
+</p>
+
+<figure class="theme-figure">
+  <img class="theme-figure-image theme-figure-image--light" src="/assets/images/blog/dollhouse-console-permissions.png" alt="DollhouseMCP permissions tab showing active policy sources, allow and deny and confirm patterns, and a live decision feed.">
+  <img class="theme-figure-image theme-figure-image--dark" src="/assets/images/blog/dollhouse-console-permissions-dark.png" alt="DollhouseMCP permissions tab showing active policy sources, allow and deny and confirm patterns, and a live decision feed.">
+  <figcaption>
+    The Permissions tab makes the Gatekeeper legible: which active element contributed each rule, the patterns in
+    force, and the live decision feed. See
+    <a href="{{ '/dynamic-permissioning.html' | relative_url }}">Dynamic permissioning</a> for how active elements
+    reshape the permission surface.
+  </figcaption>
+</figure>
+
+<h2>2. Danger zone enforcement</h2>
+<p>
+  Some situations are past the point where a confirmation prompt is enough, so the danger zone enforcer is a
+  programmatic block instead: an agent that crosses a danger threshold is recorded to disk and stopped, and that
+  block survives a crash or restart. Clearing it takes an out-of-band challenge — a one-time code shown through an
+  OS-native dialog and never returned in the model's response — so a compromised model cannot read its own way out.
+  Source: <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/DangerZoneEnforcer.ts"><code>DangerZoneEnforcer.ts</code></a>.
+</p>
+
+<h2>3. The autonomy evaluator</h2>
+<p>
+  Higher agency has to stay bounded and observable. Before every autonomous step, the autonomy evaluator runs an
+  ordered set of checks — step-count limits, the outcome of the previous step, action-pattern matching against
+  per-agent approve and require-approval lists, a safety-tier escalation ladder, and a numeric risk score against a
+  configurable tolerance — and any one of them can stop the agent. The result is always continue, pause for a human,
+  or escalate. Source:
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/elements/agents/autonomyEvaluator.ts"><code>autonomyEvaluator.ts</code></a>.
+</p>
+
+<pre><code>autonomy:
+  riskTolerance: conservative   # conservative | moderate | aggressive
+  maxAutonomousSteps: 10
+  requiresApproval: ["*delete*", "*production*"]
+  autoApprove: ["read*", "list*"]</code></pre>
+
+<h2>4. Content validation</h2>
+<p>
+  Element content is untrusted input, and it runs a gauntlet before any of it can influence the model. Source:
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/contentValidator.ts"><code>contentValidator.ts</code></a>,
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/validators/unicodeValidator.ts"><code>unicodeValidator.ts</code></a>,
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/secureYamlParser.ts"><code>secureYamlParser.ts</code></a>,
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/dosProtection.ts"><code>dosProtection.ts</code></a>.
+</p>
+
+<ul class="timeline">
+  <li>
+    <strong>Prompt-injection detection</strong>
+    <p>Deterministic pattern matching, not an AI classifier that could itself be social-engineered, covering system-prompt overrides, role impersonation, instruction overrides, embedded code execution, and known jailbreak phrasings. Skills can legitimately contain code patterns that would be blocked in a persona, so the check is context-aware.</p>
+  </li>
+  <li>
+    <strong>Unicode validation</strong>
+    <p>Detection and normalization for direction-override characters, zero-width injection, mixed-script homograph spoofing, and non-printable control codes, with NFC normalization applied at the validation boundary.</p>
+  </li>
+  <li>
+    <strong>Safe YAML parsing</strong>
+    <p>A safe schema only, with size limits and YAML-bomb detection, so circular references, anchor-to-alias amplification, and oversized documents are rejected before they can detonate.</p>
+  </li>
+  <li>
+    <strong>Regex-DoS protection</strong>
+    <p>Pattern execution runs under timeouts with complexity classification, so a crafted input cannot trigger catastrophic backtracking and hang the server.</p>
+  </li>
+  <li>
+    <strong>Input validation and normalization</strong>
+    <p>Field-specific validation for identifiers, queries, paths, and URLs, including blocking the IP-address formats that enable server-side request forgery. Every string value is normalized before downstream validation.</p>
+  </li>
+</ul>
+
+<p>
+  Content shipped inside the npm package is registered by SHA-256 hash, so trusted bundled elements are not re-scanned
+  against injection patterns they would falsely trip. A hash mismatch after install revokes that trust immediately.
+</p>
+
+<h2>5. Filesystem and process security</h2>
+<p>
+  Source:
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/pathValidator.ts"><code>pathValidator.ts</code></a>,
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/fileLockManager.ts"><code>fileLockManager.ts</code></a>,
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/commandValidator.ts"><code>commandValidator.ts</code></a>.
+</p>
+<ul class="timeline">
+  <li>
+    <strong>Path-traversal prevention</strong>
+    <p>Every path is resolved to its real file, symlinks included, before it is checked against the allowed portfolio directories and an extension allowlist. There is no <code>../..</code> escape and no symlink redirect out of the sandbox.</p>
+  </li>
+  <li>
+    <strong>Locked atomic writes</strong>
+    <p>Per-file locking with timeouts serializes concurrent writes, and a write-temp-then-rename pattern means a crash cannot leave a half-written portfolio file.</p>
+  </li>
+  <li>
+    <strong>Command allowlist</strong>
+    <p>Shell execution is restricted to a small allowlist with no shell metacharacters, a restricted <code>PATH</code>, per-argument validation, and a default timeout.</p>
+  </li>
+</ul>
+
+<h2>6. Credentials and API security</h2>
+<p>
+  Source:
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/security/tokenManager.ts"><code>tokenManager.ts</code></a>,
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/web/console/consoleToken.ts"><code>consoleToken.ts</code></a>,
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/web/middleware/authMiddleware.ts"><code>authMiddleware.ts</code></a>.
+</p>
+<ul class="timeline">
+  <li>
+    <strong>Encrypted token storage</strong>
+    <p>GitHub tokens are validated by format, encrypted at rest with AES-256-GCM under a PBKDF2-derived key, and redacted from every log line and error message.</p>
+  </li>
+  <li>
+    <strong>Constant-time console authentication</strong>
+    <p>The local web console uses a crypto-random bearer token, stored owner-only and compared in constant time. The presented token is Unicode-normalized and checked against a strict hex format before the comparison, which closes a normalization-bypass class.</p>
+  </li>
+  <li>
+    <strong>Optional TOTP multi-factor</strong>
+    <p>The console supports RFC 6238 time-based one-time passwords with backup codes, for a second factor on local administrative access.</p>
+  </li>
+  <li>
+    <strong>Rate limiting and safe downloads</strong>
+    <p>Token-bucket rate limiting with exponential backoff governs GitHub API traffic, verification attempts are limited on a sliding window, and downloads enforce timeouts, size limits, and protocol allowlisting.</p>
+  </li>
+</ul>
+
+<h2>7. Activation store isolation</h2>
+<p>
+  Active-element state is persisted per session. Session identifiers are regex-validated to prevent path injection,
+  each session writes a separate versioned activation file, only known element types are accepted, identifiers are
+  normalized, and a corrupt or missing file starts fresh with a logged security event rather than failing open. An
+  ephemeral mode turns persistence off entirely. Source:
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/services/ActivationStore.ts"><code>ActivationStore.ts</code></a>.
+</p>
+
+<h2>8. CLI tool classification</h2>
+<p>
+  When elements can drive external CLI tools, every command is classified before it runs. A static map and a large
+  pattern set sort commands into safe, moderate, dangerous, and always-blocked tiers, and assign a 0–100 risk score
+  weighted by irreversibility, network access, out-of-scope paths, and sensitive locations.
+</p>
+<p>
+  Risk and reversibility are tracked separately on purpose. <code>git checkout -b feature</code> sounds risky but is
+  trivially undone, while <code>git stash drop</code> sounds routine but cannot be taken back, so a dedicated
+  irreversibility flag gates unrecoverable operations even when their raw score looks modest. Elements can constrain
+  tools further with explicit allow, confirm, and deny patterns and an approval policy that carries its own scope and
+  TTL. Source:
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/handlers/mcp-aql/policies/ToolClassification.ts"><code>ToolClassification.ts</code></a>,
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/handlers/mcp-aql/policies/AgentToolPolicyTranslator.ts"><code>AgentToolPolicyTranslator.ts</code></a>.
+</p>
+
+<pre><code>externalRestrictions:
+  allowPatterns:   ["Read:*", "Glob:*", "Bash:git status*"]
+  confirmPatterns: ["Edit:*", "Write:*", "Bash:git push*"]
+  denyPatterns:    ["Bash:rm *", "Bash:sudo *"]</code></pre>
+
+<h2>Supply chain and collection security</h2>
+<p>
+  Community-contributed content is untrusted until it has been validated. Every user-contributed element runs the full
+  content-validation pipeline before it is trusted, external resources are validated on install, duplicate detection
+  warns before redundant publishing, and GitHub uploads are validated before any community issue is created. The
+  Collection is a shared library, not an implicitly trusted one.
+</p>
+
+<h2>Verified continuously, not once</h2>
+<p>
+  The defenses are checked on an ongoing basis, not just at the moment they ship.
+</p>
+<ul class="timeline">
+  <li>
+    <strong>Static analysis</strong>
+    <p>CodeQL runs on every push and pull request and on a daily schedule across the JavaScript and TypeScript codebase.</p>
+  </li>
+  <li>
+    <strong>Automated security audit</strong>
+    <p>A rule-based security auditor runs on every push and pull request and daily, reporting to SARIF, commenting on pull requests, and opening issues for critical findings.</p>
+  </li>
+  <li>
+    <strong>Dependency review</strong>
+    <p>Pull requests are blocked on moderate-or-higher runtime dependency vulnerabilities.</p>
+  </li>
+  <li>
+    <strong>Advisory monitoring</strong>
+    <p>A weekly job reconciles the dependency tree against the OSV and GitHub advisory databases, catching withdrawn advisories, new fixes, and severity reclassifications.</p>
+  </li>
+  <li>
+    <strong>Dedicated security test suite</strong>
+    <p>A standing suite of security-specific tests covers input validation, path traversal, command injection, YAML deserialization, token handling, memory injection, Unicode attacks, ReDoS, and OWASP Top 10 categories, and runs both on its own and in pre-merge checks.</p>
+  </li>
+</ul>
+
+<h2>Responsible disclosure</h2>
+<p>
+  Security reports go through GitHub private security advisories. The project commits to triage timelines by severity,
+  publishes fixes with coordinated GHSA advisories, and provides critical fixes for the most recent supported minor
+  versions. The full policy is in
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/SECURITY.md">SECURITY.md</a> in the public repository.
+</p>
+
+<div class="callout">
+  <p>
+    DollhouseMCP makes AI behavior programmable, and it treats that power as something earned at every step. The model
+    can be wrong, the content can be hostile, and the client can be too permissive — and none of that is enough on its
+    own, because the enforcement never lives in the prompt. It lives in the server.
+  </p>
+</div>

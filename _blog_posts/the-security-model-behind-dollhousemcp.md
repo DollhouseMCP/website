@@ -7,7 +7,7 @@ description: "Giving an AI more power means trusting it less, not more. Here is 
 keywords: "DollhouseMCP security, agentic AI safety, prompt injection defense, MCP server security, AI permission enforcement"
 ---
 
-# The security model behind DollhouseMCP
+# The Security Model Behind DollhouseMCP
 
 *Why I built DollhouseMCP to distrust its own AI — and what that means if you are deciding whether to run it.*
 
@@ -34,7 +34,7 @@ One check is a single point of failure. DollhouseMCP is built as a stack of inde
 - **The autonomy evaluator** sits in the agent loop. Before every autonomous step, it decides: continue, pause for a human, or escalate. It looks at how many steps have run, whether the last one failed, how risky the next action is, and — crucially — whether the action is reversible.
 - **Danger zone enforcement** is the layer past the point where a prompt is enough. When an agent crosses a hard line, it is blocked at the process level, and that block survives a restart. Clearing it requires a one-time code shown in a native OS dialog that never appears in the model's response — so a compromised model cannot read its own way out.
 
-There is more underneath this — encrypted credential storage, path-traversal protection with symlink resolution, a command allowlist, rate limiting, per-session isolation — and I wrote it all up in detail on the new [security page](/security.html). If you are evaluating DollhouseMCP for anything sensitive, that page is the one to read.
+There is more underneath this — encrypted credential storage, path-traversal protection with symlink resolution, a command allowlist, rate limiting, per-session isolation — and I wrote it all up in detail on the new [security page](/security/). If you are evaluating DollhouseMCP for anything sensitive, that page is the one to read.
 
 ## Risk is not the same as irreversibility
 
@@ -52,4 +52,4 @@ Second, the defenses are verified continuously, not shipped once and forgotten. 
 
 If you are deciding whether to run DollhouseMCP, the honest summary is this. The platform assumes the AI can be wrong, the content can be hostile, and the client can be too permissive. None of those is enough on its own to cause harm, because the enforcement is not a suggestion the model can override. It is the server, and it does not negotiate.
 
-That is the trade I wanted: more capability, with less trust required to use it safely. The full technical breakdown of every layer is on the [security page](/security.html).
+That is the trade I wanted: more capability, with less trust required to use it safely. The full technical breakdown of every layer is on the [security page](/security/).

@@ -1,0 +1,318 @@
+---
+layout: default
+title: "Security — The Gatekeeper"
+description: "A code-level walkthrough of the DollhouseMCP Gatekeeper, the server-side permission engine. Its type model, precedence resolver, non-elevatable operations, and the nuclear-sandbox lockout, with verbatim source."
+main_class: prose
+mermaid: true
+---
+
+<p class="eyebrow">Security · Layer 1</p>
+<h1>The Gatekeeper permission engine.</h1>
+
+<p class="lead">
+  Every MCP-AQL operation resolves to exactly one of four permission levels before it runs. This page walks the
+  actual enforcement code — verbatim from the public
+  <a href="https://github.com/DollhouseMCP/mcp-server">mcp-server</a> repository — so you can evaluate the
+  implementation, not a description of it.
+</p>
+
+<p>
+  <a href="{{ '/security/' | relative_url }}">← Back to the security overview</a>
+</p>
+
+<h2>The threat</h2>
+<p>
+  An LLM decides what tool call it wants to make. If the only thing standing between that decision and your
+  filesystem is the model's own judgement — or the MCP client's "always allow" toggle — then a prompt-injected,
+  socially-engineered, or simply mistaken model is one tool call away from damage. The Gatekeeper exists so that the
+  model's intent is never the last word.
+</p>
+
+<h2>The path every operation takes</h2>
+<p>
+  Before any of the type model or precedence rules matter, it helps to see the order things happen in. Every
+  MCP-AQL call walks this pipeline, and any stage can end it.
+</p>
+
+<pre class="mermaid">{% raw %}flowchart TD
+  A[MCP-AQL operation requested] --> B{Route valid?}
+  B -- no --> XN[DENY: unknown route]
+  B -- yes --> C[Resolve active element policy]
+  C --> D{In an element deny list?}
+  D -- yes --> XD[DENY: non-elevatable, cannot be confirmed]
+  D -- no --> E{In an element confirm list?}
+  E -- yes --> F[Mark: confirmation required]
+  E -- no --> G{In an element allow list?}
+  G -- "yes and elevatable" --> H[AUTO_APPROVE]
+  G -- no --> I[Fall back to route default level]
+  F --> J{Already confirmed this session?}
+  I --> J
+  J -- yes --> H
+  J -- no --> K[Out-of-band human confirmation or challenge]
+  K -- approved --> H
+  K -- denied --> XR[Operation rejected]
+  H --> L[Operation executes]
+  L --> M[Autonomy evaluator and danger zone gate the next step]</pre>
+
+<p>
+  The diagram is the contract; the rest of this page is the code that implements each box.
+</p>
+
+<h2>A four-value permission model, not a boolean</h2>
+<p>
+  Access control is not <code>allowed: true/false</code>. Every operation resolves to one of four discrete levels,
+  and the policy type carries an explicit <code>canBeElevated</code> flag so a destructive operation can be marked
+  non-negotiable at the type level.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/handlers/mcp-aql/GatekeeperTypes.ts"><code>src/handlers/mcp-aql/GatekeeperTypes.ts</code></a>
+</p>
+<pre><code>{% raw %}/**
+ * Permission levels for operation access control.
+ * These define how operations are approved or denied.
+ */
+export enum PermissionLevel {
+  /** Always allowed, no confirmation needed */
+  AUTO_APPROVE = 'AUTO_APPROVE',
+  /** Confirm THIS instance only, ask again next time */
+  CONFIRM_SINGLE_USE = 'CONFIRM_SINGLE_USE',
+  /** Confirm once, auto-approve for rest of session */
+  CONFIRM_SESSION = 'CONFIRM_SESSION',
+  /** Never allowed (blocked by policy) */
+  DENY = 'DENY',
+}
+
+/**
+ * Operation policy mapping entry.
+ * Defines the default permission level for an operation.
+ */
+export interface OperationPolicy {
+  /** Default permission level for this operation */
+  defaultLevel: PermissionLevel;
+  /** Human-readable description of why this level is assigned */
+  rationale: string;
+  /** Whether this operation can be elevated by active elements */
+  canBeElevated?: boolean;
+}{% endraw %}</code></pre>
+<p>
+  Forcing every operation onto one of four levels makes "fail open" structurally hard: there is no truthy default to
+  slip through. <code>canBeElevated</code> is how the most destructive operations opt out of ever being promoted.
+</p>
+
+<h2>Precedence: deny &gt; confirm &gt; allow &gt; route default</h2>
+<p>
+  Active elements (personas, skills, ensembles) contribute policy. When they conflict, the resolver applies a strict
+  hierarchy. A <code>deny</code> returns immediately and unconditionally. An <code>allow</code> can override the route
+  default, but it can <em>never</em> override another element's <code>confirm</code>, and it can never elevate an
+  operation that is not elevatable.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/handlers/mcp-aql/policies/ElementPolicies.ts"><code>src/handlers/mcp-aql/policies/ElementPolicies.ts</code></a>
+</p>
+<pre><code>{% raw %}// Check each active element's policy in order
+for (const element of activeElements) {
+  const policy = element.metadata.gatekeeper;
+  if (!policy) {
+    continue;
+  }
+
+  // 1. Check deny list first (highest priority)
+  if (policy.deny?.includes(operation)) {
+    return {
+      permissionLevel: PermissionLevel.DENY,
+      sourceElement: element.name,
+      matchedPolicy: 'deny',
+      conflictingElements: conflictingElements.length > 0 ? conflictingElements : undefined,
+    };
+  }
+
+  // ...
+
+  // 3. Check confirm list (requires confirmation)
+  if (policy.confirm?.includes(operation)) {
+    // Don't downgrade from DENY or CONFIRM_SINGLE_USE
+    if (effectiveLevel !== PermissionLevel.DENY) {
+      effectiveLevel = PermissionLevel.CONFIRM_SESSION;
+      confirmedByElement = true;
+      sourceElement = element.name;
+      matchedPolicy = 'confirm';
+    }
+  }
+
+  // 4. Check allow list (auto-approves)
+  // Issue #674: allow CAN override the route default, but NOT another element's confirm policy.
+  // Priority hierarchy: element deny > element confirm > element allow > route default
+  if (policy.allow?.includes(operation)) {
+    // Only elevate if the operation allows elevation
+    if (canOperationBeElevated(operation)) {
+      if (!confirmedByElement) {
+        // No element has confirmed this — safe to elevate (overrides route default)
+        effectiveLevel = PermissionLevel.AUTO_APPROVE;
+        sourceElement = element.name;
+        matchedPolicy = 'allow';
+      } else {
+        // Another element's confirm policy takes priority over this allow
+        conflictingElements.push({ name: element.name, wantedLevel: PermissionLevel.AUTO_APPROVE });
+      }
+    }
+  }
+}{% endraw %}</code></pre>
+<p>
+  This is the defense against privilege escalation by a malicious or careless active element: activating a permissive
+  persona cannot silently unlock an operation that another active element wanted gated, and it cannot touch a
+  non-elevatable operation at all.
+</p>
+
+<h2>Safe defaults and pinned destructive operations</h2>
+<p>
+  Permission level is derived from CRUD semantics — reads are auto-approved, writes and execution are gated. An
+  unknown operation name does not fall through to "allowed"; it falls back to per-use confirmation. And the most
+  destructive operations are pinned <code>canBeElevated: false</code> so no element policy can ever auto-approve
+  them.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/handlers/mcp-aql/policies/OperationPolicies.ts"><code>src/handlers/mcp-aql/policies/OperationPolicies.ts</code></a>
+</p>
+<pre><code>{% raw %}const ENDPOINT_DEFAULT_LEVELS: Record&lt;CRUDEndpoint, PermissionLevel&gt; = {
+  READ: PermissionLevel.AUTO_APPROVE,
+  CREATE: PermissionLevel.CONFIRM_SESSION,
+  UPDATE: PermissionLevel.CONFIRM_SINGLE_USE,
+  DELETE: PermissionLevel.CONFIRM_SINGLE_USE,
+  EXECUTE: PermissionLevel.CONFIRM_SINGLE_USE,
+};
+
+// ...
+
+// ===== DELETE endpoint overrides =====
+// These match the endpoint default (CONFIRM_SINGLE_USE) but need canBeElevated: false
+delete_element: {
+  defaultLevel: PermissionLevel.CONFIRM_SINGLE_USE,
+  rationale: 'Destructive operation, permanently removes data',
+  canBeElevated: false,
+},
+clear: {
+  defaultLevel: PermissionLevel.CONFIRM_SINGLE_USE,
+  rationale: 'Destructive operation, clears all memory entries',
+  canBeElevated: false,
+},
+clear_github_auth: {
+  defaultLevel: PermissionLevel.CONFIRM_SINGLE_USE,
+  rationale: 'Destructive operation, removes authentication credentials',
+  canBeElevated: false,
+},{% endraw %}</code></pre>
+<p>
+  And the resolver itself fails safe — an unrecognised operation gets <code>CONFIRM_SINGLE_USE</code>, never
+  auto-approval:
+</p>
+<pre><code>{% raw %}export function getDefaultPermissionLevel(operation: string): PermissionLevel {
+  // 1. Check for explicit override
+  const override = OPERATION_POLICY_OVERRIDES[operation];
+  if (override) {
+    return override.defaultLevel;
+  }
+
+  // 2. Derive from endpoint routing
+  const route = getRoute(operation);
+  if (route) {
+    return ENDPOINT_DEFAULT_LEVELS[route.endpoint];
+  }
+
+  // 3. Secure fallback for unknown operations
+  return PermissionLevel.CONFIRM_SINGLE_USE;
+}
+
+export function canOperationBeElevated(operation: string): boolean {
+  const override = OPERATION_POLICY_OVERRIDES[operation];
+  // Default to allowing elevation for operations without explicit overrides
+  return override?.canBeElevated ?? true;
+}{% endraw %}</code></pre>
+
+<h2>The nuclear sandbox</h2>
+<p>
+  An element can ship <code>gatekeeper: { deny: ['confirm_operation'] }</code>. Because nothing can then satisfy a
+  <code>CONFIRM_*</code> requirement, every mutating operation freezes and the session degrades to read-only — while
+  a small set of recovery operations (<code>verify_challenge</code>, <code>release_deadlock</code>) are
+  intentionally un-gatable so the human-in-the-loop path can never be locked out.
+</p>
+<p class="code-source">
+  From
+  <a href="https://github.com/DollhouseMCP/mcp-server/blob/main/src/handlers/mcp-aql/policies/ElementPolicies.ts"><code>src/handlers/mcp-aql/policies/ElementPolicies.ts</code></a>
+</p>
+<pre><code>{% raw %}const UNGATABLE_OPERATIONS = new Set([
+  'verify_challenge',
+  'release_deadlock',
+  'approve_cli_permission',
+  'permission_prompt',
+]);
+
+/** Derived from UNGATABLE_OPERATIONS + confirm_operation. See block comment above. */
+const GATEKEEPER_INFRA_OPERATIONS = new Set([
+  ...UNGATABLE_OPERATIONS,
+  'confirm_operation',
+]);
+
+/**
+ * Check if any active elements deny confirm_operation (nuclear sandbox).
+ * Returns the denying element name if found, undefined otherwise.
+ */
+export function findConfirmDenyingElement(
+  activeElements: Array&lt;{ name: string; type: string; metadata: Record&lt;string, unknown&gt; }&gt;
+): { name: string; type: string } | undefined {
+  for (const element of activeElements) {
+    const gatekeeper = element.metadata?.gatekeeper as Record&lt;string, unknown&gt; | undefined;
+    const denyList = gatekeeper?.deny;
+    if (Array.isArray(denyList) &amp;&amp; denyList.includes('confirm_operation')) {
+      return { name: element.name, type: element.type };
+    }
+  }
+  return undefined;
+}{% endraw %}</code></pre>
+<p>
+  This is the defense against a compromised agent confirming its own destructive operations: the escape hatch is
+  built to be removable, while the recovery path is built so that it never can be.
+</p>
+
+<div class="callout">
+  <p>
+    The Gatekeeper is server-side and runs after the MCP client approves a tool call, so an "always allow" toggle in
+    your client never reaches it. The model can ask for anything it likes, but what it actually gets is decided here —
+    in code, by policy it cannot edit.
+  </p>
+</div>
+
+<h2>Where the Gatekeeper sits in the stack</h2>
+<p>
+  The Gatekeeper is one layer, and it depends on the others. Content validation runs <em>before</em> a request is
+  even formed, so the prompt that produced the operation has already been sanitized. The Gatekeeper then decides
+  whether the operation runs. If it does, and the caller is an autonomous agent, the autonomy evaluator and danger
+  zone enforcer gate the <em>next</em> step. CLI tool classification feeds a risk score back into the confirmation
+  decision for shell-touching operations.
+</p>
+
+<pre class="mermaid">{% raw %}flowchart LR
+  CV[Content validation sanitizes element input] --> GK[Gatekeeper permission resolution]
+  CLI[CLI tool classification: risk and irreversibility] --> GK
+  GK -- "operation allowed" --> EX[Operation executes]
+  GK -- "needs confirmation" --> HC[Out-of-band human challenge]
+  EX --> AE[Autonomy evaluator gates the next agent step]
+  AE -- "danger threshold crossed" --> DZ[Danger zone enforcer: process-level block]
+  AE -- "continue" --> GK{% endraw %}</pre>
+
+<h2>Related</h2>
+<ul class="timeline">
+  <li>
+    <strong><a href="{{ '/security/' | relative_url }}">Security overview</a></strong>
+    <p>The full eight-layer defense-in-depth model and how the Gatekeeper fits into it.</p>
+  </li>
+  <li>
+    <strong><a href="{{ '/security/agent-safety.html' | relative_url }}">Agent safety</a></strong>
+    <p>The autonomy evaluator and danger zone enforcer that gate every autonomous step after the Gatekeeper allows an operation.</p>
+  </li>
+  <li>
+    <strong><a href="{{ '/dynamic-permissioning.html' | relative_url }}">Dynamic permissioning</a></strong>
+    <p>How active elements reshape the permission surface at runtime, with the live console view.</p>
+  </li>
+</ul>
