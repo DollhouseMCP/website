@@ -48,7 +48,8 @@ jobs:
 
           # First-parent diff so a merge from develop reports what actually
           # landed on main. Added + modified posts only; deletions ignored.
-          mapfile -t files < <(git diff --name-only --diff-filter=AM HEAD^ HEAD -- '_blog_posts/*.md' || true)
+          # Recursive under _blog_posts/ so posts in future subfolders count.
+          mapfile -t files < <(git diff --name-only --diff-filter=AM HEAD^ HEAD -- '_blog_posts/' | grep -E '\.md$' || true)
           if [[ ${#files[@]} -eq 0 ]]; then
             echo "No added or modified posts in this push."
             exit 0
@@ -65,18 +66,29 @@ jobs:
             ' "$1" | sed -E 's/^"(.*)"$/\1/; s/^'"'"'(.*)'"'"'$/\1/'
           }
 
+          yaml_dq() {
+            # Escape a scalar for reuse inside YAML double quotes.
+            printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'
+          }
+
+          # One fetch of open sync issues; exact-title dedup below instead of
+          # relying on GitHub search tokenization/index lag.
+          open_titles="$(gh issue list -R "$HUB_REPO" --label blog-hub-sync --state open --limit 200 --json title --jq '.[].title')"
+
           for f in "${files[@]}"; do
             slug="$(basename "$f" .md)"
             url="${SITE_BASE}/${slug}/"
             title="$(fm_field "$f" title)"
             date="$(fm_field "$f" date)"
             description="$(fm_field "$f" description)"
+            [[ -n "$description" ]] || description="$(fm_field "$f" excerpt)"
             [[ -n "$title" ]] || title="$slug"
             [[ -n "$date" ]] || date="$(git log -1 --format=%cs -- "$f")"
+            title="$(yaml_dq "$title")"
+            description="$(yaml_dq "$description")"
 
-            # Skip if an open sync issue for this slug already exists.
-            existing="$(gh issue list -R "$HUB_REPO" --label blog-hub-sync --state open --search "\"$slug\" in:title" --json number --jq 'length')"
-            if [[ "$existing" != "0" ]]; then
+            issue_title="Index new DollhouseMCP post: ${slug}"
+            if grep -Fxq "$issue_title" <<< "$open_titles"; then
               echo "Open sync issue already exists for ${slug}; skipping."
               continue
             fi
@@ -93,7 +105,7 @@ jobs:
           \`\`\`yaml
           - title: "${title}"
             date: ${date}
-            summary: ${description}
+            summary: "${description}"
             project: DollhouseMCP
             url: ${url}
           \`\`\`
@@ -102,7 +114,7 @@ jobs:
           EOF
 
             gh issue create -R "$HUB_REPO" \
-              --title "Index new DollhouseMCP post: ${slug}" \
+              --title "$issue_title" \
               --label blog-hub-sync \
               --body-file "$body_file"
             rm -f "$body_file"
