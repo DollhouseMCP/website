@@ -1,0 +1,110 @@
+name: Blog Hub Notify
+
+# Spoke side of the Dollhouse Research blog hub (DollhouseResearch-website#39).
+# When a post publishes on main, file a blog-hub-sync issue on the hub repo so
+# the _data/blog_hub.yml entry gets added even if the same-session manual rule
+# (see AGENTS.md) was missed. The issue is the signal; a human or AI session
+# makes the editorial pass and files the hub PR. No auto-PR by design.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "_blog_posts/**"
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    name: File blog-hub-sync issue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect notify token
+        id: setup
+        env:
+          NOTIFY_TOKEN: ${{ secrets.BLOG_HUB_NOTIFY_TOKEN }}
+        run: |
+          if [[ -n "$NOTIFY_TOKEN" ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "BLOG_HUB_NOTIFY_TOKEN is not set; skipping blog hub notification. Add a fine-grained PAT with Issues read/write on DollhouseMCP/DollhouseResearch-website to enable." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: File issues for published posts
+        if: steps.setup.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.BLOG_HUB_NOTIFY_TOKEN }}
+          HUB_REPO: DollhouseMCP/DollhouseResearch-website
+          SITE_BASE: https://dollhousemcp.com/blog
+        run: |
+          set -euo pipefail
+
+          # First-parent diff so a merge from develop reports what actually
+          # landed on main. Added + modified posts only; deletions ignored.
+          mapfile -t files < <(git diff --name-only --diff-filter=AM HEAD^ HEAD -- '_blog_posts/*.md' || true)
+          if [[ ${#files[@]} -eq 0 ]]; then
+            echo "No added or modified posts in this push."
+            exit 0
+          fi
+
+          fm_field() {
+            # Print a front matter scalar (first block only), stripped of quotes.
+            awk -v key="$2" '
+              NR==1 && $0=="---" { infm=1; next }
+              infm && $0=="---" { exit }
+              infm && index($0, key ": ")==1 {
+                sub(key ": ", ""); print; exit
+              }
+            ' "$1" | sed -E 's/^"(.*)"$/\1/; s/^'"'"'(.*)'"'"'$/\1/'
+          }
+
+          for f in "${files[@]}"; do
+            slug="$(basename "$f" .md)"
+            url="${SITE_BASE}/${slug}/"
+            title="$(fm_field "$f" title)"
+            date="$(fm_field "$f" date)"
+            description="$(fm_field "$f" description)"
+            [[ -n "$title" ]] || title="$slug"
+            [[ -n "$date" ]] || date="$(git log -1 --format=%cs -- "$f")"
+
+            # Skip if an open sync issue for this slug already exists.
+            existing="$(gh issue list -R "$HUB_REPO" --label blog-hub-sync --state open --search "\"$slug\" in:title" --json number --jq 'length')"
+            if [[ "$existing" != "0" ]]; then
+              echo "Open sync issue already exists for ${slug}; skipping."
+              continue
+            fi
+
+            body_file="$(mktemp)"
+            cat > "$body_file" <<EOF
+          A post published on dollhousemcp.com and needs a \`_data/blog_hub.yml\` entry.
+
+          **Post:** [${title}](${url})
+          **Published:** ${date}
+
+          Ready-to-paste entry (edit the summary and confirm the project tag before filing the PR):
+
+          \`\`\`yaml
+          - title: "${title}"
+            date: ${date}
+            summary: ${description}
+            project: DollhouseMCP
+            url: ${url}
+          \`\`\`
+
+          Filed automatically by [blog-hub-notify](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}) on push \`${GITHUB_SHA}\`. See the hub publishing rule in the DollhouseResearch-website README.
+          EOF
+
+            gh issue create -R "$HUB_REPO" \
+              --title "Index new DollhouseMCP post: ${slug}" \
+              --label blog-hub-sync \
+              --body-file "$body_file"
+            rm -f "$body_file"
+            echo "Filed hub sync issue for ${slug}."
+          done
