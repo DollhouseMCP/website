@@ -20,6 +20,10 @@ on:
         description: "Head commit (defaults to branch tip)"
         required: false
         default: ""
+      dry_run:
+        description: "Print what would be filed without creating issues"
+        required: false
+        default: "true"
 
 permissions:
   contents: read
@@ -62,15 +66,18 @@ jobs:
           EVENT_HEAD: ${{ github.sha }}
           DISPATCH_BASE: ${{ inputs.base_sha }}
           DISPATCH_HEAD: ${{ inputs.head_sha }}
+          DISPATCH_DRY: ${{ inputs.dry_run }}
         run: |
           set -euo pipefail
 
           # Diff the WHOLE push range (event.before..sha), not HEAD^..HEAD —
           # a multi-commit push would otherwise silently skip earlier commits'
           # posts. workflow_dispatch supplies an explicit range for dry runs.
+          dry_run="false"
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
             base="${DISPATCH_BASE}"
             head="${DISPATCH_HEAD:-HEAD}"
+            [[ "${DISPATCH_DRY}" == "false" ]] || dry_run="true"
           else
             base="${EVENT_BEFORE}"
             head="${EVENT_HEAD}"
@@ -147,10 +154,16 @@ jobs:
           Filed automatically by [blog-hub-notify](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}) on push \`${GITHUB_SHA}\`. See the hub publishing rule in the DollhouseResearch-website README.
           EOF
 
-            gh issue create -R "$HUB_REPO" \
-              --title "$issue_title" \
-              --label blog-hub-sync \
-              --body-file "$body_file"
+            if [[ "$dry_run" == "true" ]]; then
+              echo "[dry-run] Would file on ${HUB_REPO}: ${issue_title}"
+              echo "[dry-run] Body:"
+              cat "$body_file"
+            else
+              gh issue create -R "$HUB_REPO" \
+                --title "$issue_title" \
+                --label blog-hub-sync \
+                --body-file "$body_file"
+              echo "Filed hub sync issue for ${slug}."
+            fi
             rm -f "$body_file"
-            echo "Filed hub sync issue for ${slug}."
           done
