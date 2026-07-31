@@ -11,9 +11,24 @@ on:
     branches: [main]
     paths:
       - "_blog_posts/**"
+  workflow_dispatch:
+    inputs:
+      base_sha:
+        description: "Base commit for the dry-run diff range"
+        required: true
+      head_sha:
+        description: "Head commit (defaults to branch tip)"
+        required: false
+        default: ""
 
 permissions:
   contents: read
+
+# Queue concurrent runs (no cancel) so two rapid pushes can't both fetch the
+# open-issue list before either files, which would double-file a slug.
+concurrency:
+  group: blog-hub-notify
+  cancel-in-progress: false
 
 jobs:
   notify:
@@ -23,7 +38,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Detect notify token
         id: setup
@@ -43,15 +58,34 @@ jobs:
           GH_TOKEN: ${{ secrets.BLOG_HUB_NOTIFY_TOKEN }}
           HUB_REPO: DollhouseMCP/DollhouseResearch-website
           SITE_BASE: https://dollhousemcp.com/blog
+          EVENT_BEFORE: ${{ github.event.before }}
+          EVENT_HEAD: ${{ github.sha }}
+          DISPATCH_BASE: ${{ inputs.base_sha }}
+          DISPATCH_HEAD: ${{ inputs.head_sha }}
         run: |
           set -euo pipefail
 
-          # First-parent diff so a merge from develop reports what actually
-          # landed on main. Added + modified posts only; deletions ignored.
-          # Recursive under _blog_posts/ so posts in future subfolders count.
-          mapfile -t files < <(git diff --name-only --diff-filter=AM HEAD^ HEAD -- '_blog_posts/' | grep -E '\.md$' || true)
+          # Diff the WHOLE push range (event.before..sha), not HEAD^..HEAD —
+          # a multi-commit push would otherwise silently skip earlier commits'
+          # posts. workflow_dispatch supplies an explicit range for dry runs.
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            base="${DISPATCH_BASE}"
+            head="${DISPATCH_HEAD:-HEAD}"
+          else
+            base="${EVENT_BEFORE}"
+            head="${EVENT_HEAD}"
+            if [[ "$base" =~ ^0+$ ]]; then
+              # First push of the branch: fall back to the tip's first parent.
+              base="$(git rev-parse "${head}^")"
+            fi
+          fi
+
+          # Let a genuinely failing diff (bad ref, shallow history) fail the
+          # step loudly; only the "no .md files matched" case is a normal no-op.
+          diff_out="$(git diff --name-only --diff-filter=AM "$base" "$head" -- '_blog_posts/')"
+          mapfile -t files < <(grep -E '\.md$' <<< "$diff_out" || true)
           if [[ ${#files[@]} -eq 0 ]]; then
-            echo "No added or modified posts in this push."
+            echo "No added or modified posts in ${base}..${head}."
             exit 0
           fi
 
