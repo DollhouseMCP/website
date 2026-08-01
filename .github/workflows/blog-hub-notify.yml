@@ -1,0 +1,238 @@
+name: Blog Hub Notify
+
+# Spoke side of the Dollhouse Research blog hub (DollhouseResearch-website#39).
+# When a post publishes on main, file a blog-hub-sync issue on the hub repo so
+# the _data/blog_hub.yml entry gets added even if the same-session manual rule
+# (see AGENTS.md) was missed. The issue is the signal; a human or AI session
+# makes the editorial pass and files the hub PR. No auto-PR by design.
+#
+# NOTE: deliberately NO concurrency group. GitHub keeps only one PENDING run
+# per group and silently replaces queued runs, so queueing would drop a middle
+# push's before..sha range entirely — a permanently missed post. Parallel runs
+# can at worst double-file an issue, which the exact-title dedup usually
+# prevents and which is cheap to close by hand. Missed > duplicated.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "_blog_posts/**"
+  workflow_dispatch:
+    inputs:
+      base_sha:
+        description: "Base commit for the dry-run diff range"
+        required: true
+      head_sha:
+        description: "Head commit (defaults to branch tip)"
+        required: false
+        default: ""
+      dry_run:
+        description: "Print what would be filed without creating issues"
+        required: false
+        default: "true"
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    name: File blog-hub-sync issue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect notify token
+        id: setup
+        env:
+          NOTIFY_TOKEN: ${{ secrets.BLOG_HUB_NOTIFY_TOKEN }}
+        run: |
+          if [[ -n "$NOTIFY_TOKEN" ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "BLOG_HUB_NOTIFY_TOKEN is not set; skipping blog hub notification. Add a fine-grained PAT with Issues read/write on DollhouseMCP/DollhouseResearch-website to enable." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: File issues for published posts
+        if: steps.setup.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.BLOG_HUB_NOTIFY_TOKEN }}
+          HUB_REPO: DollhouseMCP/DollhouseResearch-website
+          SITE_ORIGIN: https://dollhousemcp.com
+          EVENT_BEFORE: ${{ github.event.before }}
+          EVENT_HEAD: ${{ github.sha }}
+          DISPATCH_BASE: ${{ inputs.base_sha }}
+          DISPATCH_HEAD: ${{ inputs.head_sha }}
+          DISPATCH_DRY: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+
+          # PyYAML ships in the runner image; guard for image changes.
+          # Pinned + wheels-only so the fallback can't resolve a surprise
+          # version or execute an sdist setup script (Sonar S8541/S8544).
+          python3 -c 'import yaml' 2>/dev/null \
+            || pip3 install --quiet --break-system-packages --only-binary ':all:' 'pyyaml==6.0.2'
+
+          # Front matter is parsed with a real YAML parser (not text munging)
+          # so quoted scalars, embedded escapes, and block scalars survive,
+          # and the ready-to-paste snippet is re-serialized by yaml.safe_dump
+          # with correct quoting. Reads from stdin (git show of the head rev).
+          parser="${RUNNER_TEMP}/hub_notify_parse.py"
+          cat > "$parser" <<'PYEOF'
+          import datetime
+          import json
+          import os
+          import sys
+
+          import yaml
+
+          slug, fallback_date, head, mode = sys.argv[1:5]
+          origin = os.environ["SITE_ORIGIN"].rstrip("/")
+          raw = sys.stdin.read()
+          fm = {}
+          if raw.startswith("---"):
+              end = raw.find("\n---", 3)
+              if end != -1:
+                  fm = yaml.safe_load(raw[3:end]) or {}
+
+          if fm.get("published") is False:
+              print(json.dumps({"skip": "front matter has published: false"}))
+              sys.exit(0)
+
+          # Honor a front-matter permalink override; otherwise the collection
+          # default of /blog/<basename>/ applies.
+          permalink = fm.get("permalink")
+          if permalink:
+              url = origin + "/" + str(permalink).lstrip("/")
+          else:
+              url = f"{origin}/blog/{slug}/"
+
+          title = str(fm.get("title") or slug)
+          date = fm.get("date") or fallback_date
+          if isinstance(date, datetime.datetime):
+              date = date.date()
+          if isinstance(date, str):
+              try:
+                  date = datetime.date.fromisoformat(date[:10])
+              except ValueError:
+                  pass
+          summary = str(fm.get("description") or fm.get("excerpt") or "")
+
+          entry = [{"title": title, "date": date, "summary": summary,
+                    "project": "DollhouseMCP", "url": url}]
+          snippet = yaml.safe_dump(entry, sort_keys=False, allow_unicode=True,
+                                   width=1000).rstrip()
+
+          if mode == "updated":
+              issue_title = f"Sync updated DollhouseMCP post: {slug}"
+              lead = "A previously published post on dollhousemcp.com was UPDATED."
+              instruction = ("Check `_data/blog_hub.yml` for an existing entry with this URL and update "
+                             "its title/summary to match; only insert a new entry (at the top) if the URL "
+                             "is somehow missing. Do not create a duplicate entry.")
+          else:
+              issue_title = f"Index new DollhouseMCP post: {slug}"
+              lead = "A post published on dollhousemcp.com and needs a `_data/blog_hub.yml` entry."
+              instruction = ("Ready-to-paste entry (edit the summary, confirm the project tag, and insert "
+                             "AT THE TOP of blog_hub.yml — file order is the display order):")
+
+          repo = os.environ.get("GITHUB_REPOSITORY", "")
+          run_id = os.environ.get("GITHUB_RUN_ID", "")
+          body = f"""{lead}
+
+          **Post:** [{title}]({url})
+          **Published:** {date}
+
+          {instruction}
+
+          ```yaml
+          {snippet}
+          ```
+
+          Filed automatically by [blog-hub-notify](https://github.com/{repo}/actions/runs/{run_id}) at `{head}`. See the hub publishing rule in the DollhouseResearch-website README.
+          """
+          print(json.dumps({"skip": "", "issue_title": issue_title, "body": body}))
+          PYEOF
+
+          dry_run="false"
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            base="${DISPATCH_BASE}"
+            head="${DISPATCH_HEAD:-HEAD}"
+            head="$(git rev-parse "$head")"
+            [[ "${DISPATCH_DRY}" == "false" ]] || dry_run="true"
+          else
+            base="${EVENT_BEFORE}"
+            head="${EVENT_HEAD}"
+            if [[ "$base" =~ ^0+$ ]]; then
+              # First push of the branch: fall back to the tip's first parent.
+              base="$(git rev-parse "${head}^")"
+            fi
+          fi
+
+          # Diff the WHOLE range with per-file status: A = first publication,
+          # M = update to an already-published post (different issue wording,
+          # so editors don't duplicate hub entries for routine corrections).
+          # --no-renames makes a renamed post surface as an Add at its new
+          # path (deletions stay ignored), so renames still notify the hub.
+          # Let a genuinely failing diff (bad ref) fail the step loudly; only
+          # the "no .md files matched" case is a normal no-op.
+          diff_out="$(git diff --name-status --no-renames --diff-filter=AM "$base" "$head" -- '_blog_posts/')"
+          mapfile -t entries < <(grep -E '\.md$' <<< "$diff_out" || true)
+          if [[ ${#entries[@]} -eq 0 ]]; then
+            echo "No added or modified posts in ${base}..${head}."
+            exit 0
+          fi
+
+          # One fetch of open sync issues; exact-title dedup below instead of
+          # relying on GitHub search tokenization/index lag.
+          open_titles="$(gh issue list -R "$HUB_REPO" --label blog-hub-sync --state open --limit 200 --json title --jq '.[].title')"
+
+          for entry in "${entries[@]}"; do
+            status="${entry%%$'\t'*}"
+            f="${entry#*$'\t'}"
+            slug="$(basename "$f" .md)"
+            mode="new"
+            [[ "$status" == "M" ]] && mode="updated"
+
+            # Read the post as it exists AT THE HEAD REVISION, not the checkout
+            # working tree — matters for dispatch runs against older ranges.
+            if ! git cat-file -e "${head}:${f}" 2>/dev/null; then
+              echo "${f} does not exist at ${head}; skipping."
+              continue
+            fi
+            fallback_date="$(git log -1 --format=%cs "$head" -- "$f")"
+            meta="$(git show "${head}:${f}" | python3 "$parser" "$slug" "$fallback_date" "$head" "$mode")"
+
+            skip="$(jq -r '.skip' <<< "$meta")"
+            if [[ -n "$skip" ]]; then
+              echo "Skipping ${slug}: ${skip}"
+              continue
+            fi
+
+            issue_title="$(jq -r '.issue_title' <<< "$meta")"
+            # Dedup against BOTH issue flavors so an edit while the original
+            # "Index new" issue is still open doesn't file a second issue.
+            if grep -Fxq "Index new DollhouseMCP post: ${slug}" <<< "$open_titles" \
+               || grep -Fxq "Sync updated DollhouseMCP post: ${slug}" <<< "$open_titles"; then
+              echo "Open sync issue already exists for ${slug}; skipping."
+              continue
+            fi
+
+            body_file="$(mktemp)"
+            jq -r '.body' <<< "$meta" > "$body_file"
+
+            if [[ "$dry_run" == "true" ]]; then
+              echo "[dry-run] Would file on ${HUB_REPO}: ${issue_title}"
+              echo "[dry-run] Body:"
+              cat "$body_file"
+            else
+              gh issue create -R "$HUB_REPO" \
+                --title "$issue_title" \
+                --label blog-hub-sync \
+                --body-file "$body_file"
+              echo "Filed hub sync issue for ${slug}."
+            fi
+            rm -f "$body_file"
+          done
