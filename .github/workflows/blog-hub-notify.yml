@@ -61,7 +61,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.BLOG_HUB_NOTIFY_TOKEN }}
           HUB_REPO: DollhouseMCP/DollhouseResearch-website
-          SITE_BASE: https://dollhousemcp.com/blog
+          SITE_ORIGIN: https://dollhousemcp.com
           EVENT_BEFORE: ${{ github.event.before }}
           EVENT_HEAD: ${{ github.sha }}
           DISPATCH_BASE: ${{ inputs.base_sha }}
@@ -86,7 +86,8 @@ jobs:
 
           import yaml
 
-          slug, url, fallback_date, head = sys.argv[1:5]
+          slug, fallback_date, head, mode = sys.argv[1:5]
+          origin = os.environ["SITE_ORIGIN"].rstrip("/")
           raw = sys.stdin.read()
           fm = {}
           if raw.startswith("---"):
@@ -97,6 +98,14 @@ jobs:
           if fm.get("published") is False:
               print(json.dumps({"skip": "front matter has published: false"}))
               sys.exit(0)
+
+          # Honor a front-matter permalink override; otherwise the collection
+          # default of /blog/<basename>/ applies.
+          permalink = fm.get("permalink")
+          if permalink:
+              url = origin + "/" + str(permalink).lstrip("/")
+          else:
+              url = f"{origin}/blog/{slug}/"
 
           title = str(fm.get("title") or slug)
           date = fm.get("date") or fallback_date
@@ -114,14 +123,26 @@ jobs:
           snippet = yaml.safe_dump(entry, sort_keys=False, allow_unicode=True,
                                    width=1000).rstrip()
 
+          if mode == "updated":
+              issue_title = f"Sync updated DollhouseMCP post: {slug}"
+              lead = "A previously published post on dollhousemcp.com was UPDATED."
+              instruction = ("Check `_data/blog_hub.yml` for an existing entry with this URL and update "
+                             "its title/summary to match; only insert a new entry (at the top) if the URL "
+                             "is somehow missing. Do not create a duplicate entry.")
+          else:
+              issue_title = f"Index new DollhouseMCP post: {slug}"
+              lead = "A post published on dollhousemcp.com and needs a `_data/blog_hub.yml` entry."
+              instruction = ("Ready-to-paste entry (edit the summary, confirm the project tag, and insert "
+                             "AT THE TOP of blog_hub.yml — file order is the display order):")
+
           repo = os.environ.get("GITHUB_REPOSITORY", "")
           run_id = os.environ.get("GITHUB_RUN_ID", "")
-          body = f"""A post published on dollhousemcp.com and needs a `_data/blog_hub.yml` entry.
+          body = f"""{lead}
 
           **Post:** [{title}]({url})
           **Published:** {date}
 
-          Ready-to-paste entry (edit the summary, confirm the project tag, and insert AT THE TOP of blog_hub.yml — file order is the display order):
+          {instruction}
 
           ```yaml
           {snippet}
@@ -129,7 +150,7 @@ jobs:
 
           Filed automatically by [blog-hub-notify](https://github.com/{repo}/actions/runs/{run_id}) at `{head}`. See the hub publishing rule in the DollhouseResearch-website README.
           """
-          print(json.dumps({"skip": "", "body": body}))
+          print(json.dumps({"skip": "", "issue_title": issue_title, "body": body}))
           PYEOF
 
           dry_run="false"
@@ -147,14 +168,16 @@ jobs:
             fi
           fi
 
-          # Diff the WHOLE range. --no-renames makes a renamed post surface as
-          # an Add at its new path (deletions stay ignored), so renames still
-          # notify the hub instead of vanishing from --diff-filter=AM.
+          # Diff the WHOLE range with per-file status: A = first publication,
+          # M = update to an already-published post (different issue wording,
+          # so editors don't duplicate hub entries for routine corrections).
+          # --no-renames makes a renamed post surface as an Add at its new
+          # path (deletions stay ignored), so renames still notify the hub.
           # Let a genuinely failing diff (bad ref) fail the step loudly; only
           # the "no .md files matched" case is a normal no-op.
-          diff_out="$(git diff --name-only --no-renames --diff-filter=AM "$base" "$head" -- '_blog_posts/')"
-          mapfile -t files < <(grep -E '\.md$' <<< "$diff_out" || true)
-          if [[ ${#files[@]} -eq 0 ]]; then
+          diff_out="$(git diff --name-status --no-renames --diff-filter=AM "$base" "$head" -- '_blog_posts/')"
+          mapfile -t entries < <(grep -E '\.md$' <<< "$diff_out" || true)
+          if [[ ${#entries[@]} -eq 0 ]]; then
             echo "No added or modified posts in ${base}..${head}."
             exit 0
           fi
@@ -163,9 +186,12 @@ jobs:
           # relying on GitHub search tokenization/index lag.
           open_titles="$(gh issue list -R "$HUB_REPO" --label blog-hub-sync --state open --limit 200 --json title --jq '.[].title')"
 
-          for f in "${files[@]}"; do
+          for entry in "${entries[@]}"; do
+            status="${entry%%$'\t'*}"
+            f="${entry#*$'\t'}"
             slug="$(basename "$f" .md)"
-            url="${SITE_BASE}/${slug}/"
+            mode="new"
+            [[ "$status" == "M" ]] && mode="updated"
 
             # Read the post as it exists AT THE HEAD REVISION, not the checkout
             # working tree — matters for dispatch runs against older ranges.
@@ -174,7 +200,7 @@ jobs:
               continue
             fi
             fallback_date="$(git log -1 --format=%cs "$head" -- "$f")"
-            meta="$(git show "${head}:${f}" | python3 "$parser" "$slug" "$url" "$fallback_date" "$head")"
+            meta="$(git show "${head}:${f}" | python3 "$parser" "$slug" "$fallback_date" "$head" "$mode")"
 
             skip="$(jq -r '.skip' <<< "$meta")"
             if [[ -n "$skip" ]]; then
@@ -182,8 +208,11 @@ jobs:
               continue
             fi
 
-            issue_title="Index new DollhouseMCP post: ${slug}"
-            if grep -Fxq "$issue_title" <<< "$open_titles"; then
+            issue_title="$(jq -r '.issue_title' <<< "$meta")"
+            # Dedup against BOTH issue flavors so an edit while the original
+            # "Index new" issue is still open doesn't file a second issue.
+            if grep -Fxq "Index new DollhouseMCP post: ${slug}" <<< "$open_titles" \
+               || grep -Fxq "Sync updated DollhouseMCP post: ${slug}" <<< "$open_titles"; then
               echo "Open sync issue already exists for ${slug}; skipping."
               continue
             fi
