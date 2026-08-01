@@ -5,6 +5,12 @@ name: Blog Hub Notify
 # the _data/blog_hub.yml entry gets added even if the same-session manual rule
 # (see AGENTS.md) was missed. The issue is the signal; a human or AI session
 # makes the editorial pass and files the hub PR. No auto-PR by design.
+#
+# NOTE: deliberately NO concurrency group. GitHub keeps only one PENDING run
+# per group and silently replaces queued runs, so queueing would drop a middle
+# push's before..sha range entirely — a permanently missed post. Parallel runs
+# can at worst double-file an issue, which the exact-title dedup usually
+# prevents and which is cheap to close by hand. Missed > duplicated.
 
 on:
   push:
@@ -27,12 +33,6 @@ on:
 
 permissions:
   contents: read
-
-# Queue concurrent runs (no cancel) so two rapid pushes can't both fetch the
-# open-issue list before either files, which would double-file a slug.
-concurrency:
-  group: blog-hub-notify
-  cancel-in-progress: false
 
 jobs:
   notify:
@@ -70,13 +70,73 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Diff the WHOLE push range (event.before..sha), not HEAD^..HEAD —
-          # a multi-commit push would otherwise silently skip earlier commits'
-          # posts. workflow_dispatch supplies an explicit range for dry runs.
+          # PyYAML ships in the runner image; guard for image changes.
+          python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet --break-system-packages pyyaml
+
+          # Front matter is parsed with a real YAML parser (not text munging)
+          # so quoted scalars, embedded escapes, and block scalars survive,
+          # and the ready-to-paste snippet is re-serialized by yaml.safe_dump
+          # with correct quoting. Reads from stdin (git show of the head rev).
+          parser="${RUNNER_TEMP}/hub_notify_parse.py"
+          cat > "$parser" <<'PYEOF'
+          import datetime
+          import json
+          import os
+          import sys
+
+          import yaml
+
+          slug, url, fallback_date, head = sys.argv[1:5]
+          raw = sys.stdin.read()
+          fm = {}
+          if raw.startswith("---"):
+              end = raw.find("\n---", 3)
+              if end != -1:
+                  fm = yaml.safe_load(raw[3:end]) or {}
+
+          if fm.get("published") is False:
+              print(json.dumps({"skip": "front matter has published: false"}))
+              sys.exit(0)
+
+          title = str(fm.get("title") or slug)
+          date = fm.get("date") or fallback_date
+          if isinstance(date, datetime.datetime):
+              date = date.date()
+          if isinstance(date, str):
+              try:
+                  date = datetime.date.fromisoformat(date[:10])
+              except ValueError:
+                  pass
+          summary = str(fm.get("description") or fm.get("excerpt") or "")
+
+          entry = [{"title": title, "date": date, "summary": summary,
+                    "project": "DollhouseMCP", "url": url}]
+          snippet = yaml.safe_dump(entry, sort_keys=False, allow_unicode=True,
+                                   width=1000).rstrip()
+
+          repo = os.environ.get("GITHUB_REPOSITORY", "")
+          run_id = os.environ.get("GITHUB_RUN_ID", "")
+          body = f"""A post published on dollhousemcp.com and needs a `_data/blog_hub.yml` entry.
+
+          **Post:** [{title}]({url})
+          **Published:** {date}
+
+          Ready-to-paste entry (edit the summary, confirm the project tag, and insert AT THE TOP of blog_hub.yml — file order is the display order):
+
+          ```yaml
+          {snippet}
+          ```
+
+          Filed automatically by [blog-hub-notify](https://github.com/{repo}/actions/runs/{run_id}) at `{head}`. See the hub publishing rule in the DollhouseResearch-website README.
+          """
+          print(json.dumps({"skip": "", "body": body}))
+          PYEOF
+
           dry_run="false"
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
             base="${DISPATCH_BASE}"
             head="${DISPATCH_HEAD:-HEAD}"
+            head="$(git rev-parse "$head")"
             [[ "${DISPATCH_DRY}" == "false" ]] || dry_run="true"
           else
             base="${EVENT_BEFORE}"
@@ -87,30 +147,17 @@ jobs:
             fi
           fi
 
-          # Let a genuinely failing diff (bad ref, shallow history) fail the
-          # step loudly; only the "no .md files matched" case is a normal no-op.
-          diff_out="$(git diff --name-only --diff-filter=AM "$base" "$head" -- '_blog_posts/')"
+          # Diff the WHOLE range. --no-renames makes a renamed post surface as
+          # an Add at its new path (deletions stay ignored), so renames still
+          # notify the hub instead of vanishing from --diff-filter=AM.
+          # Let a genuinely failing diff (bad ref) fail the step loudly; only
+          # the "no .md files matched" case is a normal no-op.
+          diff_out="$(git diff --name-only --no-renames --diff-filter=AM "$base" "$head" -- '_blog_posts/')"
           mapfile -t files < <(grep -E '\.md$' <<< "$diff_out" || true)
           if [[ ${#files[@]} -eq 0 ]]; then
             echo "No added or modified posts in ${base}..${head}."
             exit 0
           fi
-
-          fm_field() {
-            # Print a front matter scalar (first block only), stripped of quotes.
-            awk -v key="$2" '
-              NR==1 && $0=="---" { infm=1; next }
-              infm && $0=="---" { exit }
-              infm && index($0, key ": ")==1 {
-                sub(key ": ", ""); print; exit
-              }
-            ' "$1" | sed -E 's/^"(.*)"$/\1/; s/^'"'"'(.*)'"'"'$/\1/'
-          }
-
-          yaml_dq() {
-            # Escape a scalar for reuse inside YAML double quotes.
-            printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'
-          }
 
           # One fetch of open sync issues; exact-title dedup below instead of
           # relying on GitHub search tokenization/index lag.
@@ -119,14 +166,21 @@ jobs:
           for f in "${files[@]}"; do
             slug="$(basename "$f" .md)"
             url="${SITE_BASE}/${slug}/"
-            title="$(fm_field "$f" title)"
-            date="$(fm_field "$f" date)"
-            description="$(fm_field "$f" description)"
-            [[ -n "$description" ]] || description="$(fm_field "$f" excerpt)"
-            [[ -n "$title" ]] || title="$slug"
-            [[ -n "$date" ]] || date="$(git log -1 --format=%cs -- "$f")"
-            title="$(yaml_dq "$title")"
-            description="$(yaml_dq "$description")"
+
+            # Read the post as it exists AT THE HEAD REVISION, not the checkout
+            # working tree — matters for dispatch runs against older ranges.
+            if ! git cat-file -e "${head}:${f}" 2>/dev/null; then
+              echo "${f} does not exist at ${head}; skipping."
+              continue
+            fi
+            fallback_date="$(git log -1 --format=%cs "$head" -- "$f")"
+            meta="$(git show "${head}:${f}" | python3 "$parser" "$slug" "$url" "$fallback_date" "$head")"
+
+            skip="$(jq -r '.skip' <<< "$meta")"
+            if [[ -n "$skip" ]]; then
+              echo "Skipping ${slug}: ${skip}"
+              continue
+            fi
 
             issue_title="Index new DollhouseMCP post: ${slug}"
             if grep -Fxq "$issue_title" <<< "$open_titles"; then
@@ -135,24 +189,7 @@ jobs:
             fi
 
             body_file="$(mktemp)"
-            cat > "$body_file" <<EOF
-          A post published on dollhousemcp.com and needs a \`_data/blog_hub.yml\` entry.
-
-          **Post:** [${title}](${url})
-          **Published:** ${date}
-
-          Ready-to-paste entry (edit the summary and confirm the project tag before filing the PR):
-
-          \`\`\`yaml
-          - title: "${title}"
-            date: ${date}
-            summary: "${description}"
-            project: DollhouseMCP
-            url: ${url}
-          \`\`\`
-
-          Filed automatically by [blog-hub-notify](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}) on push \`${GITHUB_SHA}\`. See the hub publishing rule in the DollhouseResearch-website README.
-          EOF
+            jq -r '.body' <<< "$meta" > "$body_file"
 
             if [[ "$dry_run" == "true" ]]; then
               echo "[dry-run] Would file on ${HUB_REPO}: ${issue_title}"
