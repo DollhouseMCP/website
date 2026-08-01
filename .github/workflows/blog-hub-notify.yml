@@ -71,7 +71,10 @@ jobs:
           set -euo pipefail
 
           # PyYAML ships in the runner image; guard for image changes.
-          python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet --break-system-packages pyyaml
+          # Pinned + wheels-only so the fallback can't resolve a surprise
+          # version or execute an sdist setup script (Sonar S8541/S8544).
+          python3 -c 'import yaml' 2>/dev/null \
+            || pip3 install --quiet --break-system-packages --only-binary ':all:' 'pyyaml==6.0.2'
 
           # Front matter is parsed with a real YAML parser (not text munging)
           # so quoted scalars, embedded escapes, and block scalars survive,
