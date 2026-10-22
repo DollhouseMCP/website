@@ -43,6 +43,16 @@ class VisiDeltaRouteManifestTests(unittest.TestCase):
         self.assertEqual(route_map["/blog/second"], "_blog_posts/second.md")
         self.assertEqual(len(updated), len(route_map))
 
+    def test_augment_routes_removes_seeded_backend_and_partial_routes(self):
+        existing = [
+            {"id": "backend", "file": "_beta/README.md", "route": "/_beta/README/"},
+            {"id": "partial", "file": "_includes/header.html", "route": "/_includes/header.html"},
+        ]
+        updated = routes.augment_routes(existing, ["_beta/README.md", "_includes/header.html", "beta.html"], [])
+        self.assertTrue(any(item["route"] == "/beta.html" for item in updated))
+        self.assertTrue(any(item["route"] == "/" for item in updated))
+        self.assertFalse(any(item["file"].startswith(("_beta/", "_includes/")) for item in updated))
+
     def test_writes_stable_json_manifest(self):
         with tempfile.TemporaryDirectory() as tmp:
             manifest = Path(tmp) / "routes.json"

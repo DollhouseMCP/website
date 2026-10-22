@@ -7,7 +7,7 @@ import { mockEnv, mockContext } from "./mock.ts";
 const root = resolve(import.meta.dirname, "../../_site");
 const env = mockEnv();
 env.PUBLIC_ORIGIN = "http://localhost:4173";
-globalThis.fetch = async () => Response.json({ result: "success" });
+globalThis.fetch = () => Promise.resolve(Response.json({ result: "success" }));
 const types = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2", ".xml": "application/xml" };
 createServer(async (incoming, outgoing) => {
   const url = new URL(incoming.url || "/", env.PUBLIC_ORIGIN);
@@ -28,7 +28,8 @@ createServer(async (incoming, outgoing) => {
     return;
   }
   try {
-    const path = resolve(root, `.${decodeURIComponent(url.pathname.endsWith("/") ? `${url.pathname}index.html` : url.pathname)}`);
+    const pathname = url.pathname.endsWith("/") ? url.pathname + "index.html" : url.pathname;
+    const path = resolve(root, "." + decodeURIComponent(pathname));
     if (!path.startsWith(`${root}/`)) throw new Error("outside root");
     const body = await readFile(path);
     outgoing.writeHead(200, { "Content-Type": types[extname(path)] || "application/octet-stream" });

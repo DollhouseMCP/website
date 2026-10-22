@@ -26,7 +26,7 @@ jobs:
           node-version: "24"
           cache: npm
           cache-dependency-path: _beta/package-lock.json
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - run: npm run check
       - run: npm test
-      - run: npx wrangler deploy --dry-run --outdir /tmp/beta-worker-build
+      - run: npm run bundle

@@ -33,11 +33,13 @@
       open = false;
       status.textContent = "Request received. Mick will review it by hand and email you if access is approved.";
     } catch (error) {
-      status.textContent = error.name === "TimeoutError"
-        ? "The connection timed out. Your request may have been saved. Please wait before trying again."
-        : error.message === "Failed to fetch"
-          ? "We could not reach the form. Please try again later."
-          : error.message;
+      if (error.name === "TimeoutError") {
+        status.textContent = "The connection timed out. Your request may have been saved. Please wait before trying again.";
+      } else if (error.message === "Failed to fetch") {
+        status.textContent = "We could not reach the form. Please try again later.";
+      } else {
+        status.textContent = error.message;
+      }
     } finally {
       sending = false;
       button.disabled = !open;

@@ -53,9 +53,10 @@ async function rateKey(ip: string, windowStart: number, secret: string) {
 
 async function notify(env: Env, id: string) {
   // Only an opaque ID leaves D1. Configure a Zulip server owned by DollhouseMCP.
+  const credentials = btoa(env.ZULIP_BOT_EMAIL + ":" + env.ZULIP_API_KEY);
   const response = await fetch(`${env.ZULIP_ORIGIN}/api/v1/messages`, {
     method: "POST",
-    headers: { Authorization: `Basic ${btoa(`${env.ZULIP_BOT_EMAIL}:${env.ZULIP_API_KEY}`)}` },
+    headers: { Authorization: `Basic ${credentials}` },
     body: new URLSearchParams({
       type: "stream", to: env.ZULIP_STREAM_ID, topic: env.ZULIP_TOPIC,
       content: `Hosted beta request ${id} is ready for manual review in the beta requests database.`,
@@ -71,6 +72,26 @@ async function notify(env: Env, id: string) {
 
 async function tryNotify(env: Env, id: string) {
   try { await notify(env, id); } catch { /* Saved request stays pending for the daily retry. No PII in logs. */ }
+}
+
+function validEmail(email: string) {
+  const parts = email.split("@");
+  if (parts.length !== 2 || !parts[0] || /\s/.test(email)) return false;
+  const labels = parts[1].split(".");
+  return labels.length > 1 && labels.every((label) => label.length > 0);
+}
+
+function invalidFields(data: URLSearchParams) {
+  const fields: Record<string, number> = { name: 100, email: 254, organisation: 160, use_case: 2000, client_notes: 300, consent: 3, website: 0 };
+  for (const [field, max] of Object.entries(fields)) {
+    if (data.getAll(field).length > 1 || (data.get(field) || "").length > max) {
+      return true;
+    }
+  }
+  if ([...data.keys()].some((field) => !Object.hasOwn(fields, field) && field !== "clients")) {
+    return true;
+  }
+  return false;
 }
 
 async function handle(request: Request, env: Env, ctx: ExecutionContext) {
@@ -104,20 +125,12 @@ async function handle(request: Request, env: Env, ctx: ExecutionContext) {
   catch (error) { return json(error instanceof RangeError ? 413 : 400, { message: "The form could not be read. Please check its size and try again." }); }
   // Honeypot responses look successful but store nothing and send no notification.
   if (data.get("website")) return json(200, { received: true });
-  const fields: Record<string, number> = { name: 100, email: 254, organisation: 160, use_case: 2000, client_notes: 300, consent: 3, website: 0 };
-  for (const [field, max] of Object.entries(fields)) {
-    if (data.getAll(field).length > 1 || (data.get(field) || "").length > max) {
-      return json(400, { message: "Please check the form fields and their lengths." });
-    }
-  }
-  if ([...data.keys()].some((field) => !Object.hasOwn(fields, field) && field !== "clients")) {
-    return json(400, { message: "The form contains an unknown field." });
-  }
+  if (invalidFields(data)) return json(400, { message: "Please check the form fields and their lengths." });
   const name = (data.get("name") || "").trim();
   const email = (data.get("email") || "").trim().toLowerCase();
   const useCase = (data.get("use_case") || "").trim();
   const clients = data.getAll("clients");
-  if (!name || !useCase || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+  if (!name || !useCase || !validEmail(email) ||
       data.get("consent") !== "yes" || clients.length < 1 || clients.length > CLIENTS.size ||
       clients.some((client) => !CLIENTS.has(client)) || new Set(clients).size !== clients.length) {
     return json(400, { message: "Enter your name, a valid email, a use case, at least one MCP client, and consent to be contacted." });

@@ -60,7 +60,7 @@ Explicit setup commands for Mick to run later:
 
 ```sh
 cd _beta
-npm ci
+npm ci --ignore-scripts
 npx wrangler d1 create dollhouse-beta-requests
 # Set the returned ID in wrangler.jsonc before continuing.
 npx wrangler d1 migrations apply dollhouse-beta-requests --remote
@@ -115,10 +115,10 @@ or credential is needed.
 
 ```sh
 cd _beta
-npm ci
+npm ci --ignore-scripts
 npm run check
 npm test
-npx wrangler deploy --dry-run --outdir /tmp/beta-worker-build
+npm run bundle
 # Optional runtime check: D1 writes remain local.
 npx wrangler d1 migrations apply dollhouse-beta-requests --local
 npm run dev

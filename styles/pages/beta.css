@@ -86,6 +86,8 @@
 }
 
 .beta-status {
+  display: block;
+  margin-top: 1em;
   color: var(--ink-900);
   overflow-wrap: anywhere;
 }

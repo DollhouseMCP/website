@@ -9,6 +9,7 @@ from pathlib import Path
 
 
 EXCLUDED_PREFIXES = ("docs/", "scripts/", ".github/", "_beta/")
+NON_PAGE_PREFIXES = EXCLUDED_PREFIXES + ("_includes/", "_layouts/")
 SHELL_CHANGE_PREFIXES = ("_layouts/", "_includes/", "assets/", "styles/")
 CORE_ROUTES = [
     ("index.html", "/"),
@@ -70,12 +71,17 @@ def add_route(routes, seen, source_file: str, route: str) -> None:
 
 
 def augment_routes(routes, changed_files, blog_post_paths):
+    # The upstream scanner also seeds routes for source-only Markdown/partials.
+    routes = [item for item in routes if not item.get("file", "").startswith(NON_PAGE_PREFIXES)]
     seen = {normalize_route(item["route"]) for item in routes}
     shell_changed = False
 
     for path in changed_files:
         if path == "_config.yml" or path.startswith(SHELL_CHANGE_PREFIXES):
             shell_changed = True
+
+        if path.startswith(NON_PAGE_PREFIXES):
+            continue
 
         if path.endswith(".html") and not path.startswith(("mockups/", "_site/")):
             add_route(routes, seen, path, html_route(path))

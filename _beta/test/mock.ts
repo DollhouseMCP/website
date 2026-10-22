@@ -9,8 +9,8 @@ export function mockDatabase() {
     let values: unknown[] = [];
     const statement = {
       bind(...args: unknown[]) { values = args; return statement; },
-      async all() { return { success: true, results: sqlite.prepare(sql).all(...values) }; },
-      async run() { const result = sqlite.prepare(sql).run(...values); return { success: true, results: [], meta: { changes: result.changes } }; },
+      all() { return Promise.resolve({ success: true, results: sqlite.prepare(sql).all(...values) }); },
+      run() { const result = sqlite.prepare(sql).run(...values); return Promise.resolve({ success: true, results: [], meta: { changes: result.changes } }); },
     };
     return statement;
   }
