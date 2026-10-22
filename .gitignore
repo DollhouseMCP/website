@@ -59,3 +59,8 @@ Thumbs.db
 # Note: _config.yml also excludes docs/ from the Jekyll build as defense in depth.
 # If public-facing docs are ever added under docs/, update both files intentionally.
 docs/
+
+# Beta Worker local credentials, bindings, and generated runtime types
+.dev.vars*
+.wrangler/
+_beta/worker-configuration.d.ts

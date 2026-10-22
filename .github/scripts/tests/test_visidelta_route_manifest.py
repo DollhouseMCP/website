@@ -23,6 +23,7 @@ class VisiDeltaRouteManifestTests(unittest.TestCase):
 
     def test_markdown_route_excludes_non_public_paths(self):
         self.assertIsNone(routes.markdown_route("README.md"))
+        self.assertIsNone(routes.markdown_route("_beta/README.md"))
         self.assertIsNone(routes.markdown_route("LICENSING.md"))
         self.assertIsNone(routes.markdown_route("docs/internal-note.md"))
         self.assertEqual(routes.markdown_route("guides/intro.md"), "/guides/intro/")

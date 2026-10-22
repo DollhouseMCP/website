@@ -1,0 +1,32 @@
+name: Beta intake checks
+
+on:
+  pull_request:
+    paths:
+      - "_beta/**"
+      - "assets/js/beta.js"
+      - ".github/workflows/beta-intake-checks.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: _beta
+    env:
+      WRANGLER_SEND_METRICS: "false"
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: _beta/package-lock.json
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - run: npx wrangler deploy --dry-run --outdir /tmp/beta-worker-build

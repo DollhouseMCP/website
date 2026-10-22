@@ -1,0 +1,15 @@
+{
+  "name": "dollhouse-beta-intake",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.ts",
+    "check": "wrangler types --strict-vars=false && tsc --noEmit",
+    "dev": "wrangler dev --local"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.0.0"
+  }
+}

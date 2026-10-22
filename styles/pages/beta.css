@@ -1,0 +1,106 @@
+/* Page-specific form styles use Atelier's light and dark theme tokens. */
+.beta-content > section + section {
+  margin-top: calc(3 * var(--gutter));
+}
+
+.beta-request {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(2 * var(--gutter));
+  scroll-margin-top: calc(4 * var(--gutter));
+}
+
+.beta-request form {
+  min-width: 0;
+  padding: var(--gutter);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--paper-strong);
+}
+
+.beta-field, .beta-clients, .beta-consent {
+  margin: 0 0 var(--gutter);
+}
+
+.beta-field label, .beta-clients legend {
+  display: block;
+  margin-bottom: 0.5em;
+  font-weight: 700;
+  color: var(--ink-900);
+}
+
+.beta-field label span, .beta-hint {
+  font-size: var(--step--1);
+  font-weight: 400;
+  color: var(--ink-700);
+}
+
+.beta-field input, .beta-field textarea {
+  width: 100%;
+  padding: 0.7em;
+  border: 1px solid var(--ink-500);
+  border-radius: var(--radius-sm);
+  color: var(--ink-950);
+  background: var(--paper);
+  font: inherit;
+}
+
+.beta-field textarea {
+  resize: vertical;
+}
+
+.beta-clients {
+  padding: 0;
+  border: 0;
+}
+
+.beta-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6em;
+  padding: 0.5em 0;
+  cursor: pointer;
+}
+
+.beta-choice input {
+  flex: 0 0 auto;
+  width: 1.2em;
+  height: 1.2em;
+  margin-top: 0.2em;
+  accent-color: var(--signal);
+}
+
+.beta-request :is(input, textarea, button):focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 3px;
+}
+
+.beta-request button {
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.beta-request button:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.beta-status {
+  color: var(--ink-900);
+  overflow-wrap: anywhere;
+}
+
+.beta-honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+@media (max-width: 760px) {
+  .beta-request {
+    grid-template-columns: 1fr;
+    gap: var(--gutter);
+  }
+}

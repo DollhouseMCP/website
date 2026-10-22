@@ -4,7 +4,8 @@
   "ignorePaths": [
     "vendor/**",
     "node_modules/**",
-    "Gemfile.lock"
+    "Gemfile.lock",
+    "**/node_modules/**"
   ],
   "ignoreRegExpList": [
     "\\{\\{[^}]*\\}\\}",
@@ -28,18 +29,21 @@
     "frontmatter",
     "gatekeeper",
     "glama",
+    "hmac",
     "jekyll",
     "llels",
     "lobehub",
     "lychee",
     "markdownlint",
     "mcpaql",
+    "mcpb",
     "merview",
     "mickdarling",
-    "mcpb",
     "mountpoints",
     "multipage",
+    "nosniff",
     "npmjs",
+    "organisation",
     "permissioning",
     "personas",
     "pulsemcp",
@@ -51,12 +55,12 @@
     "smithery",
     "sonarcloud",
     "sonarqube",
-    "tomorrowish",
     "tmpfs",
+    "tomorrowish",
     "untracked",
     "visidelta",
-    "wcag",
     "wayback",
+    "wcag",
     "zoomable",
     "zulip"
   ]

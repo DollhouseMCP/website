@@ -11,4 +11,4 @@ globs:
 ignores:
   - "_site/**"
   - "vendor/**"
-  - "node_modules/**"
+  - "**/node_modules/**"

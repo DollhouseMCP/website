@@ -8,7 +8,7 @@ import subprocess
 from pathlib import Path
 
 
-EXCLUDED_PREFIXES = ("docs/", "scripts/", ".github/")
+EXCLUDED_PREFIXES = ("docs/", "scripts/", ".github/", "_beta/")
 SHELL_CHANGE_PREFIXES = ("_layouts/", "_includes/", "assets/", "styles/")
 CORE_ROUTES = [
     ("index.html", "/"),
