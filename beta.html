@@ -1,0 +1,125 @@
+---
+layout: default
+title: Hosted beta
+description: Request access to the DollhouseMCP hosted beta for supervised agents, MCP-AQL, and dynamic permissioning.
+---
+<link rel="stylesheet" href="{{ '/styles/pages/beta.css' | relative_url }}?v=20261022b" />
+
+<section class="atelier-hero">
+  <div class="hero-grid">
+    <div>
+      <span class="hero-kicker">Hosted beta</span>
+      <h1>Try DollhouseMCP.<br />Tell us what needs work.</h1>
+      <p class="lead">
+        <a href="https://mcp.dollhousemcp.com">mcp.dollhousemcp.com</a> runs the beta build of DollhouseMCP:
+        supervised agents, MCP-AQL, and dynamic permissioning.
+      </p>
+      <p>Access is approved by hand. Tell Mick what you want to try and which MCP clients you use.</p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="#request-access">Request access</a>
+        <a class="button button-secondary" href="{{ '/about.html' | relative_url }}">About DollhouseMCP</a>
+      </div>
+    </div>
+    <aside class="panel panel-primary" aria-labelledby="beta-expectations">
+      <div class="panel-head" id="beta-expectations">What to expect</div>
+      <div class="panel-body">
+        <p>If approved, you get access to the hosted beta and instructions for connecting your MCP client.</p>
+        <p>This is a test build. Expect changes and rough edges. We want feedback on what works, what breaks, and what is unclear.</p>
+        <p>Submitting a request does not create an account or grant access.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<div class="prose beta-content">
+  <section aria-labelledby="beta-for">
+    <p class="eyebrow">Who it is for</p>
+    <h2 id="beta-for">People testing MCP workflows</h2>
+    <p>
+      The beta is for developers, researchers, and people using MCP clients who want to try supervised agent workflows
+      and report what happens. Bring a use case you can test and describe. Keep sensitive data out of early tests.
+    </p>
+    <div class="focus-grid">
+      <article class="focus-panel">
+        <h3>Supervised agents</h3>
+        <p>Try agent execution with approval flows and execution-state tracking.</p>
+        <a href="{{ '/agent-runtime.html' | relative_url }}">Read about the agent runtime</a>
+      </article>
+      <article class="focus-panel">
+        <h3>MCP-AQL</h3>
+        <p>Use structured operations and introspection to discover what the server supports.</p>
+        <a href="{{ '/mcp-aql.html' | relative_url }}">Read about MCP-AQL</a>
+      </article>
+      <article class="focus-panel">
+        <h3>Dynamic permissioning</h3>
+        <p>See how active elements shape what an agent can do and what needs approval.</p>
+        <a href="{{ '/dynamic-permissioning.html' | relative_url }}">Read about permissioning</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="beta-request" id="request-access" aria-labelledby="request-heading">
+    <div>
+      <p class="eyebrow">Request access</p>
+      <h2 id="request-heading">What do you want to try?</h2>
+      <p>Mick reviews requests and contacts approved testers by email. There is no automatic approval.</p>
+      <p>All fields are required except organisation and the client notes. Select at least one MCP client.</p>
+      <div class="callout" id="beta-privacy">
+        <h3>Your request data</h3>
+        <p>
+          We store your answers, consent, and the submission time in a Cloudflare database in our account to review
+          beta access and contact you about testing. We remove requests daily once they are 90 days old.
+          For spam protection, we temporarily store a keyed hash of your IP address, not the address itself.
+          Deleted records may remain in provider backups until those expire.
+          Notifications contain a request ID, not your answers. There are no tracking scripts or outside form services.
+        </p>
+        <p>
+          To delete your request sooner, email <a href="mailto:{{ site.email }}">{{ site.email }}</a>
+          from the address you submitted and ask to delete your beta request.
+        </p>
+      </div>
+    </div>
+    <form id="beta-request-form" action="{{ '/api/beta-request' | relative_url }}" method="post" aria-describedby="beta-privacy">
+      <div class="beta-field">
+        <label for="beta-name">Name</label>
+        <input id="beta-name" name="name" autocomplete="name" maxlength="100" required />
+      </div>
+      <div class="beta-field">
+        <label for="beta-email">Email</label>
+        <input id="beta-email" name="email" type="email" autocomplete="email" maxlength="254" required />
+      </div>
+      <div class="beta-field">
+        <label for="beta-organisation">Organisation <span>(optional)</span></label>
+        <input id="beta-organisation" name="organisation" autocomplete="organization" maxlength="160" />
+      </div>
+      <div class="beta-field">
+        <label for="beta-use-case">What do you want to use it for?</label>
+        <textarea id="beta-use-case" name="use_case" rows="5" maxlength="2000" required aria-describedby="beta-use-hint"></textarea>
+        <p class="beta-hint" id="beta-use-hint">A short description is enough. Please leave out passwords and private data.</p>
+      </div>
+      <fieldset class="beta-clients">
+        <legend>Which MCP clients do you use?</legend>
+        {% assign clients = 'Claude Desktop,Claude Code,Cursor,VS Code,Codex,Gemini CLI,Other' | split: ',' %}
+        {% for client in clients %}
+        <label class="beta-choice"><input type="checkbox" name="clients" value="{{ client }}" /> <span>{{ client }}</span></label>
+        {% endfor %}
+      </fieldset>
+      <div class="beta-field">
+        <label for="beta-client-notes">Other clients or connection details <span>(optional)</span></label>
+        <input id="beta-client-notes" name="client_notes" maxlength="300" />
+      </div>
+      <div class="beta-honeypot" aria-hidden="true" inert>
+        <label for="beta-website">Leave this field empty</label>
+        <input id="beta-website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+      <label class="beta-choice beta-consent">
+        <input type="checkbox" name="consent" value="yes" required />
+        <span>I agree to be contacted about my beta request and testing. I have read the request data notice.</span>
+      </label>
+      <button class="button button-primary" type="submit" disabled>Send request</button>
+      <output class="beta-status" id="beta-status" aria-live="polite" tabindex="-1">Checking whether requests are open…</output>
+      <noscript><p>JavaScript is needed to send this form. You can also email <a href="mailto:{{ site.email }}">{{ site.email }}</a> about beta access.</p></noscript>
+    </form>
+  </section>
+</div>
+<script src="{{ '/assets/js/beta.js' | relative_url }}?v=20261022b" defer></script>

@@ -7,6 +7,9 @@ retry_wait_time = 4
 timeout = 30
 no_progress = true
 exclude = [
+  # This form action is a Worker route, not a file in the static Jekyll build.
+  # The beta intake checks exercise the actual handler and its route.
+  "/api/beta-request$",
   "https://www.linkedin.com/.*",
   "https://dxt.so/.*",
   "https://lobehub.com/.*",
