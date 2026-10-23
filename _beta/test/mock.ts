@@ -9,7 +9,8 @@ export function mockDatabase() {
     let values: unknown[] = [];
     const statement = {
       bind(...args: unknown[]) { values = args; return statement; },
-      all() { return Promise.resolve({ success: true, results: sqlite.prepare(sql).all(...values) }); },
+      allSync() { return { success: true, results: sqlite.prepare(sql).all(...values) }; },
+      all() { return Promise.resolve(statement.allSync()); },
       run() { const result = sqlite.prepare(sql).run(...values); return Promise.resolve({ success: true, results: [], meta: { changes: result.changes } }); },
     };
     return statement;
@@ -20,8 +21,8 @@ export function mockDatabase() {
     async batch(statements: ReturnType<typeof prepare>[]) {
       sqlite.exec("BEGIN");
       try {
-        const result = [];
-        for (const statement of statements) result.push(await statement.all());
+        // DatabaseSync executes in input order without yielding inside the transaction.
+        const result = statements.map((statement) => statement.allSync());
         sqlite.exec("COMMIT");
         return result;
       } catch (error) { sqlite.exec("ROLLBACK"); throw error; }

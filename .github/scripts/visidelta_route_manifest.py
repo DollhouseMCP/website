@@ -70,6 +70,29 @@ def add_route(routes, seen, source_file: str, route: str) -> None:
     routes.append({"id": route_id(source_file, normalized), "file": source_file, "route": normalized})
 
 
+def add_changed_route(routes, seen, path):
+    if path.startswith(NON_PAGE_PREFIXES):
+        return
+
+    if path.endswith(".html") and not path.startswith(("mockups/", "_site/")):
+        add_route(routes, seen, path, html_route(path))
+
+    if path.endswith(".md"):
+        route = markdown_route(path)
+        if route:
+            add_route(routes, seen, path, route)
+
+
+def add_shell_routes(routes, seen, blog_post_paths):
+    for source_file, route in CORE_ROUTES:
+        add_route(routes, seen, source_file, route)
+
+    for blog_post in blog_post_paths:
+        route = markdown_route(blog_post)
+        if route:
+            add_route(routes, seen, blog_post, route)
+
+
 def augment_routes(routes, changed_files, blog_post_paths):
     # The upstream scanner also seeds routes for source-only Markdown/partials.
     routes = [item for item in routes if not item.get("file", "").startswith(NON_PAGE_PREFIXES)]
@@ -79,26 +102,10 @@ def augment_routes(routes, changed_files, blog_post_paths):
     for path in changed_files:
         if path == "_config.yml" or path.startswith(SHELL_CHANGE_PREFIXES):
             shell_changed = True
-
-        if path.startswith(NON_PAGE_PREFIXES):
-            continue
-
-        if path.endswith(".html") and not path.startswith(("mockups/", "_site/")):
-            add_route(routes, seen, path, html_route(path))
-
-        if path.endswith(".md"):
-            route = markdown_route(path)
-            if route:
-                add_route(routes, seen, path, route)
+        add_changed_route(routes, seen, path)
 
     if shell_changed:
-        for source_file, route in CORE_ROUTES:
-            add_route(routes, seen, source_file, route)
-
-        for blog_post in blog_post_paths:
-            route = markdown_route(blog_post)
-            if route:
-                add_route(routes, seen, blog_post, route)
+        add_shell_routes(routes, seen, blog_post_paths)
 
     routes.sort(key=lambda item: item["route"])
     return routes

@@ -29,10 +29,12 @@ async function readBody(request: Request) {
   const chunks: Uint8Array[] = [];
   let size = 0;
   while (true) {
+    // Read sequentially to enforce the byte limit and cancel before requesting another chunk.
     const { done, value } = await reader.read();
     if (done) break;
     size += value.byteLength;
     if (size > MAX_BODY) {
+      // Finish cancelling the oversized stream before rejecting the request.
       await reader.cancel();
       throw new RangeError("body too large");
     }
@@ -159,6 +161,7 @@ export default {
     ]);
     if (!configured(env)) return;
     const pending = await env.BETA_DB.prepare("SELECT id FROM beta_requests WHERE notification_sent = 0 ORDER BY created_at LIMIT 50").all<{ id: string }>();
+    // Retry sequentially to preserve creation order and avoid concurrent requests to the notification server.
     for (const { id } of pending.results) await tryNotify(env, id);
   },
 } satisfies ExportedHandler<Env>;
